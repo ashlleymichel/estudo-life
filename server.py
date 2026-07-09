@@ -29,7 +29,7 @@ except Exception:
 
 
 ROOT = Path(__file__).resolve().parent
-STATIC_DIR = ROOT / "static"
+STATIC_DIR = ROOT / "public"
 LOGO_PATH = ROOT / "LOGO" / "LOGO.svg"
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
 

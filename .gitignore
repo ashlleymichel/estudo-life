@@ -6,5 +6,6 @@ tmp/
 output/
 *.pdf
 *.json
+!vercel.json
 EXEMPLOS/
 TADEL/
