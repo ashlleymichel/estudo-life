@@ -477,10 +477,11 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
         "com escrita clara, bíblica, pastoral e simples para pequenos grupos nas casas. "
-        "Siga o estilo: Introdução em blocos curtos, cada ideia importante seguida pelo versículo em linha separada; "
-        "perguntas simples para discussão em grupo, com o versículo logo abaixo; conclusão curta com 3 a 5 linhas. "
+        "Escreva no estilo devocional do exemplo: uma frase pastoral que explica a ideia, depois o versículo em uma linha separada. "
+        "Não use frases genéricas como 'o texto bíblico principal mostra' ou 'essa perspectiva fortalece'; escreva o conteúdo da mensagem. "
+        "As perguntas devem ser específicas ao tema e ao versículo, com o versículo logo abaixo. "
         "Use apenas referências bíblicas presentes no texto enviado. Quando escrever versículos, use NAA, em texto completo quando possível, "
-        "sem reticências e sem cortes. Se o texto não trouxer o versículo completo, use a referência sem inventar conteúdo. "
+        "sem reticências e sem cortes. Se o texto não trouxer o versículo completo, use só a referência, sem inventar conteúdo. "
         "Não inclua markdown, títulos de seção, numeração externa ou explicações fora dos campos JSON."
     )
     user_prompt = f"""
@@ -489,8 +490,10 @@ Subtítulo detectado: {subtitle or "não informado"}
 
 Regras da folha:
 - A introdução deve ser clara, coesa e pastoral, no estilo do exemplo do usuário.
-- Na introdução, use o primeiro versículo do documento como principal; use no máximo 2 versículos se isso ajudar o entendimento.
-- As perguntas devem ser simples, boas para discussão em grupo, de acordo com o assunto do PDF e usando os versículos como apoio.
+- Na introdução, escreva entre 3 e 5 pequenos blocos. Cada bloco deve ter uma ideia pastoral e, quando houver versículo, o versículo em uma linha separada logo abaixo.
+- A introdução deve falar do assunto do PDF, não apenas listar versículos.
+- Use os versículos principais do documento, em especial os primeiros que aparecem.
+- As perguntas devem ser simples, boas para discussão em grupo, específicas ao assunto do PDF e usando os versículos como apoio.
 - Gere exatamente 4 perguntas.
 - A primeira pergunta deve ser: Compartilhe conosco o que essa Palavra de domingo falou com você.
 - Nas perguntas 2 a 4, escreva a pergunta e na linha seguinte o versículo de apoio.
@@ -684,9 +687,9 @@ def simplify_group_question(question, source_text, refs, index):
     if ref:
         verse = scripture_line(source_text, ref)
         simple_prompts = [
-            f"Segundo {ref}, o que esse texto ensina para a vida hoje?\n{verse}",
-            f"Como {ref} ajuda a praticar essa Palavra no dia a dia?\n{verse}",
-            f"Quais passos práticos podem ser aplicados a partir de {ref}?\n{verse}",
+            f"Segundo {ref}, qual verdade Deus está destacando nessa mensagem?\n{verse}",
+            f"Como essa verdade de {ref} pode ser vivida de forma prática no dia a dia?\n{verse}",
+            f"Quais passos práticos podem ser aplicados a partir do que Deus ensina em {ref}?\n{verse}",
         ]
         return simple_prompts[index % len(simple_prompts)]
 
@@ -701,9 +704,9 @@ def simplify_group_question(question, source_text, refs, index):
 def discussion_question_for_ref(text, ref, title="", index=0):
     verse = scripture_line(text, ref)
     prompts = [
-        f"Segundo {ref}, o que esse texto ensina para a vida hoje?\n{verse}",
-        f"Como {ref} ajuda a praticar essa Palavra no dia a dia?\n{verse}",
-        f"Quais passos práticos podem ser aplicados a partir de {ref}?\n{verse}",
+        f"Segundo {ref}, qual verdade Deus está destacando nessa mensagem?\n{verse}",
+        f"Como essa verdade de {ref} pode ser vivida de forma prática no dia a dia?\n{verse}",
+        f"Quais passos práticos podem ser aplicados a partir do que Deus ensina em {ref}?\n{verse}",
     ]
     return prompts[index % len(prompts)]
 
@@ -895,11 +898,12 @@ def summarize_with_title(text, title="", max_sentences=5):
 
     usable_refs = refs[:4] if refs else []
     if usable_refs:
+        topic = title if title and title != "Folha de Estudo Life Group" else "essa Palavra"
         connectors = [
-            "O texto bíblico principal mostra a base dessa verdade.",
-            "Essa perspectiva fortalece a fé em meio aos desafios.",
-            "A Palavra também ensina como viver essa verdade de forma prática.",
-            "Por isso, a fé é alimentada quando a Escritura guia as decisões do dia a dia.",
+            f"{topic} começa quando o coração reconhece a voz de Deus e responde com fé.",
+            "Mesmo em meio aos desafios, a Palavra mantém a fé firme e orienta as decisões.",
+            "A obediência nasce quando a verdade bíblica deixa de ser apenas informação e se torna prática.",
+            "Por isso, meditar nas Escrituras fortalece a confiança e conduz a uma vida alinhada com Deus.",
         ]
         for index, ref in enumerate(usable_refs):
             context = connectors[min(index, len(connectors) - 1)]
