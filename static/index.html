@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Extrator de Folha de Estudo</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <aside class="panel">
+          <div>
+            <div class="brandMark">
+              <img src="/paz-logo.svg" alt="Paz Church" />
+              <span>PAZ Church Barueri</span>
+            </div>
+            <p class="eyebrow" id="modeEyebrow">Life Group</p>
+            <h1>Folha de Estudo</h1>
+            <p class="muted">
+              Envie um PDF ou Word, revise os campos gerados e baixe uma nova folha pronta para compartilhar.
+            </p>
+          </div>
+
+          <div class="modeSwitch" role="group" aria-label="Tipo de conteúdo">
+            <button id="lifeMode" class="modeBtn active" type="button">Life Group</button>
+            <button id="tadelMode" class="modeBtn" type="button">TADEL</button>
+          </div>
+
+          <form id="uploadForm" class="upload">
+            <label class="dropzone" for="pdfFile">
+              <span class="dropIcon">DOC</span>
+              <strong>Selecionar arquivo</strong>
+              <small id="fileName">Nenhum arquivo escolhido</small>
+            </label>
+            <input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+            <button class="primary" type="submit">Extrair informações</button>
+          </form>
+
+          <div class="status" id="status">Aguardando um PDF.</div>
+        </aside>
+
+        <section class="editor" aria-label="Editor da folha de estudo">
+          <div class="topbar">
+            <div>
+              <h2>Revisão do conteúdo</h2>
+            </div>
+            <button id="downloadBtn" class="download" type="button">Baixar PDF</button>
+          </div>
+
+          <div class="grid">
+            <label>
+              <span>Título da série</span>
+              <input id="titulo" type="text" />
+            </label>
+            <label>
+              <span>Linha do culto</span>
+              <input id="subtitulo" type="text" />
+            </label>
+          </div>
+
+          <label class="lifeOnly">
+            <span>Momento Generosidade</span>
+            <textarea id="momentoGenerosidade" rows="5"></textarea>
+          </label>
+
+          <label class="lifeOnly">
+            <span>Avisos / Agenda</span>
+            <textarea id="avisos" rows="4"></textarea>
+          </label>
+
+          <label class="lifeOnly">
+            <span>Momento da Visão</span>
+            <textarea id="momentoVisao" rows="5"></textarea>
+          </label>
+
+          <label>
+            <span id="resumoLabel">Resumo</span>
+            <textarea id="resumo" rows="7"></textarea>
+          </label>
+
+          <div class="questionsHeader lifeOnly">
+            <span>Perguntas</span>
+            <button id="addQuestion" class="ghost" type="button">Adicionar</button>
+          </div>
+          <div id="questions" class="questions lifeOnly"></div>
+
+          <label>
+            <span>Conclusão</span>
+            <textarea id="conclusao" rows="5"></textarea>
+          </label>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js?v=2"></script>
+  </body>
+</html>
