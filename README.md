@@ -1,4 +1,4 @@
-# Extrator de Folha de Estudo
+# Folha de Estudo
 
 Plataforma local para enviar PDF ou Word, extrair as informações principais, revisar o conteúdo em campos editáveis e baixar uma nova folha em PDF.
 
