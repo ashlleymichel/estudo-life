@@ -65,7 +65,7 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
   height: 72px;
@@ -85,10 +85,10 @@ textarea {
 }
 
 .brandMark img {
-  width: 68px;
-  height: 68px;
-  margin: -14px 0;
-  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  transform: scale(2);
 }
 
 .eyebrow {
