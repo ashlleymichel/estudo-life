@@ -12,6 +12,7 @@ const state = {
   perguntas: [],
   tipo: "life_group",
   textoExtraido: "",
+  busy: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -20,6 +21,40 @@ function setStatus(message, type = "") {
   const status = $("status");
   status.textContent = message;
   status.className = `status ${type}`.trim();
+}
+
+function buttonContent(label, loading = false) {
+  return loading ? `<span class="spinner" aria-hidden="true"></span><span>${label}</span>` : label;
+}
+
+function setBusy(isBusy, action = "") {
+  state.busy = isBusy;
+  const extractBtn = $("extractBtn");
+  const downloadBtn = $("downloadBtn");
+  const addQuestion = $("addQuestion");
+  const fileInput = $("pdfFile");
+  const modeButtons = [$("lifeMode"), $("tadelMode")];
+  const fieldsToToggle = [
+    ...fields.map((field) => $(field)),
+    ...document.querySelectorAll("#questions textarea, .questionRow button"),
+  ];
+
+  extractBtn.disabled = isBusy;
+  downloadBtn.disabled = isBusy;
+  addQuestion.disabled = isBusy;
+  fileInput.disabled = isBusy;
+  modeButtons.forEach((button) => {
+    button.disabled = isBusy;
+  });
+  fieldsToToggle.forEach((field) => {
+    field.disabled = isBusy;
+  });
+
+  extractBtn.classList.toggle("loading", isBusy && action === "extract");
+  downloadBtn.classList.toggle("loading", isBusy && action === "pdf");
+  extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : "Extrair informações", isBusy && action === "extract");
+  downloadBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : state.tipo === "tadel" ? "Baixar Resumo" : "Baixar PDF", isBusy && action === "pdf");
+  document.body.classList.toggle("isBusy", isBusy);
 }
 
 function fillForm(data) {
@@ -79,6 +114,9 @@ function collectData() {
 }
 
 function setMode(tipo) {
+  if (state.busy) {
+    return;
+  }
   state.tipo = tipo === "tadel" ? "tadel" : "life_group";
   const isTadel = state.tipo === "tadel";
   $("lifeMode").classList.toggle("active", !isTadel);
@@ -89,9 +127,9 @@ function setMode(tipo) {
     element.classList.toggle("hidden", isTadel);
   });
   if (isTadel) {
-    $("downloadBtn").textContent = "Baixar Resumo";
+    $("downloadBtn").innerHTML = "Baixar Resumo";
   } else {
-    $("downloadBtn").textContent = "Baixar PDF";
+    $("downloadBtn").innerHTML = "Baixar PDF";
   }
 }
 
@@ -102,6 +140,9 @@ $("pdfFile").addEventListener("change", (event) => {
 
 $("uploadForm").addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (state.busy) {
+    return;
+  }
   const file = $("pdfFile").files[0];
   if (!file) {
     setStatus("Escolha um PDF ou Word antes de extrair.", "error");
@@ -109,6 +150,7 @@ $("uploadForm").addEventListener("submit", async (event) => {
   }
 
   setStatus("Lendo o arquivo e organizando os campos...");
+  setBusy(true, "extract");
   const form = new FormData();
   form.append("arquivo", file);
   form.append("tipo", state.tipo);
@@ -126,15 +168,23 @@ $("uploadForm").addEventListener("submit", async (event) => {
     setStatus("Conteúdo extraído. Revise e ajuste o que precisar antes de baixar.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
+  } finally {
+    setBusy(false);
   }
 });
 
 $("addQuestion").addEventListener("click", () => {
+  if (state.busy) {
+    return;
+  }
   state.perguntas.push("");
   renderQuestions();
 });
 
 $("downloadBtn").addEventListener("click", async () => {
+  if (state.busy) {
+    return;
+  }
   const data = collectData();
   if (!data.titulo || !data.resumo) {
     setStatus("Preencha pelo menos o título e o resumo antes de baixar.", "error");
@@ -142,6 +192,7 @@ $("downloadBtn").addEventListener("click", async () => {
   }
 
   setStatus("Gerando o PDF final...");
+  setBusy(true, "pdf");
   try {
     const response = await fetch("/api/pdf", {
       method: "POST",
@@ -164,6 +215,8 @@ $("downloadBtn").addEventListener("click", async () => {
     setStatus("PDF gerado e baixado.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
+  } finally {
+    setBusy(false);
   }
 });
 

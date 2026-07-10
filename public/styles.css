@@ -196,6 +196,39 @@ button {
   font-weight: 800;
 }
 
+button:disabled,
+input:disabled,
+textarea:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+button.loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.38);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+body.isBusy {
+  cursor: wait;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .primary,
 .download {
   color: #ffffff;
