@@ -11,6 +11,7 @@ const fields = [
 const state = {
   perguntas: [],
   tipo: "life_group",
+  textoExtraido: "",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -29,6 +30,7 @@ function fillForm(data) {
     $(field).value = data[field] || "";
   });
   state.perguntas = Array.isArray(data.perguntas) ? data.perguntas : [];
+  state.textoExtraido = data.textoExtraido || "";
   renderQuestions();
 }
 
@@ -72,6 +74,7 @@ function collectData() {
   });
   data.perguntas = state.perguntas.map((item) => item.trim()).filter(Boolean);
   data.tipo = state.tipo;
+  data.textoExtraido = state.textoExtraido;
   return data;
 }
 

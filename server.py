@@ -480,6 +480,8 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "Escreva no estilo devocional do exemplo: uma frase pastoral que explica a ideia, depois o versículo em uma linha separada. "
         "Não use frases genéricas como 'o texto bíblico principal mostra' ou 'essa perspectiva fortalece'; escreva o conteúdo da mensagem. "
         "As perguntas devem ser específicas ao tema e ao versículo, com o versículo logo abaixo. "
+        "Evite perguntas rasas como 'o que esse texto ensina para a vida hoje?' ou 'como praticar no dia a dia?'. "
+        "Cada pergunta deve conectar o versículo ao assunto central e provocar reflexão, comparação, arrependimento, fé ou aplicação concreta. "
         "Use apenas referências bíblicas presentes no texto enviado. Quando escrever versículos, use NAA, em texto completo quando possível, "
         "sem reticências e sem cortes. Se o texto não trouxer o versículo completo, use só a referência, sem inventar conteúdo. "
         "Não inclua markdown, títulos de seção, numeração externa ou explicações fora dos campos JSON."
@@ -494,6 +496,9 @@ Regras da folha:
 - A introdução deve falar do assunto do PDF, não apenas listar versículos.
 - Use os versículos principais do documento, em especial os primeiros que aparecem.
 - As perguntas devem ser simples, boas para discussão em grupo, específicas ao assunto do PDF e usando os versículos como apoio.
+- As perguntas 2 a 4 devem ter profundidade semelhante a este modelo:
+  "Em 2 Coríntios 4:16-18, Paulo ensina que as tribulações são temporárias, mas a glória é eterna. Como essa perspectiva pode ajudar a viver em estado de graça mesmo em dias difíceis?"
+- Não escreva perguntas genéricas como "O que essa mensagem ensina para a vida hoje?"
 - Gere exatamente 4 perguntas.
 - A primeira pergunta deve ser: Compartilhe conosco o que essa Palavra de domingo falou com você.
 - Nas perguntas 2 a 4, escreva a pergunta e na linha seguinte o versículo de apoio.
@@ -622,6 +627,24 @@ def broken_generated_question(question):
     return False
 
 
+def shallow_question(question):
+    value = compact_text(question)
+    lower = value.lower()
+    shallow_patterns = [
+        "o que essa mensagem ensina",
+        "o que esse texto ensina para a vida hoje",
+        "como essa palavra pode ser praticada",
+        "ajuda a praticar essa palavra",
+        "quais passos práticos podem ser aplicados",
+        "onde essa palavra precisa aparecer",
+    ]
+    if any(pattern in lower for pattern in shallow_patterns):
+        return True
+    if len(value) < 95 and not biblical_references(value):
+        return True
+    return False
+
+
 def question_already_has_quote_for_ref(question, ref):
     escaped_ref = re.escape(ref)
     return bool(re.search(rf"[“\"][^”\"]+[”\"]\s*\({escaped_ref}(?:\s+NAA)?\)", question, re.IGNORECASE))
@@ -687,9 +710,9 @@ def simplify_group_question(question, source_text, refs, index):
     if ref:
         verse = scripture_line(source_text, ref)
         simple_prompts = [
-            f"Segundo {ref}, qual verdade Deus está destacando nessa mensagem?\n{verse}",
-            f"Como essa verdade de {ref} pode ser vivida de forma prática no dia a dia?\n{verse}",
-            f"Quais passos práticos podem ser aplicados a partir do que Deus ensina em {ref}?\n{verse}",
+            f"Segundo {ref}, que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
+            f"Em {ref}, que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
+            f"A partir de {ref}, quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
         ]
         return simple_prompts[index % len(simple_prompts)]
 
@@ -704,9 +727,9 @@ def simplify_group_question(question, source_text, refs, index):
 def discussion_question_for_ref(text, ref, title="", index=0):
     verse = scripture_line(text, ref)
     prompts = [
-        f"Segundo {ref}, qual verdade Deus está destacando nessa mensagem?\n{verse}",
-        f"Como essa verdade de {ref} pode ser vivida de forma prática no dia a dia?\n{verse}",
-        f"Quais passos práticos podem ser aplicados a partir do que Deus ensina em {ref}?\n{verse}",
+        f"Segundo {ref}, que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
+        f"Em {ref}, que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
+        f"A partir de {ref}, quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
     ]
     return prompts[index % len(prompts)]
 
@@ -750,7 +773,10 @@ def normalize_questions(text, questions=None):
     for question in filtered:
         if len(result) == 4:
             break
-        result.append(simplify_group_question(question, text, refs, len(result) - 1))
+        if shallow_question(question):
+            result.append(simplify_group_question(question, text, refs, len(result) - 1))
+        else:
+            result.append(question_with_scripture(question, text, refs, len(result) - 1))
     for question in fallback:
         if len(result) == 4:
             break
