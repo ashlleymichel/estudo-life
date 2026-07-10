@@ -10,7 +10,7 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:title" content="Folha de Estudo" />
     <meta name="twitter:description" content="Plataforma para gerar folhas de estudo da PAZ Church Barueri." />
-    <link rel="stylesheet" href="/styles.css?v=2" />
+    <link rel="stylesheet" href="/styles.css?v=3" />
   </head>
   <body>
     <main class="shell">
@@ -21,8 +21,8 @@
               <img src="/paz-logo.svg" alt="Paz Church" />
               <span>PAZ Church Barueri</span>
             </div>
-            <p class="eyebrow" id="modeEyebrow">Life Group</p>
             <h1>Folha de Estudo</h1>
+            <p class="eyebrow" id="modeEyebrow">Life Group</p>
             <p class="muted">
               Envie um PDF ou Word, revise os campos gerados e baixe uma nova folha pronta para compartilhar.
             </p>
@@ -35,12 +35,13 @@
 
           <form id="uploadForm" class="upload">
             <label class="dropzone" for="pdfFile">
-              <span class="dropIcon">DOC</span>
-              <strong>Selecionar arquivo</strong>
-              <small id="fileName">Nenhum arquivo escolhido</small>
+              <span class="dropIcon" aria-hidden="true"></span>
+              <strong>Anexar documento</strong>
+              <small>PDF, Word ou documento de texto</small>
+              <em id="fileName">Nenhum arquivo escolhido</em>
             </label>
             <input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-            <button id="extractBtn" class="primary" type="submit">Extrair informações</button>
+            <button id="extractBtn" class="primary" type="submit">Gerar Folha de Estudo</button>
           </form>
 
           <div class="status" id="status">Aguardando um PDF.</div>
