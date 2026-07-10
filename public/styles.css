@@ -19,7 +19,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Inter, Arial, Helvetica, sans-serif;
   color: var(--ink);
   background: var(--surface);
 }
@@ -31,14 +31,14 @@ textarea {
 }
 
 .shell {
-  width: min(1180px, 100%);
+  width: min(970px, 100%);
   margin: 0 auto;
-  padding: 22px;
+  padding: 40px 0;
 }
 
 .workspace {
   display: grid;
-  grid-template-columns: 330px minmax(0, 1fr);
+  grid-template-columns: 320px 630px;
   gap: 20px;
   align-items: start;
 }
@@ -47,54 +47,50 @@ textarea {
 .editor {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 10px;
 }
 
 .panel {
-  position: sticky;
-  top: 22px;
-  min-height: calc(100vh - 44px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 24px;
+  gap: 10px;
+  padding: 20px 10px;
 }
 
 .brandMark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
   min-width: 0;
-  height: 72px;
-  margin-bottom: 18px;
-  padding: 0 12px;
-  background: #f8fafc;
+  min-height: 49px;
+  margin-bottom: 10px;
+  padding: 15px 20px;
+  background: #f9fafc;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 10px;
 }
 
 .brandMark span {
   color: var(--brand);
-  font-size: 1.08rem;
+  font-size: 1rem;
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
 }
 
 .brandMark img {
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
-  transform: scale(2);
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  transform: scale(1.9);
 }
 
 .eyebrow {
-  margin: 0 0 8px;
+  margin: 2px 0 0;
   color: var(--accent);
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -107,40 +103,49 @@ h2 {
 }
 
 h1 {
+  max-width: 170px;
   color: var(--brand);
-  font-size: clamp(2rem, 3vw, 2.75rem);
-  line-height: 1.02;
+  font-size: 2.25rem;
+  line-height: 1.15;
 }
 
 h2 {
   color: var(--brand);
-  font-size: 1.35rem;
+  font-size: 1rem;
 }
 
 .muted {
-  max-width: 27ch;
+  max-width: 100%;
   color: var(--muted);
-  line-height: 1.55;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.18;
+  margin: 28px 10px 34px;
 }
 
 .upload {
   display: grid;
-  gap: 12px;
+  gap: 10px;
+  justify-items: center;
 }
 
 .modeSwitch {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 4px;
-  background: #eaf1f8;
-  border-radius: 14px;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 30px;
+  padding: 2px;
+  background: #eaf1f9;
+  border-radius: 10px;
 }
 
 .modeBtn {
-  min-height: 40px;
+  min-height: 35px;
   color: var(--brand);
   background: transparent;
+  border-radius: 10px;
+  font-size: 0.75rem;
 }
 
 .modeBtn.active {
@@ -150,14 +155,15 @@ h2 {
 
 .dropzone {
   display: grid;
-  gap: 10px;
+  gap: 0;
   place-items: center;
-  min-height: 168px;
-  padding: 20px;
+  width: 100%;
+  min-height: 132px;
+  padding: 40px 10px;
   text-align: center;
   background: #f8fafc;
   border: 1px dashed #a9b8c9;
-  border-radius: 18px;
+  border-radius: 20px;
   cursor: pointer;
 }
 
@@ -166,19 +172,19 @@ h2 {
 }
 
 .dropIcon {
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 64px;
-  color: #ffffff;
-  background: var(--brand);
-  border-radius: 12px;
-  font-weight: 800;
-  font-size: 0.84rem;
+  display: none;
+}
+
+.dropzone strong {
+  color: var(--ink);
+  font-size: 0.875rem;
+  line-height: 1.2;
 }
 
 .dropzone small {
-  color: var(--muted);
+  margin-top: 10px;
+  color: var(--ink);
+  font-size: 0.75rem;
   overflow-wrap: anywhere;
 }
 
@@ -190,9 +196,9 @@ input[type="file"] {
 }
 
 button {
-  min-height: 44px;
+  min-height: 37px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 800;
 }
@@ -236,24 +242,34 @@ body.isBusy {
   background: var(--brand);
 }
 
+.primary {
+  width: 207px;
+  padding: 0 18px;
+  font-size: 0.875rem;
+}
+
 .primary:hover,
 .download:hover {
   background: var(--brand-2);
 }
 
 .ghost {
-  min-height: 38px;
-  padding: 0 14px;
+  width: 143px;
+  min-height: 35px;
+  padding: 0 20px;
   color: var(--brand);
-  background: #eaf1f8;
+  background: #c8daee;
+  font-size: 0.75rem;
 }
 
 .status {
-  padding: 12px 14px;
+  margin-top: 10px;
+  padding: 10px;
   color: var(--muted);
   background: #f8fafc;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 10px;
+  font-size: 0.875rem;
   line-height: 1.4;
 }
 
@@ -267,60 +283,64 @@ body.isBusy {
 
 .editor {
   display: grid;
-  gap: 18px;
-  padding: 24px;
+  gap: 10px;
+  padding: 20px 10px;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
   align-items: center;
-  padding-bottom: 16px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
 }
 
 .download {
-  padding: 0 18px;
+  padding: 0 20px;
+  font-size: 1rem;
   white-space: nowrap;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1.35fr;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
 label {
   display: grid;
-  gap: 7px;
+  gap: 0;
 }
 
 label span,
 .questionsHeader span {
   color: var(--brand);
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   font-weight: 800;
+  line-height: 1.2;
+  padding: 10px 0;
 }
 
 input,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--ink);
   background: #ffffff;
   outline: 0;
 }
 
 input {
-  height: 44px;
+  height: 36px;
   padding: 0 12px;
 }
 
 textarea {
   resize: vertical;
-  min-height: 96px;
+  height: 116px;
+  min-height: 116px;
   padding: 12px;
   line-height: 1.5;
 }
@@ -344,7 +364,7 @@ textarea:focus {
 
 .questionRow {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) 38px;
+  grid-template-columns: 37px minmax(0, 1fr) 18px;
   gap: 10px;
   align-items: start;
 }
@@ -352,18 +372,27 @@ textarea:focus {
 .number {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 38px;
+  width: 37px;
+  height: 37px;
   color: #ffffff;
   background: var(--brand);
   border-radius: 10px;
   font-weight: 800;
 }
 
+.questionRow textarea {
+  height: 70px;
+  min-height: 70px;
+}
+
 .remove {
-  min-height: 38px;
+  width: 18px;
+  min-height: 18px;
+  padding: 0;
   color: var(--danger);
-  background: #f9e8e6;
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .hidden {
@@ -381,7 +410,6 @@ textarea:focus {
   }
 
   .panel {
-    position: static;
     min-height: auto;
   }
 
