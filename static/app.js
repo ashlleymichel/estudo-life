@@ -122,14 +122,28 @@ function setMode(tipo) {
   $("lifeMode").classList.toggle("active", !isTadel);
   $("tadelMode").classList.toggle("active", isTadel);
   $("modeEyebrow").textContent = isTadel ? "TADEL" : "Life Group";
+  $("tituloLabel").textContent = isTadel ? "Resumo TADEL" : "Título da série";
+  $("subtituloLabel").textContent = isTadel ? "DATA" : "Linha do culto";
   $("resumoLabel").textContent = isTadel ? "Conteúdo do TADEL" : "Resumo";
   document.querySelectorAll(".lifeOnly").forEach((element) => {
     element.classList.toggle("hidden", isTadel);
   });
   if (isTadel) {
     $("downloadBtn").innerHTML = "Baixar Resumo";
+    if (!$("titulo").value.trim() || $("titulo").value.trim() === "Folha de Estudo Life Group") {
+      $("titulo").value = "Resumo TADEL";
+    }
+    if (!$("subtitulo").value.trim() || $("subtitulo").value.trim() === "Culto Presencial e On-Line / Life Group") {
+      $("subtitulo").value = "Data: ";
+    }
   } else {
     $("downloadBtn").innerHTML = "Baixar PDF";
+    if ($("titulo").value.trim() === "Resumo TADEL") {
+      $("titulo").value = "Folha de Estudo Life Group";
+    }
+    if ($("subtitulo").value.trim() === "Data:") {
+      $("subtitulo").value = "Culto Presencial e On-Line / Life Group";
+    }
   }
 }
 
