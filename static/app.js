@@ -27,10 +27,6 @@ function buttonContent(label, loading = false) {
   return loading ? `<span class="spinner" aria-hidden="true"></span><span>${label}</span>` : label;
 }
 
-function getExtractLabel() {
-  return state.tipo === "tadel" ? "Gerar Resumo TADEL" : "Gerar Folha de Estudo";
-}
-
 function setBusy(isBusy, action = "") {
   state.busy = isBusy;
   const extractBtn = $("extractBtn");
@@ -56,7 +52,7 @@ function setBusy(isBusy, action = "") {
 
   extractBtn.classList.toggle("loading", isBusy && action === "extract");
   downloadBtn.classList.toggle("loading", isBusy && action === "pdf");
-  extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : getExtractLabel(), isBusy && action === "extract");
+  extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : "Extrair informações", isBusy && action === "extract");
   downloadBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : state.tipo === "tadel" ? "Baixar Resumo" : "Baixar PDF", isBusy && action === "pdf");
   document.body.classList.toggle("isBusy", isBusy);
 }
@@ -134,7 +130,6 @@ function setMode(tipo) {
   });
   if (isTadel) {
     $("downloadBtn").innerHTML = "Baixar Resumo";
-    $("extractBtn").innerHTML = getExtractLabel();
     if (!$("titulo").value.trim() || $("titulo").value.trim() === "Folha de Estudo Life Group") {
       $("titulo").value = "Resumo TADEL";
     }
@@ -143,7 +138,6 @@ function setMode(tipo) {
     }
   } else {
     $("downloadBtn").innerHTML = "Baixar PDF";
-    $("extractBtn").innerHTML = getExtractLabel();
     if ($("titulo").value.trim() === "Resumo TADEL") {
       $("titulo").value = "Folha de Estudo Life Group";
     }
