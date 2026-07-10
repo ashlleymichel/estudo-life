@@ -85,8 +85,9 @@ textarea {
 }
 
 .brandMark img {
-  width: 46px;
-  height: 46px;
+  width: 82px;
+  height: 82px;
+  margin: -18px 0;
   flex: 0 0 auto;
 }
 
