@@ -73,6 +73,21 @@ function downloadFile(file) {
   URL.revokeObjectURL(url);
 }
 
+function editFile(file) {
+  if (!file.data) {
+    alert("Este arquivo foi salvo antes da função de edição. Gere e salve novamente para editar online.");
+    return;
+  }
+  sessionStorage.setItem(
+    "folhaEstudoEditDraft",
+    JSON.stringify({
+      id: file.id,
+      data: file.data,
+    }),
+  );
+  window.location.href = "/";
+}
+
 function renderFiles(files) {
   list.innerHTML = "";
   if (!files.length) {
@@ -102,6 +117,12 @@ function renderFiles(files) {
     download.textContent = "Baixar PDF";
     download.addEventListener("click", () => downloadFile(file));
 
+    const edit = document.createElement("button");
+    edit.className = "secondaryAction";
+    edit.type = "button";
+    edit.textContent = "Editar";
+    edit.addEventListener("click", () => editFile(file));
+
     const remove = document.createElement("button");
     remove.className = "deleteSaved";
     remove.type = "button";
@@ -112,7 +133,7 @@ function renderFiles(files) {
     });
 
     info.append(title, meta);
-    actions.append(download, remove);
+    actions.append(edit, download, remove);
     item.append(info, actions);
     list.append(item);
   });

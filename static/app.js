@@ -14,6 +14,7 @@ const state = {
   textoExtraido: "",
   busy: false,
   previewFormat: "pdf",
+  editingSavedId: "",
 };
 
 const DB_NAME = "folha-estudo-arquivos";
@@ -277,13 +278,15 @@ function openSavedDb() {
 
 async function savePdfOnline(blob, data) {
   const db = await openSavedDb();
+  const id = state.editingSavedId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const file = {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    id,
     name: getFileName(),
     title: data.titulo || "Arquivo sem título",
     type: data.tipo,
     size: blob.size,
     createdAt: new Date().toISOString(),
+    data,
     blob,
   };
 
@@ -295,6 +298,28 @@ async function savePdfOnline(blob, data) {
   });
   db.close();
   return file;
+}
+
+function loadSavedDraftForEditing() {
+  const raw = sessionStorage.getItem("folhaEstudoEditDraft");
+  if (!raw) {
+    return false;
+  }
+  sessionStorage.removeItem("folhaEstudoEditDraft");
+  try {
+    const saved = JSON.parse(raw);
+    if (!saved || !saved.data) {
+      return false;
+    }
+    state.editingSavedId = saved.id || "";
+    fillForm(saved.data);
+    openPreview(saved.data.tipo === "tadel" ? "word" : "pdf");
+    setStatus("Arquivo salvo aberto para edição. Ajuste o que precisar e salve novamente.", "ok");
+    return true;
+  } catch (error) {
+    setStatus("Não foi possível abrir o arquivo salvo para edição.", "error");
+    return false;
+  }
 }
 
 function setMode(tipo) {
@@ -492,3 +517,4 @@ fillForm({
 
 setMode("life_group");
 updatePreview();
+loadSavedDraftForEditing();
