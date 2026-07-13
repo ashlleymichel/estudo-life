@@ -1406,6 +1406,138 @@ def build_pdf(data, output_path):
         build_life_group_pdf(data, output_path)
 
 
+def word_escape(text):
+    return (
+        str(text or "")
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
+def word_text_runs(text):
+    lines = str(text or "").splitlines() or [""]
+    parts = []
+    for index, line in enumerate(lines):
+        if index:
+            parts.append("<w:br/>")
+        parts.append(f'<w:t xml:space="preserve">{word_escape(line)}</w:t>')
+    return "".join(parts)
+
+
+def word_paragraph(text="", style=None, bold=False):
+    p_style = f'<w:pPr><w:pStyle w:val="{style}"/></w:pPr>' if style else ""
+    bold_xml = "<w:b/>" if bold else ""
+    return f"<w:p>{p_style}<w:r><w:rPr>{bold_xml}</w:rPr>{word_text_runs(text)}</w:r></w:p>"
+
+
+def split_word_paragraphs(text):
+    blocks = [clean_block(block) for block in re.split(r"\n{2,}", str(text or ""))]
+    if len(blocks) == 1:
+        blocks = [line.strip() for line in str(text or "").splitlines()]
+    return [block for block in blocks if compact_text(block)]
+
+
+def word_section(label, text):
+    blocks = [word_paragraph(f"- {label}:", "Heading2")]
+    for paragraph_text in split_word_paragraphs(text):
+        blocks.append(word_paragraph(paragraph_text))
+    return blocks
+
+
+def docx_document_xml(data):
+    title = data.get("titulo") or ("Resumo TADEL" if data.get("tipo") == "tadel" else "Folha de Estudo Life Group")
+    subtitle = data.get("subtitulo") or ""
+    body = [
+        word_paragraph("Resumo TADEL" if data.get("tipo") == "tadel" else "Estudo Life Group", "Title"),
+        word_paragraph(title, "Heading1"),
+    ]
+    if subtitle:
+        body.append(word_paragraph(subtitle, "Subtitle"))
+
+    if data.get("tipo") == "tadel":
+        body.extend(word_section("Resumo TADEL", data.get("resumo")))
+        if compact_text(data.get("conclusao")):
+            body.extend(word_section("Conclusão", data.get("conclusao")))
+    else:
+        source_for_questions = " ".join(compact_text(data.get(key, "")) for key in ("textoExtraido", "resumo"))
+        final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
+        body.extend(word_section("Momento Generosidade", data.get("momentoGenerosidade")))
+        body.extend(word_section("Avisos / Agenda", data.get("avisos")))
+        body.extend(word_section("Momento Visão e Missão Paz Church", data.get("momentoVisao")))
+        body.extend(word_section("Introdução", data.get("resumo")))
+        body.append(word_paragraph("- Perguntas:", "Heading2"))
+        for index, question in enumerate(final_questions, start=1):
+            body.append(word_paragraph(f"{index}) {question}"))
+        body.extend(word_section("Conclusão", data.get("conclusao")))
+
+    section = (
+        "<w:sectPr>"
+        '<w:pgSz w:w="11906" w:h="16838"/>'
+        '<w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>'
+        "</w:sectPr>"
+    )
+    return (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+        f"<w:body>{''.join(body)}{section}</w:body>"
+        "</w:document>"
+    )
+
+
+def docx_styles_xml():
+    return """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:style w:type="paragraph" w:default="1" w:styleId="Normal">
+    <w:name w:val="Normal"/>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/></w:rPr>
+    <w:pPr><w:spacing w:after="160" w:line="276" w:lineRule="auto"/></w:pPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Title">
+    <w:name w:val="Title"/>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="183A64"/><w:sz w:val="34"/></w:rPr>
+    <w:pPr><w:jc w:val="center"/><w:spacing w:after="240"/></w:pPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading1">
+    <w:name w:val="heading 1"/>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="183A64"/><w:sz w:val="28"/></w:rPr>
+    <w:pPr><w:spacing w:before="120" w:after="180"/></w:pPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading2">
+    <w:name w:val="heading 2"/>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:u w:val="single"/><w:sz w:val="22"/></w:rPr>
+    <w:pPr><w:spacing w:before="160" w:after="80"/></w:pPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Subtitle">
+    <w:name w:val="Subtitle"/>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:color w:val="5F6F82"/><w:sz w:val="22"/></w:rPr>
+    <w:pPr><w:spacing w:after="220"/></w:pPr>
+  </w:style>
+</w:styles>"""
+
+
+def build_word(data, output_path):
+    content_types = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>"""
+    rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>"""
+    document_rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>"""
+    with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as docx:
+        docx.writestr("[Content_Types].xml", content_types)
+        docx.writestr("_rels/.rels", rels)
+        docx.writestr("word/_rels/document.xml.rels", document_rels)
+        docx.writestr("word/styles.xml", docx_styles_xml())
+        docx.writestr("word/document.xml", docx_document_xml(data))
+
+
 class Handler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
         parsed = urlparse(path)
@@ -1461,6 +1593,25 @@ class Handler(SimpleHTTPRequestHandler):
                     self.send_header("Content-Length", str(len(pdf)))
                     self.end_headers()
                     self.wfile.write(pdf)
+                finally:
+                    output_path.unlink(missing_ok=True)
+                return
+
+            if self.path == "/api/word":
+                length = int(self.headers.get("Content-Length", "0"))
+                data = json.loads(self.rfile.read(length).decode("utf-8"))
+                with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as temp:
+                    output_path = Path(temp.name)
+                try:
+                    build_word(data, output_path)
+                    docx = output_path.read_bytes()
+                    filename = "resumo-tadel.docx" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.docx"
+                    self.send_response(HTTPStatus.OK)
+                    self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                    self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+                    self.send_header("Content-Length", str(len(docx)))
+                    self.end_headers()
+                    self.wfile.write(docx)
                 finally:
                     output_path.unlink(missing_ok=True)
                 return

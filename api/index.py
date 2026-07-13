@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 
 from server import (  # noqa: E402
     build_pdf,
+    build_word,
     extract_text_from_document,
     parse_multipart_file,
     parse_pdf_text,
@@ -68,6 +69,25 @@ class handler(BaseHTTPRequestHandler):
                     self.send_header("Content-Length", str(len(pdf)))
                     self.end_headers()
                     self.wfile.write(pdf)
+                finally:
+                    output_path.unlink(missing_ok=True)
+                return
+
+            if self.path.startswith("/api/word"):
+                length = int(self.headers.get("Content-Length", "0"))
+                data = json.loads(self.rfile.read(length).decode("utf-8"))
+                with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as temp:
+                    output_path = Path(temp.name)
+                try:
+                    build_word(data, output_path)
+                    docx = output_path.read_bytes()
+                    filename = "resumo-tadel.docx" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.docx"
+                    self.send_response(HTTPStatus.OK)
+                    self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                    self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+                    self.send_header("Content-Length", str(len(docx)))
+                    self.end_headers()
+                    self.wfile.write(docx)
                 finally:
                     output_path.unlink(missing_ok=True)
                 return

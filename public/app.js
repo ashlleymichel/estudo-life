@@ -47,6 +47,7 @@ function setBusy(isBusy, action = "") {
   state.busy = isBusy;
   const extractBtn = $("extractBtn");
   const downloadBtn = $("downloadBtn");
+  const downloadWordBtn = $("downloadWordBtn");
   const saveOnlineBtn = $("saveOnlineBtn");
   const addQuestion = $("addQuestion");
   const fileInput = $("pdfFile");
@@ -58,6 +59,7 @@ function setBusy(isBusy, action = "") {
 
   extractBtn.disabled = isBusy;
   downloadBtn.disabled = isBusy;
+  downloadWordBtn.disabled = isBusy;
   saveOnlineBtn.disabled = isBusy;
   addQuestion.disabled = isBusy;
   fileInput.disabled = isBusy;
@@ -70,9 +72,11 @@ function setBusy(isBusy, action = "") {
 
   extractBtn.classList.toggle("loading", isBusy && action === "extract");
   downloadBtn.classList.toggle("loading", isBusy && action === "pdf");
+  downloadWordBtn.classList.toggle("loading", isBusy && action === "word");
   saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
   extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : getExtractLabel(), isBusy && action === "extract");
   downloadBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : getDownloadLabel(), isBusy && action === "pdf");
+  downloadWordBtn.innerHTML = buttonContent(action === "word" ? "Gerando Word..." : "Baixar Word", isBusy && action === "word");
   saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
   document.body.classList.toggle("isBusy", isBusy);
 }
@@ -150,6 +154,19 @@ async function generatePdfBlob(data) {
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.erro || "Não foi possível gerar o PDF.");
+  }
+  return response.blob();
+}
+
+async function generateWordBlob(data) {
+  const response = await fetch("/api/word", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.erro || "Não foi possível gerar o Word.");
   }
   return response.blob();
 }
@@ -300,6 +317,28 @@ $("downloadBtn").addEventListener("click", async () => {
     const blob = await generatePdfBlob(data);
     downloadBlob(blob, getFileName());
     setStatus("PDF gerado e baixado.", "ok");
+  } catch (error) {
+    setStatus(error.message, "error");
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("downloadWordBtn").addEventListener("click", async () => {
+  if (state.busy) {
+    return;
+  }
+  const data = collectData();
+  if (!validatePdfData(data)) {
+    return;
+  }
+
+  setStatus("Gerando o arquivo Word...");
+  setBusy(true, "word");
+  try {
+    const blob = await generateWordBlob(data);
+    downloadBlob(blob, state.tipo === "tadel" ? "resumo-tadel.docx" : "folha-de-estudo-life-group.docx");
+    setStatus("Arquivo Word gerado e baixado.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
   } finally {
