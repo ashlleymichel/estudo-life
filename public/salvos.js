@@ -73,6 +73,47 @@ function downloadFile(file) {
   URL.revokeObjectURL(url);
 }
 
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function downloadWordFile(file, button) {
+  if (!file.data) {
+    alert("Este arquivo foi salvo antes da função de DOCX. Gere e salve novamente para baixar em Word.");
+    return;
+  }
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Gerando...";
+  try {
+    const response = await fetch("/api/word", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(file.data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.erro || "Não foi possível gerar o Word.");
+    }
+    const blob = await response.blob();
+    const filename = file.data.tipo === "tadel" ? "resumo-tadel.docx" : "folha-de-estudo-life-group.docx";
+    downloadBlob(blob, filename);
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
 function editFile(file) {
   if (!file.data) {
     alert("Este arquivo foi salvo antes da função de edição. Gere e salve novamente para editar online.");
@@ -113,11 +154,49 @@ function renderFiles(files) {
     const actions = document.createElement("div");
     actions.className = "savedActions";
 
+    const downloadMenu = document.createElement("div");
+    downloadMenu.className = "downloadMenu";
+
     const download = document.createElement("button");
     download.className = "download";
     download.type = "button";
     download.textContent = "Baixar";
-    download.addEventListener("click", () => downloadFile(file));
+    download.setAttribute("aria-expanded", "false");
+
+    const downloadOptions = document.createElement("div");
+    downloadOptions.className = "downloadOptions hidden";
+
+    const pdf = document.createElement("button");
+    pdf.type = "button";
+    pdf.textContent = "PDF";
+    pdf.addEventListener("click", () => {
+      downloadOptions.classList.add("hidden");
+      download.setAttribute("aria-expanded", "false");
+      downloadFile(file);
+    });
+
+    const docx = document.createElement("button");
+    docx.type = "button";
+    docx.textContent = "DOCX";
+    docx.addEventListener("click", () => {
+      downloadOptions.classList.add("hidden");
+      download.setAttribute("aria-expanded", "false");
+      downloadWordFile(file, docx);
+    });
+
+    download.addEventListener("click", () => {
+      const isOpen = !downloadOptions.classList.contains("hidden");
+      document.querySelectorAll(".savedActions .downloadOptions").forEach((menu) => {
+        if (menu !== downloadOptions) {
+          menu.classList.add("hidden");
+        }
+      });
+      downloadOptions.classList.toggle("hidden", isOpen);
+      download.setAttribute("aria-expanded", String(!isOpen));
+    });
+
+    downloadOptions.append(pdf, docx);
+    downloadMenu.append(download, downloadOptions);
 
     const edit = document.createElement("button");
     edit.className = "secondaryAction";
@@ -135,11 +214,23 @@ function renderFiles(files) {
     });
 
     info.append(title, meta);
-    actions.append(edit, download, remove);
+    actions.append(edit, downloadMenu, remove);
     item.append(info, actions);
     list.append(item);
   });
 }
+
+document.addEventListener("click", (event) => {
+  if (event.target.closest(".downloadMenu")) {
+    return;
+  }
+  document.querySelectorAll(".savedActions .downloadOptions").forEach((menu) => {
+    menu.classList.add("hidden");
+  });
+  document.querySelectorAll(".savedActions .download").forEach((button) => {
+    button.setAttribute("aria-expanded", "false");
+  });
+});
 
 getSavedFiles()
   .then(renderFiles)
