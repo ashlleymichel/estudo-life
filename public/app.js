@@ -13,7 +13,6 @@ const state = {
   tipo: "life_group",
   textoExtraido: "",
   busy: false,
-  previewFormat: "pdf",
   editingSavedId: "",
 };
 
@@ -93,7 +92,6 @@ function fillForm(data) {
   state.perguntas = Array.isArray(data.perguntas) ? data.perguntas : [];
   state.textoExtraido = data.textoExtraido || "";
   renderQuestions();
-  updatePreview();
 }
 
 function renderQuestions() {
@@ -112,7 +110,6 @@ function renderQuestions() {
     input.value = question;
     input.addEventListener("input", () => {
       state.perguntas[index] = input.value;
-      updatePreview();
     });
 
     const remove = document.createElement("button");
@@ -123,87 +120,11 @@ function renderQuestions() {
     remove.addEventListener("click", () => {
       state.perguntas.splice(index, 1);
       renderQuestions();
-      updatePreview();
     });
 
     row.append(number, input, remove);
     container.append(row);
   });
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-function previewParagraphs(value) {
-  const blocks = String(value || "")
-    .split(/\n{2,}|\n/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-  return blocks.map((item) => `<p>${escapeHtml(item)}</p>`).join("");
-}
-
-function previewSection(label, value) {
-  if (!String(value || "").trim()) {
-    return "";
-  }
-  return `<section class="previewBlock"><h4>- ${escapeHtml(label)}:</h4>${previewParagraphs(value)}</section>`;
-}
-
-function updatePreview() {
-  const previewPage = $("previewPage");
-  if (!previewPage) {
-    return;
-  }
-  const data = collectData();
-  const isTadel = data.tipo === "tadel";
-  const format = state.previewFormat === "word" ? "Word" : "PDF";
-  $("previewFormatLabel").textContent = `Prévia ${format}`;
-  $("previewPdfBtn").classList.toggle("active", state.previewFormat === "pdf");
-  $("previewWordBtn").classList.toggle("active", state.previewFormat === "word");
-
-  const questions = data.perguntas
-    .map((question, index) => `<p class="previewQuestion">${index + 1}) ${escapeHtml(question)}</p>`)
-    .join("");
-
-  if (isTadel) {
-    previewPage.innerHTML = `
-      <div class="previewHeader">${state.previewFormat === "word" ? "Documento Word" : "Resumo TADEL"}</div>
-      <h3>${escapeHtml(data.titulo || "Resumo TADEL")}</h3>
-      <p class="previewMeta">${escapeHtml(data.subtitulo || "Data")}</p>
-      ${previewSection("Resumo TADEL", data.resumo)}
-      ${previewSection("Conclusão", data.conclusao)}
-    `;
-    return;
-  }
-
-  previewPage.innerHTML = `
-    <div class="previewHeader">${state.previewFormat === "word" ? "Documento Word" : "Estudo Life Group"}</div>
-    <h3>Série: “${escapeHtml(data.titulo || "Folha de Estudo Life Group")}”</h3>
-    <p class="previewMeta">${escapeHtml(data.subtitulo || "Culto Presencial e On-Line / Life Group")}</p>
-    ${previewSection("Momento Generosidade", data.momentoGenerosidade)}
-    ${previewSection("Avisos / Agenda", data.avisos)}
-    ${previewSection("Momento Visão e Missão Paz Church", data.momentoVisao)}
-    ${previewSection("Introdução", data.resumo)}
-    <section class="previewBlock"><h4>- Perguntas:</h4>${questions || "<p>As perguntas aparecerão aqui.</p>"}</section>
-    ${previewSection("Conclusão", data.conclusao)}
-  `;
-}
-
-function openPreview(format = "pdf") {
-  state.previewFormat = format;
-  document.querySelector(".workspace").classList.add("previewOpen");
-  $("documentPreview").classList.remove("hidden");
-  updatePreview();
-}
-
-function closePreviewMenu() {
-  document.querySelector(".workspace").classList.remove("previewOpen");
-  $("documentPreview").classList.add("hidden");
 }
 
 function collectData() {
@@ -313,7 +234,6 @@ function loadSavedDraftForEditing() {
     }
     state.editingSavedId = saved.id || "";
     fillForm(saved.data);
-    openPreview(saved.data.tipo === "tadel" ? "word" : "pdf");
     setStatus("Arquivo salvo aberto para edição. Ajuste o que precisar e salve novamente.", "ok");
     return true;
   } catch (error) {
@@ -356,7 +276,6 @@ function setMode(tipo) {
       $("subtitulo").value = "Culto Presencial e On-Line / Life Group";
     }
   }
-  updatePreview();
 }
 
 $("pdfFile").addEventListener("change", (event) => {
@@ -391,7 +310,6 @@ $("uploadForm").addEventListener("submit", async (event) => {
       throw new Error(data.erro || "Não foi possível extrair o arquivo.");
     }
     fillForm(data);
-    openPreview("pdf");
     setStatus("Conteúdo extraído. Revise e ajuste o que precisar antes de baixar.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
@@ -406,21 +324,6 @@ $("addQuestion").addEventListener("click", () => {
   }
   state.perguntas.push("");
   renderQuestions();
-  updatePreview();
-});
-
-$("previewPdfBtn").addEventListener("click", () => {
-  state.previewFormat = "pdf";
-  updatePreview();
-});
-
-$("previewWordBtn").addEventListener("click", () => {
-  state.previewFormat = "word";
-  updatePreview();
-});
-
-$("showMenuBtn").addEventListener("click", () => {
-  closePreviewMenu();
 });
 
 $("downloadBtn").addEventListener("click", async () => {
@@ -498,10 +401,6 @@ document.addEventListener("click", (event) => {
   }
 });
 
-fields.forEach((field) => {
-  $(field).addEventListener("input", updatePreview);
-});
-
 fillForm({
   titulo: "Folha de Estudo Life Group",
   subtitulo: "Culto Presencial e On-Line / Life Group",
@@ -516,5 +415,4 @@ fillForm({
 });
 
 setMode("life_group");
-updatePreview();
 loadSavedDraftForEditing();
