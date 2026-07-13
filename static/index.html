@@ -10,7 +10,7 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:title" content="Folha de Estudo" />
     <meta name="twitter:description" content="Plataforma para gerar folhas de estudo da PAZ Church Barueri." />
-    <link rel="stylesheet" href="/styles.css?v=11" />
+    <link rel="stylesheet" href="/styles.css?v=12" />
   </head>
   <body>
     <main class="shell">
@@ -55,8 +55,13 @@
             </div>
             <div class="topActions">
               <button id="saveOnlineBtn" class="secondaryAction" type="button">Salvar Arquivo Online</button>
-              <button id="downloadWordBtn" class="secondaryAction" type="button">Baixar Word</button>
-              <button id="downloadBtn" class="download" type="button">Baixar PDF</button>
+              <div class="downloadMenu">
+                <button id="downloadMenuBtn" class="download" type="button" aria-expanded="false">Baixar</button>
+                <div id="downloadOptions" class="downloadOptions hidden">
+                  <button id="downloadPdfBtn" type="button">PDF</button>
+                  <button id="downloadDocxBtn" type="button">DOCX</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -105,6 +110,6 @@
       </section>
     </main>
 
-    <script src="/app.js?v=9"></script>
+    <script src="/app.js?v=10"></script>
   </body>
 </html>

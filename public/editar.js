@@ -39,7 +39,7 @@ function getFileName() {
 
 function setBusy(isBusy, action = "") {
   state.busy = isBusy;
-  const buttons = [$("saveOnlineBtn"), $("downloadBtn"), $("downloadWordBtn"), $("addQuestion")];
+  const buttons = [$("saveOnlineBtn"), $("downloadMenuBtn"), $("downloadPdfBtn"), $("downloadDocxBtn"), $("addQuestion")];
   const fieldsToToggle = [
     ...fields.map((field) => $(field)),
     ...document.querySelectorAll("#questions textarea, .questionRow button"),
@@ -57,11 +57,9 @@ function setBusy(isBusy, action = "") {
   });
 
   $("saveOnlineBtn").classList.toggle("loading", isBusy && action === "save");
-  $("downloadBtn").classList.toggle("loading", isBusy && action === "pdf");
-  $("downloadWordBtn").classList.toggle("loading", isBusy && action === "word");
+  $("downloadMenuBtn").classList.toggle("loading", isBusy && (action === "pdf" || action === "word"));
   $("saveOnlineBtn").innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar", isBusy && action === "save");
-  $("downloadBtn").innerHTML = buttonContent(action === "pdf" ? "Gerando..." : "Baixar PDF", isBusy && action === "pdf");
-  $("downloadWordBtn").innerHTML = buttonContent(action === "word" ? "Gerando..." : "Baixar Word", isBusy && action === "word");
+  $("downloadMenuBtn").innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
   document.body.classList.toggle("isBusy", isBusy);
 }
 
@@ -283,10 +281,25 @@ $("saveOnlineBtn").addEventListener("click", async () => {
   }
 });
 
-$("downloadBtn").addEventListener("click", async () => {
+function closeDownloadMenu() {
+  $("downloadOptions").classList.add("hidden");
+  $("downloadMenuBtn").setAttribute("aria-expanded", "false");
+}
+
+$("downloadMenuBtn").addEventListener("click", () => {
   if (state.busy) {
     return;
   }
+  const isOpen = !$("downloadOptions").classList.contains("hidden");
+  $("downloadOptions").classList.toggle("hidden", isOpen);
+  $("downloadMenuBtn").setAttribute("aria-expanded", String(!isOpen));
+});
+
+$("downloadPdfBtn").addEventListener("click", async () => {
+  if (state.busy) {
+    return;
+  }
+  closeDownloadMenu();
   const data = collectData();
   if (!validateData(data)) {
     return;
@@ -305,10 +318,11 @@ $("downloadBtn").addEventListener("click", async () => {
   }
 });
 
-$("downloadWordBtn").addEventListener("click", async () => {
+$("downloadDocxBtn").addEventListener("click", async () => {
   if (state.busy) {
     return;
   }
+  closeDownloadMenu();
   const data = collectData();
   if (!validateData(data)) {
     return;
@@ -324,6 +338,12 @@ $("downloadWordBtn").addEventListener("click", async () => {
     setStatus(error.message, "error");
   } finally {
     setBusy(false);
+  }
+});
+
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".downloadMenu")) {
+    closeDownloadMenu();
   }
 });
 

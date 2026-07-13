@@ -332,6 +332,42 @@ body.isBusy {
   white-space: nowrap;
 }
 
+.downloadMenu {
+  position: relative;
+}
+
+.downloadMenu .download {
+  min-width: 90px;
+}
+
+.downloadOptions {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 10;
+  display: grid;
+  gap: 6px;
+  min-width: 132px;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(22, 38, 61, 0.12);
+}
+
+.downloadOptions button {
+  min-height: 35px;
+  padding: 0 14px;
+  color: var(--brand);
+  background: #eaf1f9;
+  text-align: left;
+}
+
+.downloadOptions button:hover {
+  color: #ffffff;
+  background: var(--brand);
+}
+
 .secondaryAction {
   padding: 0 16px;
   color: var(--brand);
@@ -606,6 +642,16 @@ textarea:focus {
   .savedActions button,
   .editButtons button {
     width: 100%;
+  }
+
+  .downloadMenu,
+  .downloadOptions {
+    width: 100%;
+  }
+
+  .downloadOptions {
+    position: static;
+    margin-top: 8px;
   }
 
   .savedItem,

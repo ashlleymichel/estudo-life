@@ -36,10 +36,6 @@ function getExtractLabel() {
   return state.tipo === "tadel" ? "Gerar Resumo TADEL" : "Gerar Folha de Estudo";
 }
 
-function getDownloadLabel() {
-  return state.tipo === "tadel" ? "Baixar Resumo" : "Baixar PDF";
-}
-
 function getFileName() {
   return state.tipo === "tadel" ? "resumo-tadel.pdf" : "folha-de-estudo-life-group.pdf";
 }
@@ -47,8 +43,9 @@ function getFileName() {
 function setBusy(isBusy, action = "") {
   state.busy = isBusy;
   const extractBtn = $("extractBtn");
-  const downloadBtn = $("downloadBtn");
-  const downloadWordBtn = $("downloadWordBtn");
+  const downloadMenuBtn = $("downloadMenuBtn");
+  const downloadPdfBtn = $("downloadPdfBtn");
+  const downloadDocxBtn = $("downloadDocxBtn");
   const saveOnlineBtn = $("saveOnlineBtn");
   const addQuestion = $("addQuestion");
   const fileInput = $("pdfFile");
@@ -59,8 +56,9 @@ function setBusy(isBusy, action = "") {
   ];
 
   extractBtn.disabled = isBusy;
-  downloadBtn.disabled = isBusy;
-  downloadWordBtn.disabled = isBusy;
+  downloadMenuBtn.disabled = isBusy;
+  downloadPdfBtn.disabled = isBusy;
+  downloadDocxBtn.disabled = isBusy;
   saveOnlineBtn.disabled = isBusy;
   addQuestion.disabled = isBusy;
   fileInput.disabled = isBusy;
@@ -72,12 +70,10 @@ function setBusy(isBusy, action = "") {
   });
 
   extractBtn.classList.toggle("loading", isBusy && action === "extract");
-  downloadBtn.classList.toggle("loading", isBusy && action === "pdf");
-  downloadWordBtn.classList.toggle("loading", isBusy && action === "word");
+  downloadMenuBtn.classList.toggle("loading", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
   extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : getExtractLabel(), isBusy && action === "extract");
-  downloadBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : getDownloadLabel(), isBusy && action === "pdf");
-  downloadWordBtn.innerHTML = buttonContent(action === "word" ? "Gerando Word..." : "Baixar Word", isBusy && action === "word");
+  downloadMenuBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
   document.body.classList.toggle("isBusy", isBusy);
 }
@@ -258,7 +254,6 @@ function setMode(tipo) {
     element.classList.toggle("hidden", isTadel);
   });
   if (isTadel) {
-    $("downloadBtn").innerHTML = getDownloadLabel();
     $("extractBtn").innerHTML = getExtractLabel();
     if (!$("titulo").value.trim() || $("titulo").value.trim() === "Folha de Estudo Life Group") {
       $("titulo").value = "Resumo TADEL";
@@ -267,7 +262,6 @@ function setMode(tipo) {
       $("subtitulo").value = "Data: ";
     }
   } else {
-    $("downloadBtn").innerHTML = getDownloadLabel();
     $("extractBtn").innerHTML = getExtractLabel();
     if ($("titulo").value.trim() === "Resumo TADEL") {
       $("titulo").value = "Folha de Estudo Life Group";
@@ -326,10 +320,25 @@ $("addQuestion").addEventListener("click", () => {
   renderQuestions();
 });
 
-$("downloadBtn").addEventListener("click", async () => {
+function closeDownloadMenu() {
+  $("downloadOptions").classList.add("hidden");
+  $("downloadMenuBtn").setAttribute("aria-expanded", "false");
+}
+
+$("downloadMenuBtn").addEventListener("click", () => {
   if (state.busy) {
     return;
   }
+  const isOpen = !$("downloadOptions").classList.contains("hidden");
+  $("downloadOptions").classList.toggle("hidden", isOpen);
+  $("downloadMenuBtn").setAttribute("aria-expanded", String(!isOpen));
+});
+
+$("downloadPdfBtn").addEventListener("click", async () => {
+  if (state.busy) {
+    return;
+  }
+  closeDownloadMenu();
   const data = collectData();
   if (!validatePdfData(data)) {
     return;
@@ -348,10 +357,11 @@ $("downloadBtn").addEventListener("click", async () => {
   }
 });
 
-$("downloadWordBtn").addEventListener("click", async () => {
+$("downloadDocxBtn").addEventListener("click", async () => {
   if (state.busy) {
     return;
   }
+  closeDownloadMenu();
   const data = collectData();
   if (!validatePdfData(data)) {
     return;
@@ -367,6 +377,12 @@ $("downloadWordBtn").addEventListener("click", async () => {
     setStatus(error.message, "error");
   } finally {
     setBusy(false);
+  }
+});
+
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".downloadMenu")) {
+    closeDownloadMenu();
   }
 });
 

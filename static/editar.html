@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Editar Arquivo | Folha de Estudo</title>
     <meta name="description" content="Edite um arquivo salvo da plataforma Folha de Estudo." />
-    <link rel="stylesheet" href="/styles.css?v=11" />
+    <link rel="stylesheet" href="/styles.css?v=12" />
   </head>
   <body>
     <main class="editPage">
@@ -61,13 +61,18 @@
         <p class="status" id="status">Carregando arquivo salvo...</p>
         <div class="editButtons">
           <button id="saveOnlineBtn" class="download" type="button">Salvar</button>
-          <button id="downloadWordBtn" class="secondaryAction" type="button">Baixar Word</button>
-          <button id="downloadBtn" class="download" type="button">Baixar PDF</button>
+          <div class="downloadMenu">
+            <button id="downloadMenuBtn" class="download" type="button" aria-expanded="false">Baixar</button>
+            <div id="downloadOptions" class="downloadOptions hidden">
+              <button id="downloadPdfBtn" type="button">PDF</button>
+              <button id="downloadDocxBtn" type="button">DOCX</button>
+            </div>
+          </div>
         </div>
         <a class="backButton" href="/salvos.html">Voltar</a>
       </section>
     </main>
 
-    <script src="/editar.js?v=1"></script>
+    <script src="/editar.js?v=2"></script>
   </body>
 </html>
