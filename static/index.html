@@ -10,12 +10,12 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:title" content="Folha de Estudo" />
     <meta name="twitter:description" content="Plataforma para gerar folhas de estudo da PAZ Church Barueri." />
-    <link rel="stylesheet" href="/styles.css?v=9" />
+    <link rel="stylesheet" href="/styles.css?v=10" />
   </head>
   <body>
     <main class="shell">
       <section class="workspace">
-        <aside class="panel">
+        <aside class="panel" id="sidePanel">
           <div>
             <div class="brandMark">
               <img src="/paz-logo.svg" alt="Paz Church" />
@@ -101,9 +101,26 @@
             <textarea id="conclusao" rows="5"></textarea>
           </label>
         </section>
+
+        <section class="documentPreview hidden" id="documentPreview" aria-label="Prévia do arquivo">
+          <div class="previewTopbar">
+            <div>
+              <h2>Prévia do arquivo</h2>
+              <p id="previewFormatLabel">PDF</p>
+            </div>
+            <button id="showMenuBtn" class="secondaryAction" type="button">Mostrar menu</button>
+          </div>
+
+          <div class="previewSwitch" role="group" aria-label="Tipo de prévia">
+            <button id="previewPdfBtn" class="modeBtn active" type="button">PDF</button>
+            <button id="previewWordBtn" class="modeBtn" type="button">Word</button>
+          </div>
+
+          <article class="previewPage" id="previewPage"></article>
+        </section>
       </section>
     </main>
 
-    <script src="/app.js?v=6"></script>
+    <script src="/app.js?v=7"></script>
   </body>
 </html>

@@ -44,8 +44,17 @@ textarea {
   align-items: start;
 }
 
+.workspace.previewOpen {
+  grid-template-columns: 630px 320px;
+}
+
+.workspace.previewOpen .panel {
+  display: none;
+}
+
 .panel,
-.editor {
+.editor,
+.documentPreview {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -305,6 +314,90 @@ body.isBusy {
   padding: 20px 10px;
 }
 
+.documentPreview {
+  display: grid;
+  gap: 10px;
+  padding: 20px 10px;
+}
+
+.previewTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.previewTopbar p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.previewSwitch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 2px;
+  background: #eaf1f9;
+  border-radius: 10px;
+}
+
+.previewPage {
+  min-height: 560px;
+  padding: 18px;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(22, 38, 61, 0.08);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.72rem;
+  line-height: 1.42;
+}
+
+.previewHeader {
+  margin: -18px -18px 14px;
+  padding: 14px 18px;
+  color: #ffffff;
+  background: var(--brand);
+  border-radius: 6px 6px 18px 18px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.previewPage h3 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.previewMeta {
+  margin: 0 0 12px;
+  color: #111827;
+}
+
+.previewBlock {
+  margin-top: 10px;
+}
+
+.previewBlock h4 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+.previewBlock p,
+.previewQuestion {
+  margin: 0 0 7px;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -530,6 +623,14 @@ textarea:focus {
   .workspace,
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .workspace.previewOpen {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace.previewOpen .panel {
+    display: flex;
   }
 
   .panel {
