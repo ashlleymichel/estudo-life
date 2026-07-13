@@ -1103,9 +1103,25 @@ def parse_multipart_file(body, content_type):
     raise ValueError("Não encontrei um arquivo no envio.")
 
 
+def normalize_pdf_chars(text):
+    return (
+        str(text or "")
+        .replace("\u00a0", " ")
+        .replace("\u2010", "-")
+        .replace("\u2011", "-")
+        .replace("\u2012", "-")
+        .replace("\u2013", "-")
+        .replace("\u2014", "-")
+        .replace("\u2212", "-")
+        .replace("\u2022", "-")
+        .replace("\u25cf", "-")
+        .replace("\u25a0", "-")
+    )
+
+
 def paragraph(text, style):
     escaped = (
-        str(text or "")
+        normalize_pdf_chars(text)
         .replace("&", "&amp;")
         .replace("<", "&lt;")
         .replace(">", "&gt;")
@@ -1117,7 +1133,7 @@ def paragraph(text, style):
 def labeled_paragraph(label, text, style):
     escaped_label = str(label or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     escaped_text = (
-        str(text or "")
+        normalize_pdf_chars(text)
         .replace("&", "&amp;")
         .replace("<", "&lt;")
         .replace(">", "&gt;")
@@ -1127,11 +1143,11 @@ def labeled_paragraph(label, text, style):
 
 
 def compact_text(text):
-    return re.sub(r"\s+", " ", str(text or "")).strip()
+    return re.sub(r"\s+", " ", normalize_pdf_chars(text)).strip()
 
 
 def escape_pdf_text(text):
-    lines = str(text or "").splitlines() or [""]
+    lines = normalize_pdf_chars(text).splitlines() or [""]
     escaped_lines = []
     for line in lines:
         escaped_lines.append(
