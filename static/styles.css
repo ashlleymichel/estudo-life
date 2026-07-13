@@ -262,14 +262,19 @@ body.isBusy {
   align-items: center;
   justify-content: center;
   min-height: 35px;
-  margin: 0 10px;
+  width: 100%;
+  margin: 0 0 32px;
   padding: 0 14px;
-  color: var(--brand);
-  background: #eaf1f9;
+  color: #ffffff;
+  background: var(--brand);
   border-radius: 10px;
   font-size: var(--button-font-size);
   font-weight: 800;
   text-decoration: none;
+}
+
+.savedLink:hover {
+  background: var(--brand-2);
 }
 
 .ghost {
