@@ -509,9 +509,10 @@ textarea:focus {
 .savedItem {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: end;
   justify-content: space-between;
-  gap: 16px;
+  column-gap: 20px;
+  row-gap: 14px;
   min-height: 108px;
   padding: 20px 10px 18px;
   background: #ffffff;
@@ -519,8 +520,13 @@ textarea:focus {
   border-radius: 10px;
 }
 
+.savedInfo {
+  display: contents;
+}
+
 .savedInfo h2 {
-  margin: 0 0 8px;
+  grid-column: 1 / -1;
+  margin: 0;
   padding-bottom: 8px;
   color: var(--brand);
   font-size: 1rem;
@@ -532,6 +538,10 @@ textarea:focus {
   margin: 0;
   color: #9aaec5;
   font-size: 0.875rem;
+}
+
+.savedInfo p {
+  align-self: center;
 }
 
 .emptyState {
@@ -546,8 +556,10 @@ textarea:focus {
 
 .savedActions {
   display: flex;
+  grid-column: 2;
   gap: 10px;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .deleteSaved {
