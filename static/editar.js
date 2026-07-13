@@ -26,7 +26,7 @@ const $ = (id) => document.getElementById(id);
 function setStatus(message, type = "") {
   const status = $("status");
   status.textContent = message;
-  status.className = `status ${type}`.trim();
+  status.className = "srOnly";
 }
 
 function buttonContent(label, loading = false) {
