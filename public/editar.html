@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editar Arquivo | Folha de Estudo</title>
+    <meta name="description" content="Edite um arquivo salvo da plataforma Folha de Estudo." />
+    <link rel="stylesheet" href="/styles.css?v=11" />
+  </head>
+  <body>
+    <main class="editPage">
+      <section class="editor editEditor" aria-label="Edição da folha de estudo">
+        <div class="editHeading">
+          <h1 id="editTitle">Arquivo salvo</h1>
+        </div>
+
+        <div class="grid editGrid">
+          <label>
+            <span id="tituloLabel">Título da ministração ou da série</span>
+            <input id="titulo" type="text" />
+          </label>
+          <label>
+            <span id="subtituloLabel">Linha do culto</span>
+            <input id="subtitulo" type="text" />
+          </label>
+        </div>
+
+        <label class="lifeOnly">
+          <span>Momento Generosidade</span>
+          <textarea id="momentoGenerosidade" rows="5"></textarea>
+        </label>
+
+        <label class="lifeOnly">
+          <span>Aviso/Agenda</span>
+          <textarea id="avisos" rows="4"></textarea>
+        </label>
+
+        <label class="lifeOnly">
+          <span>Momento da visão</span>
+          <textarea id="momentoVisao" rows="5"></textarea>
+        </label>
+
+        <label>
+          <span id="resumoLabel">Resumo</span>
+          <textarea id="resumo" rows="7"></textarea>
+        </label>
+
+        <div class="questionsHeader lifeOnly">
+          <span>Perguntas</span>
+          <button id="addQuestion" class="ghost" type="button">Adicionar</button>
+        </div>
+        <div id="questions" class="questions lifeOnly"></div>
+
+        <label>
+          <span>Conclusão</span>
+          <textarea id="conclusao" rows="5"></textarea>
+        </label>
+      </section>
+
+      <section class="editActions" aria-label="Ações do arquivo">
+        <p class="status" id="status">Carregando arquivo salvo...</p>
+        <div class="editButtons">
+          <button id="saveOnlineBtn" class="download" type="button">Salvar</button>
+          <button id="downloadWordBtn" class="secondaryAction" type="button">Baixar Word</button>
+          <button id="downloadBtn" class="download" type="button">Baixar PDF</button>
+        </div>
+        <a class="backButton" href="/salvos.html">Voltar</a>
+      </section>
+    </main>
+
+    <script src="/editar.js?v=1"></script>
+  </body>
+</html>

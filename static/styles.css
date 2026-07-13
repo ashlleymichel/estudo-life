@@ -440,31 +440,12 @@ textarea:focus {
   padding: 40px 0;
 }
 
-.savedHeader,
-.savedList {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-
-.savedHeader {
-  display: grid;
-  grid-template-columns: 320px minmax(0, 1fr) auto;
-  gap: 20px;
+.savedToolbar {
+  display: flex;
   align-items: center;
-  padding: 20px 10px;
-}
-
-.savedHeader .brandMark {
-  margin: 0;
-}
-
-.savedHeader h1 {
-  max-width: none;
-}
-
-.savedHeader .muted {
-  margin: 8px 0 0;
+  justify-content: flex-end;
+  min-height: 39px;
+  margin-bottom: 20px;
 }
 
 .backButton {
@@ -481,33 +462,45 @@ textarea:focus {
 
 .savedList {
   display: grid;
-  gap: 10px;
-  margin-top: 20px;
-  padding: 10px;
+  gap: 20px;
 }
 
 .savedItem {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px;
-  background: #f9fafc;
+  min-height: 108px;
+  padding: 20px 10px 18px;
+  background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 10px;
 }
 
 .savedInfo h2 {
-  margin: 0;
+  margin: 0 0 8px;
+  padding-bottom: 8px;
   color: var(--brand);
   font-size: 1rem;
+  border-bottom: 1px solid var(--line);
 }
 
 .savedInfo p,
 .emptyState {
-  margin: 6px 0 0;
-  color: var(--muted);
+  margin: 0;
+  color: #9aaec5;
   font-size: 0.875rem;
+}
+
+.emptyState {
+  min-height: 96px;
+  padding: 20px 10px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--brand);
+  font-weight: 700;
 }
 
 .savedActions {
@@ -520,6 +513,61 @@ textarea:focus {
   padding: 0 16px;
   color: var(--danger);
   background: #f9e8e6;
+}
+
+.editPage {
+  width: min(970px, 100%);
+  margin: 0 auto;
+  padding: 80px 0 40px;
+}
+
+.editEditor {
+  gap: 10px;
+  padding: 20px 10px;
+}
+
+.editHeading {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.editHeading h1 {
+  max-width: none;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.editGrid {
+  gap: 20px;
+}
+
+.editEditor textarea {
+  height: 116px;
+  min-height: 116px;
+}
+
+.editActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+.editActions .status {
+  margin: 0;
+}
+
+.editButtons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.editActions .backButton {
+  grid-column: 2;
+  justify-self: end;
+  margin-top: 40px;
 }
 
 @media (max-width: 860px) {
@@ -543,17 +591,36 @@ textarea:focus {
 
   .topActions,
   .savedItem,
-  .savedActions {
+  .savedActions,
+  .editButtons {
     align-items: stretch;
     flex-direction: column;
   }
 
   .topActions button,
-  .savedActions button {
+  .savedActions button,
+  .editButtons button {
     width: 100%;
   }
 
-  .savedHeader {
+  .savedItem,
+  .editActions {
     grid-template-columns: 1fr;
+  }
+
+  .savedPage,
+  .editPage {
+    padding: 14px;
+  }
+
+  .savedToolbar {
+    justify-content: stretch;
+  }
+
+  .savedToolbar .backButton,
+  .editActions .backButton {
+    grid-column: auto;
+    justify-self: stretch;
+    margin-top: 0;
   }
 }

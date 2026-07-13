@@ -82,10 +82,12 @@ function editFile(file) {
     "folhaEstudoEditDraft",
     JSON.stringify({
       id: file.id,
+      name: file.name,
+      createdAt: file.createdAt,
       data: file.data,
     }),
   );
-  window.location.href = "/";
+  window.location.href = "/editar.html";
 }
 
 function renderFiles(files) {
@@ -114,7 +116,7 @@ function renderFiles(files) {
     const download = document.createElement("button");
     download.className = "download";
     download.type = "button";
-    download.textContent = "Baixar PDF";
+    download.textContent = "Baixar";
     download.addEventListener("click", () => downloadFile(file));
 
     const edit = document.createElement("button");
