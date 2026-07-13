@@ -10,6 +10,7 @@
   --accent: #2f80c8;
   --danger: #b42318;
   --focus: rgba(24, 58, 100, 0.16);
+  --button-font-size: 0.875rem;
 }
 
 * {
@@ -145,7 +146,6 @@ h2 {
   color: var(--brand);
   background: transparent;
   border-radius: 10px;
-  font-size: 0.75rem;
 }
 
 .modeBtn.active {
@@ -201,6 +201,7 @@ button {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 800;
+  font-size: var(--button-font-size);
 }
 
 button:disabled,
@@ -247,7 +248,6 @@ body.isBusy {
 .primary {
   width: 207px;
   padding: 0 18px;
-  font-size: 0.875rem;
 }
 
 .primary:hover,
@@ -267,7 +267,7 @@ body.isBusy {
   color: var(--brand);
   background: #eaf1f9;
   border-radius: 10px;
-  font-size: 0.75rem;
+  font-size: var(--button-font-size);
   font-weight: 800;
   text-decoration: none;
 }
@@ -278,7 +278,6 @@ body.isBusy {
   padding: 0 20px;
   color: var(--brand);
   background: #c8daee;
-  font-size: 0.75rem;
 }
 
 .status {
@@ -325,7 +324,6 @@ body.isBusy {
 
 .download {
   padding: 0 20px;
-  font-size: 1rem;
   white-space: nowrap;
 }
 
@@ -333,7 +331,6 @@ body.isBusy {
   padding: 0 16px;
   color: var(--brand);
   background: #c8daee;
-  font-size: 0.75rem;
   white-space: nowrap;
 }
 
@@ -430,7 +427,6 @@ textarea:focus {
   padding: 0;
   color: var(--danger);
   background: transparent;
-  font-size: 1rem;
   line-height: 1;
 }
 
@@ -478,7 +474,7 @@ textarea:focus {
   min-height: 37px;
   padding: 0 20px;
   border-radius: 10px;
-  font-size: 0.875rem;
+  font-size: var(--button-font-size);
   font-weight: 800;
   text-decoration: none;
 }
@@ -524,7 +520,6 @@ textarea:focus {
   padding: 0 16px;
   color: var(--danger);
   background: #f9e8e6;
-  font-size: 0.875rem;
 }
 
 @media (max-width: 860px) {
