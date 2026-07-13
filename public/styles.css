@@ -237,7 +237,9 @@ body.isBusy {
 }
 
 .primary,
-.download {
+.download,
+.secondaryAction,
+.backButton {
   color: #ffffff;
   background: var(--brand);
 }
@@ -249,8 +251,25 @@ body.isBusy {
 }
 
 .primary:hover,
-.download:hover {
+.download:hover,
+.secondaryAction:hover,
+.backButton:hover {
   background: var(--brand-2);
+}
+
+.savedLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 35px;
+  margin: 0 10px;
+  padding: 0 14px;
+  color: var(--brand);
+  background: #eaf1f9;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .ghost {
@@ -296,10 +315,30 @@ body.isBusy {
   border-bottom: 1px solid var(--line);
 }
 
+.topActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .download {
   padding: 0 20px;
   font-size: 1rem;
   white-space: nowrap;
+}
+
+.secondaryAction {
+  padding: 0 16px;
+  color: var(--brand);
+  background: #c8daee;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.secondaryAction:hover {
+  color: #ffffff;
 }
 
 .grid {
@@ -399,6 +438,95 @@ textarea:focus {
   display: none !important;
 }
 
+.savedPage {
+  width: min(970px, 100%);
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.savedHeader,
+.savedList {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.savedHeader {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 10px;
+}
+
+.savedHeader .brandMark {
+  margin: 0;
+}
+
+.savedHeader h1 {
+  max-width: none;
+}
+
+.savedHeader .muted {
+  margin: 8px 0 0;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 37px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.savedList {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+.savedItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  background: #f9fafc;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.savedInfo h2 {
+  margin: 0;
+  color: var(--brand);
+  font-size: 1rem;
+}
+
+.savedInfo p,
+.emptyState {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.savedActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.deleteSaved {
+  padding: 0 16px;
+  color: var(--danger);
+  background: #f9e8e6;
+  font-size: 0.875rem;
+}
+
 @media (max-width: 860px) {
   .shell {
     padding: 14px;
@@ -416,5 +544,21 @@ textarea:focus {
   .topbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .topActions,
+  .savedItem,
+  .savedActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .topActions button,
+  .savedActions button {
+    width: 100%;
+  }
+
+  .savedHeader {
+    grid-template-columns: 1fr;
   }
 }

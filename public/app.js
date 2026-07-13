@@ -15,6 +15,10 @@ const state = {
   busy: false,
 };
 
+const DB_NAME = "folha-estudo-arquivos";
+const DB_VERSION = 1;
+const STORE_NAME = "arquivos";
+
 const $ = (id) => document.getElementById(id);
 
 function setStatus(message, type = "") {
@@ -31,10 +35,19 @@ function getExtractLabel() {
   return state.tipo === "tadel" ? "Gerar Resumo TADEL" : "Gerar Folha de Estudo";
 }
 
+function getDownloadLabel() {
+  return state.tipo === "tadel" ? "Baixar Resumo" : "Baixar PDF";
+}
+
+function getFileName() {
+  return state.tipo === "tadel" ? "resumo-tadel.pdf" : "folha-de-estudo-life-group.pdf";
+}
+
 function setBusy(isBusy, action = "") {
   state.busy = isBusy;
   const extractBtn = $("extractBtn");
   const downloadBtn = $("downloadBtn");
+  const saveOnlineBtn = $("saveOnlineBtn");
   const addQuestion = $("addQuestion");
   const fileInput = $("pdfFile");
   const modeButtons = [$("lifeMode"), $("tadelMode")];
@@ -45,6 +58,7 @@ function setBusy(isBusy, action = "") {
 
   extractBtn.disabled = isBusy;
   downloadBtn.disabled = isBusy;
+  saveOnlineBtn.disabled = isBusy;
   addQuestion.disabled = isBusy;
   fileInput.disabled = isBusy;
   modeButtons.forEach((button) => {
@@ -56,8 +70,10 @@ function setBusy(isBusy, action = "") {
 
   extractBtn.classList.toggle("loading", isBusy && action === "extract");
   downloadBtn.classList.toggle("loading", isBusy && action === "pdf");
+  saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
   extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : getExtractLabel(), isBusy && action === "extract");
-  downloadBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : state.tipo === "tadel" ? "Baixar Resumo" : "Baixar PDF", isBusy && action === "pdf");
+  downloadBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : getDownloadLabel(), isBusy && action === "pdf");
+  saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
   document.body.classList.toggle("isBusy", isBusy);
 }
 
@@ -117,6 +133,74 @@ function collectData() {
   return data;
 }
 
+function validatePdfData(data) {
+  if (!data.titulo || !data.resumo) {
+    setStatus("Preencha pelo menos o título e o resumo antes de baixar.", "error");
+    return false;
+  }
+  return true;
+}
+
+async function generatePdfBlob(data) {
+  const response = await fetch("/api/pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.erro || "Não foi possível gerar o PDF.");
+  }
+  return response.blob();
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function openSavedDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "id" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function savePdfOnline(blob, data) {
+  const db = await openSavedDb();
+  const file = {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name: getFileName(),
+    title: data.titulo || "Arquivo sem título",
+    type: data.tipo,
+    size: blob.size,
+    createdAt: new Date().toISOString(),
+    blob,
+  };
+
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).put(file);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+  db.close();
+  return file;
+}
+
 function setMode(tipo) {
   if (state.busy) {
     return;
@@ -133,7 +217,7 @@ function setMode(tipo) {
     element.classList.toggle("hidden", isTadel);
   });
   if (isTadel) {
-    $("downloadBtn").innerHTML = "Baixar Resumo";
+    $("downloadBtn").innerHTML = getDownloadLabel();
     $("extractBtn").innerHTML = getExtractLabel();
     if (!$("titulo").value.trim() || $("titulo").value.trim() === "Folha de Estudo Life Group") {
       $("titulo").value = "Resumo TADEL";
@@ -142,7 +226,7 @@ function setMode(tipo) {
       $("subtitulo").value = "Data: ";
     }
   } else {
-    $("downloadBtn").innerHTML = "Baixar PDF";
+    $("downloadBtn").innerHTML = getDownloadLabel();
     $("extractBtn").innerHTML = getExtractLabel();
     if ($("titulo").value.trim() === "Resumo TADEL") {
       $("titulo").value = "Folha de Estudo Life Group";
@@ -206,33 +290,38 @@ $("downloadBtn").addEventListener("click", async () => {
     return;
   }
   const data = collectData();
-  if (!data.titulo || !data.resumo) {
-    setStatus("Preencha pelo menos o título e o resumo antes de baixar.", "error");
+  if (!validatePdfData(data)) {
     return;
   }
 
   setStatus("Gerando o PDF final...");
   setBusy(true, "pdf");
   try {
-    const response = await fetch("/api/pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.erro || "Não foi possível gerar o PDF.");
-    }
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = state.tipo === "tadel" ? "resumo-tadel.pdf" : "folha-de-estudo-life-group.pdf";
-    document.body.append(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    const blob = await generatePdfBlob(data);
+    downloadBlob(blob, getFileName());
     setStatus("PDF gerado e baixado.", "ok");
+  } catch (error) {
+    setStatus(error.message, "error");
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("saveOnlineBtn").addEventListener("click", async () => {
+  if (state.busy) {
+    return;
+  }
+  const data = collectData();
+  if (!validatePdfData(data)) {
+    return;
+  }
+
+  setStatus("Gerando e salvando o arquivo...");
+  setBusy(true, "save");
+  try {
+    const blob = await generatePdfBlob(data);
+    await savePdfOnline(blob, data);
+    setStatus("Arquivo salvo. Abra a página Arquivos salvos para ver seus PDFs.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
   } finally {
