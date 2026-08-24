@@ -130,29 +130,6 @@ h2 {
   justify-items: center;
 }
 
-.modeSwitch {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: 100%;
-  margin-bottom: 30px;
-  padding: 2px;
-  background: #eaf1f9;
-  border-radius: 10px;
-}
-
-.modeBtn {
-  min-height: 35px;
-  color: var(--brand);
-  background: transparent;
-  border-radius: 10px;
-}
-
-.modeBtn.active {
-  color: #ffffff;
-  background: var(--brand);
-}
-
 .dropzone {
   display: grid;
   gap: 0;

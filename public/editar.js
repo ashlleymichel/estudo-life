@@ -34,7 +34,7 @@ function buttonContent(label, loading = false) {
 }
 
 function getFileName() {
-  return state.tipo === "tadel" ? "resumo-tadel.pdf" : "folha-de-estudo-life-group.pdf";
+  return "folha-de-estudo-life-group.pdf";
 }
 
 function setBusy(isBusy, action = "") {
@@ -63,14 +63,13 @@ function setBusy(isBusy, action = "") {
   document.body.classList.toggle("isBusy", isBusy);
 }
 
-function setMode(tipo) {
-  state.tipo = tipo === "tadel" ? "tadel" : "life_group";
-  const isTadel = state.tipo === "tadel";
-  $("tituloLabel").textContent = isTadel ? "Resumo TADEL" : "Título da ministração ou da série";
-  $("subtituloLabel").textContent = isTadel ? "DATA" : "Linha do culto";
-  $("resumoLabel").textContent = isTadel ? "Conteúdo do TADEL" : "Resumo";
+function setMode() {
+  state.tipo = "life_group";
+  $("tituloLabel").textContent = "Título da ministração ou da série";
+  $("subtituloLabel").textContent = "Linha do culto";
+  $("resumoLabel").textContent = "Resumo";
   document.querySelectorAll(".lifeOnly").forEach((element) => {
-    element.classList.toggle("hidden", isTadel);
+    element.classList.remove("hidden");
   });
 }
 
@@ -108,7 +107,7 @@ function renderQuestions() {
 }
 
 function fillForm(data) {
-  setMode(data.tipo);
+  setMode();
   fields.forEach((field) => {
     $(field).value = data[field] || "";
   });
@@ -123,7 +122,7 @@ function collectData() {
     data[field] = $(field).value.trim();
   });
   data.perguntas = state.perguntas.map((item) => item.trim()).filter(Boolean);
-  data.tipo = state.tipo;
+  data.tipo = "life_group";
   data.textoExtraido = state.textoExtraido;
   return data;
 }
@@ -145,10 +144,8 @@ function formatDate(value) {
 }
 
 function updateHeading(saved) {
-  const data = saved.data || {};
-  const base = data.tipo === "tadel" ? "Resumo TADEL" : "Folha de Estudo Life Group";
   const date = saved.createdAt ? ` - ${formatDate(saved.createdAt)}` : "";
-  $("editTitle").textContent = `${base}${date}`;
+  $("editTitle").textContent = `Folha de Estudo Life Group${date}`;
 }
 
 async function generatePdfBlob(data) {
@@ -332,7 +329,7 @@ $("downloadDocxBtn").addEventListener("click", async () => {
   setBusy(true, "word");
   try {
     const blob = await generateWordBlob(data);
-    downloadBlob(blob, state.tipo === "tadel" ? "resumo-tadel.docx" : "folha-de-estudo-life-group.docx");
+    downloadBlob(blob, "folha-de-estudo-life-group.docx");
     setStatus("Word baixado.", "ok");
   } catch (error) {
     setStatus(error.message, "error");

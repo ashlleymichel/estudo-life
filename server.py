@@ -98,10 +98,6 @@ def draw_life_group_header(canvas, doc):
     draw_document_header(canvas, doc, "Estudo Life Group")
 
 
-def draw_tadel_header(canvas, doc):
-    draw_document_header(canvas, doc, "Resumo TADEL")
-
-
 def register_document_fonts():
     fonts = {
         "DocRegular": Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
@@ -476,33 +472,32 @@ def life_group_schema():
 def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
-        "com escrita clara, bíblica, pastoral e simples para pequenos grupos nas casas. "
-        "Escreva no estilo devocional do exemplo: uma frase pastoral que explica a ideia, depois o versículo em uma linha separada. "
-        "Não use frases genéricas como 'o texto bíblico principal mostra' ou 'essa perspectiva fortalece'; escreva o conteúdo da mensagem. "
-        "As perguntas devem ser específicas ao tema e ao versículo, com o versículo logo abaixo. "
-        "Evite perguntas rasas como 'o que esse texto ensina para a vida hoje?' ou 'como praticar no dia a dia?'. "
-        "Cada pergunta deve conectar o versículo ao assunto central e provocar reflexão, comparação, arrependimento, fé ou aplicação concreta. "
-        "Use apenas referências bíblicas presentes no texto enviado. Quando escrever versículos, use NAA, em texto completo quando possível, "
-        "sem reticências e sem cortes. Se o texto não trouxer o versículo completo, use só a referência, sem inventar conteúdo. "
+        "com escrita clara, bíblica, pastoral e simples para uma reunião da igreja PAZ Church nas casas. "
+        "O conteúdo será usado em um pequeno PDF de estudo, então seja objetivo, profundo e fácil de discutir. "
+        "Dê ênfase maior aos versículos bíblicos citados no sermão. "
+        "Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas, usando a versão NAA. "
+        "Quando o texto trouxer o versículo completo, preserve o versículo completo, sem cortes e sem reticências. "
+        "Use apenas referências bíblicas presentes no texto enviado; se o texto não trouxer o versículo completo, use a referência sem inventar conteúdo. "
+        "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, sempre apoiadas nos textos bíblicos citados. "
+        "Evite perguntas rasas, genéricas ou que possam ser respondidas com sim/não. "
         "Não inclua markdown, títulos de seção, numeração externa ou explicações fora dos campos JSON."
     )
     user_prompt = f"""
 Título detectado: {title or "não informado"}
 Subtítulo detectado: {subtitle or "não informado"}
 
-Regras da folha:
-- A introdução deve ser clara, coesa e pastoral, no estilo do exemplo do usuário.
-- Na introdução, escreva entre 3 e 5 pequenos blocos. Cada bloco deve ter uma ideia pastoral e, quando houver versículo, o versículo em uma linha separada logo abaixo.
-- A introdução deve falar do assunto do PDF, não apenas listar versículos.
-- Use os versículos principais do documento, em especial os primeiros que aparecem.
-- As perguntas devem ser simples, boas para discussão em grupo, específicas ao assunto do PDF e usando os versículos como apoio.
-- As perguntas 2 a 4 devem ter profundidade semelhante a este modelo:
-  "Em 2 Coríntios 4:16-18, Paulo ensina que as tribulações são temporárias, mas a glória é eterna. Como essa perspectiva pode ajudar a viver em estado de graça mesmo em dias difíceis?"
-- Não escreva perguntas genéricas como "O que essa mensagem ensina para a vida hoje?"
-- Gere exatamente 4 perguntas.
-- A primeira pergunta deve ser: Compartilhe conosco o que essa Palavra de domingo falou com você.
-- Nas perguntas 2 a 4, escreva a pergunta e na linha seguinte o versículo de apoio.
-- A conclusão deve ter no mínimo 3 linhas e no máximo 5 linhas, sem começar com "Concluímos que", "Em resumo" ou "Então".
+Contexto e regras por trás:
+- Faça um resumo introdutório claro e de fácil entendimento do texto extraído, em no máximo 10 linhas.
+- Esse resumo será apenas a introdução de um pequeno PDF de estudos, de aproximadamente meia página, para reunião da PAZ Church nas casas.
+- A introdução deve ser coesa, pastoral e conectada ao tema do sermão, não apenas uma lista de versículos.
+- Dê ênfase maior aos versículos; use preferencialmente os primeiros versículos principais que aparecem no documento.
+- Logo após essa introdução, formule exatamente quatro perguntas para pequenos grupos discutirem o assunto e aprenderem mais profundamente.
+- A primeira pergunta deve ser exatamente: Compartilhe conosco o que essa Palavra de domingo falou com você.
+- As perguntas 2 a 4 devem ser simples de discutir em grupo, mas profundas; devem usar os versículos como apoio e fazer a pessoa ler o texto bíblico antes de responder.
+- Nas perguntas 2 a 4, escreva a pergunta e logo abaixo o versículo de apoio, da mesma forma que na introdução.
+- Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas na versão NAA. Escreva o versículo completo, sem cortes, sempre que ele estiver disponível no texto.
+- No final, faça uma conclusão curta, com no máximo cinco linhas, sobre os principais destaques e revelações do texto, focando naquilo que é o título.
+- Não comece a conclusão com "Concluímos que", "Em resumo" ou "Então".
 
 Texto extraído do arquivo:
 {truncate_for_model(text)}
@@ -1034,46 +1029,6 @@ def parse_pdf_text(text):
     }
 
 
-def parse_tadel_text(text):
-    date_match = re.search(r"Data\s*:\s*([0-9./_-]+)", text, re.IGNORECASE)
-    clean = text.strip()
-    raw_lines = clean.splitlines()
-    nonempty = [(index, line.strip()) for index, line in enumerate(raw_lines) if line.strip()]
-    title = "Resumo TADEL"
-
-    title_index = None
-    for index, line in nonempty:
-        if re.match(r"Data\s*:", line, flags=re.IGNORECASE):
-            continue
-        title = line
-        title_index = index
-        break
-
-    body_text = "\n".join(raw_lines[(title_index or 0) + 1 :]).strip()
-    conclusion = section_between(body_text, ["Conclusão", "Conclusao"], [])
-    if conclusion:
-        body_text = re.sub(
-            r"(?:^|\n)\s*Conclus[ãa]o\s*:?\s*.*\Z",
-            "",
-            body_text,
-            flags=re.IGNORECASE | re.DOTALL,
-        ).strip()
-
-    return {
-        "tipo": "tadel",
-        "titulo": title,
-        "subtitulo": f"Data: {date_match.group(1).strip()}" if date_match else "",
-        "data": date_match.group(1).strip() if date_match else "",
-        "momentoGenerosidade": "",
-        "avisos": "",
-        "momentoVisao": "",
-        "resumo": body_text or summarize(text, 8),
-        "perguntas": [],
-        "conclusao": conclusion or "",
-        "textoExtraido": text,
-    }
-
-
 def parse_multipart_file(body, content_type):
     boundary_match = re.search(r"boundary=(.+)", content_type)
     if not boundary_match:
@@ -1240,44 +1195,6 @@ def agenda_box(lines, doc_width, styles):
     return table
 
 
-def tadel_paragraphs(text):
-    lines = [line.rstrip() for line in str(text or "").splitlines()]
-    blocks = []
-    current = []
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            if current:
-                blocks.append(" ".join(current).strip())
-                current = []
-            continue
-        if re.match(r"^\d+\s*[-.]\s+", stripped) or stripped.startswith("●"):
-            if current:
-                blocks.append(" ".join(current).strip())
-            blocks.append(stripped)
-            current = []
-        else:
-            current.append(stripped)
-    if current:
-        blocks.append(" ".join(current).strip())
-    return [block for block in blocks if block]
-
-
-def tadel_block(block, styles, bold_font):
-    escaped = escape_pdf_text(block)
-    escaped = re.sub(
-        r"^(Texto base:)",
-        lambda match: bold_underline(match.group(1), bold_font),
-        escaped,
-        flags=re.IGNORECASE,
-    )
-    if re.match(r"^\d+\s*[-.]\s+", block):
-        return Paragraph(bold_underline(escaped, bold_font), styles["body"])
-    if block.startswith("●"):
-        return Paragraph(escaped, styles["body"])
-    return Paragraph(escaped, styles["body"])
-
-
 def document_styles():
     base = getSampleStyleSheet()
     regular_font, bold_font = register_document_fonts()
@@ -1397,29 +1314,9 @@ def build_life_group_pdf(data, output_path):
     doc.build(story, onFirstPage=draw_life_group_header, onLaterPages=draw_life_group_header)
 
 
-def build_tadel_pdf(data, output_path):
-    doc = make_doc(output_path, data.get("titulo", "Resumo TADEL"))
-    styles, regular_font, bold_font = document_styles()
-    story = [
-        paragraph(data.get("subtitulo") or "", styles["meta"]),
-        paragraph(data.get("titulo") or "Resumo TADEL", styles["title"]),
-    ]
-
-    for block in tadel_paragraphs(data.get("resumo")):
-        story.append(tadel_block(block, styles, bold_font))
-
-    if compact_text(data.get("conclusao")):
-        story.append(Paragraph(bold_underline("Conclusão", bold_font), styles["section"]))
-        story.append(Paragraph(escape_pdf_text(data.get("conclusao")), styles["body"]))
-
-    doc.build(story, onFirstPage=draw_tadel_header, onLaterPages=draw_tadel_header)
-
-
 def build_pdf(data, output_path):
-    if data.get("tipo") == "tadel":
-        build_tadel_pdf(data, output_path)
-    else:
-        build_life_group_pdf(data, output_path)
+    data["tipo"] = "life_group"
+    build_life_group_pdf(data, output_path)
 
 
 def word_escape(text):
@@ -1462,30 +1359,26 @@ def word_section(label, text):
 
 
 def docx_document_xml(data):
-    title = data.get("titulo") or ("Resumo TADEL" if data.get("tipo") == "tadel" else "Folha de Estudo Life Group")
+    data["tipo"] = "life_group"
+    title = data.get("titulo") or "Folha de Estudo Life Group"
     subtitle = data.get("subtitulo") or ""
     body = [
-        word_paragraph("Resumo TADEL" if data.get("tipo") == "tadel" else "Estudo Life Group", "Title"),
+        word_paragraph("Estudo Life Group", "Title"),
         word_paragraph(title, "Heading1"),
     ]
     if subtitle:
         body.append(word_paragraph(subtitle, "Subtitle"))
 
-    if data.get("tipo") == "tadel":
-        body.extend(word_section("Resumo TADEL", data.get("resumo")))
-        if compact_text(data.get("conclusao")):
-            body.extend(word_section("Conclusão", data.get("conclusao")))
-    else:
-        source_for_questions = " ".join(compact_text(data.get(key, "")) for key in ("textoExtraido", "resumo"))
-        final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
-        body.extend(word_section("Momento Generosidade", data.get("momentoGenerosidade")))
-        body.extend(word_section("Avisos / Agenda", data.get("avisos")))
-        body.extend(word_section("Momento Visão e Missão Paz Church", data.get("momentoVisao")))
-        body.extend(word_section("Introdução", data.get("resumo")))
-        body.append(word_paragraph("- Perguntas:", "Heading2"))
-        for index, question in enumerate(final_questions, start=1):
-            body.append(word_paragraph(f"{index}) {question}"))
-        body.extend(word_section("Conclusão", data.get("conclusao")))
+    source_for_questions = " ".join(compact_text(data.get(key, "")) for key in ("textoExtraido", "resumo"))
+    final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
+    body.extend(word_section("Momento Generosidade", data.get("momentoGenerosidade")))
+    body.extend(word_section("Avisos / Agenda", data.get("avisos")))
+    body.extend(word_section("Momento Visão e Missão Paz Church", data.get("momentoVisao")))
+    body.extend(word_section("Introdução", data.get("resumo")))
+    body.append(word_paragraph("- Perguntas:", "Heading2"))
+    for index, question in enumerate(final_questions, start=1):
+        body.append(word_paragraph(f"{index}) {question}"))
+    body.extend(word_section("Conclusão", data.get("conclusao")))
 
     section = (
         "<w:sectPr>"
@@ -1585,12 +1478,9 @@ class Handler(SimpleHTTPRequestHandler):
                     temp_path = Path(temp.name)
                 try:
                     text = extract_text_from_document(temp_path, filename)
-                    if fields.get("tipo") == "tadel":
-                        self.send_json(parse_tadel_text(text))
-                    else:
-                        payload = parse_pdf_text(text)
-                        payload["tipo"] = "life_group"
-                        self.send_json(payload)
+                    payload = parse_pdf_text(text)
+                    payload["tipo"] = "life_group"
+                    self.send_json(payload)
                 finally:
                     temp_path.unlink(missing_ok=True)
                 return
@@ -1621,7 +1511,7 @@ class Handler(SimpleHTTPRequestHandler):
                 try:
                     build_word(data, output_path)
                     docx = output_path.read_bytes()
-                    filename = "resumo-tadel.docx" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.docx"
+                    filename = "folha-de-estudo-life-group.docx"
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                     self.send_header("Content-Disposition", f'attachment; filename="{filename}"')

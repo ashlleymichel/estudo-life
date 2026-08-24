@@ -104,7 +104,7 @@ async function downloadWordFile(file, button) {
       throw new Error(error.erro || "Não foi possível gerar o Word.");
     }
     const blob = await response.blob();
-    const filename = file.data.tipo === "tadel" ? "resumo-tadel.docx" : "folha-de-estudo-life-group.docx";
+    const filename = "folha-de-estudo-life-group.docx";
     downloadBlob(blob, filename);
   } catch (error) {
     alert(error.message);

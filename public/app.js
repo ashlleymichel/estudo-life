@@ -33,11 +33,11 @@ function buttonContent(label, loading = false) {
 }
 
 function getExtractLabel() {
-  return state.tipo === "tadel" ? "Gerar Resumo TADEL" : "Gerar Folha de Estudo";
+  return "Gerar Folha de Estudo";
 }
 
 function getFileName() {
-  return state.tipo === "tadel" ? "resumo-tadel.pdf" : "folha-de-estudo-life-group.pdf";
+  return "folha-de-estudo-life-group.pdf";
 }
 
 function setBusy(isBusy, action = "") {
@@ -49,7 +49,6 @@ function setBusy(isBusy, action = "") {
   const saveOnlineBtn = $("saveOnlineBtn");
   const addQuestion = $("addQuestion");
   const fileInput = $("pdfFile");
-  const modeButtons = [$("lifeMode"), $("tadelMode")];
   const fieldsToToggle = [
     ...fields.map((field) => $(field)),
     ...document.querySelectorAll("#questions textarea, .questionRow button"),
@@ -62,9 +61,6 @@ function setBusy(isBusy, action = "") {
   saveOnlineBtn.disabled = isBusy;
   addQuestion.disabled = isBusy;
   fileInput.disabled = isBusy;
-  modeButtons.forEach((button) => {
-    button.disabled = isBusy;
-  });
   fieldsToToggle.forEach((field) => {
     field.disabled = isBusy;
   });
@@ -129,7 +125,7 @@ function collectData() {
     data[field] = $(field).value.trim();
   });
   data.perguntas = state.perguntas.map((item) => item.trim()).filter(Boolean);
-  data.tipo = state.tipo;
+  data.tipo = "life_group";
   data.textoExtraido = state.textoExtraido;
   return data;
 }
@@ -238,38 +234,19 @@ function loadSavedDraftForEditing() {
   }
 }
 
-function setMode(tipo) {
+function setMode() {
   if (state.busy) {
     return;
   }
-  state.tipo = tipo === "tadel" ? "tadel" : "life_group";
-  const isTadel = state.tipo === "tadel";
-  $("lifeMode").classList.toggle("active", !isTadel);
-  $("tadelMode").classList.toggle("active", isTadel);
-  $("modeEyebrow").textContent = isTadel ? "TADEL" : "Life Group";
-  $("tituloLabel").textContent = isTadel ? "Resumo TADEL" : "Título da série";
-  $("subtituloLabel").textContent = isTadel ? "DATA" : "Linha do culto";
-  $("resumoLabel").textContent = isTadel ? "Conteúdo do TADEL" : "Resumo";
+  state.tipo = "life_group";
+  $("modeEyebrow").textContent = "Life Group";
+  $("tituloLabel").textContent = "Título da série";
+  $("subtituloLabel").textContent = "Linha do culto";
+  $("resumoLabel").textContent = "Resumo";
   document.querySelectorAll(".lifeOnly").forEach((element) => {
-    element.classList.toggle("hidden", isTadel);
+    element.classList.remove("hidden");
   });
-  if (isTadel) {
-    $("extractBtn").innerHTML = getExtractLabel();
-    if (!$("titulo").value.trim() || $("titulo").value.trim() === "Folha de Estudo Life Group") {
-      $("titulo").value = "Resumo TADEL";
-    }
-    if (!$("subtitulo").value.trim() || $("subtitulo").value.trim() === "Culto Presencial e On-Line / Life Group") {
-      $("subtitulo").value = "Data: ";
-    }
-  } else {
-    $("extractBtn").innerHTML = getExtractLabel();
-    if ($("titulo").value.trim() === "Resumo TADEL") {
-      $("titulo").value = "Folha de Estudo Life Group";
-    }
-    if ($("subtitulo").value.trim() === "Data:") {
-      $("subtitulo").value = "Culto Presencial e On-Line / Life Group";
-    }
-  }
+  $("extractBtn").innerHTML = getExtractLabel();
 }
 
 $("pdfFile").addEventListener("change", (event) => {
@@ -292,7 +269,7 @@ $("uploadForm").addEventListener("submit", async (event) => {
   setBusy(true, "extract");
   const form = new FormData();
   form.append("arquivo", file);
-  form.append("tipo", state.tipo);
+  form.append("tipo", "life_group");
 
   try {
     const response = await fetch("/api/extract", {
@@ -371,7 +348,7 @@ $("downloadDocxBtn").addEventListener("click", async () => {
   setBusy(true, "word");
   try {
     const blob = await generateWordBlob(data);
-    downloadBlob(blob, state.tipo === "tadel" ? "resumo-tadel.docx" : "folha-de-estudo-life-group.docx");
+    downloadBlob(blob, "folha-de-estudo-life-group.docx");
     setStatus("Arquivo Word gerado e baixado.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
@@ -408,15 +385,6 @@ $("saveOnlineBtn").addEventListener("click", async () => {
   }
 });
 
-document.addEventListener("click", (event) => {
-  if (event.target.closest("#lifeMode")) {
-    setMode("life_group");
-  }
-  if (event.target.closest("#tadelMode")) {
-    setMode("tadel");
-  }
-});
-
 fillForm({
   titulo: "Folha de Estudo Life Group",
   subtitulo: "Culto Presencial e On-Line / Life Group",
@@ -430,5 +398,5 @@ fillForm({
   conclusao: "",
 });
 
-setMode("life_group");
+setMode();
 loadSavedDraftForEditing();

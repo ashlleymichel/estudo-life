@@ -15,7 +15,6 @@ from server import (  # noqa: E402
     extract_text_from_document,
     parse_multipart_file,
     parse_pdf_text,
-    parse_tadel_text,
 )
 
 
@@ -45,12 +44,9 @@ class handler(BaseHTTPRequestHandler):
                     temp_path = Path(temp.name)
                 try:
                     text = extract_text_from_document(temp_path, filename)
-                    if fields.get("tipo") == "tadel":
-                        self.send_json(parse_tadel_text(text))
-                    else:
-                        data = parse_pdf_text(text)
-                        data["tipo"] = "life_group"
-                        self.send_json(data)
+                    data = parse_pdf_text(text)
+                    data["tipo"] = "life_group"
+                    self.send_json(data)
                 finally:
                     temp_path.unlink(missing_ok=True)
                 return
@@ -81,7 +77,7 @@ class handler(BaseHTTPRequestHandler):
                 try:
                     build_word(data, output_path)
                     docx = output_path.read_bytes()
-                    filename = "resumo-tadel.docx" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.docx"
+                    filename = "folha-de-estudo-life-group.docx"
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                     self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
