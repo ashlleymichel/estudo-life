@@ -12,10 +12,14 @@ if str(ROOT) not in sys.path:
 from server import (  # noqa: E402
     build_pdf,
     build_word,
+    delete_shared_file,
     extract_text_from_document,
+    list_saved_files,
     parse_multipart_file,
     parse_pdf_text,
+    save_shared_file,
 )
+from urllib.parse import parse_qs, urlparse
 
 
 class handler(BaseHTTPRequestHandler):
@@ -27,8 +31,23 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def do_GET(self):
+        try:
+            if self.path.startswith("/api/saved"):
+                self.send_json({"arquivos": list_saved_files()})
+                return
+            self.send_error(HTTPStatus.NOT_FOUND)
+        except Exception as exc:
+            self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
+
     def do_POST(self):
         try:
+            if self.path.startswith("/api/saved"):
+                length = int(self.headers.get("Content-Length", "0"))
+                payload = json.loads(self.rfile.read(length).decode("utf-8"))
+                self.send_json(save_shared_file(payload))
+                return
+
             if self.path.startswith("/api/extract"):
                 length = int(self.headers.get("Content-Length", "0"))
                 filename, payload, fields = parse_multipart_file(
@@ -89,5 +108,19 @@ class handler(BaseHTTPRequestHandler):
                 return
 
             self.send_error(HTTPStatus.NOT_FOUND)
+        except Exception as exc:
+            self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
+
+    def do_DELETE(self):
+        try:
+            parsed = urlparse(self.path)
+            if parsed.path != "/api/saved":
+                self.send_error(HTTPStatus.NOT_FOUND)
+                return
+            file_id = parse_qs(parsed.query).get("id", [""])[0]
+            if not file_id:
+                raise ValueError("Arquivo não informado.")
+            delete_shared_file(file_id)
+            self.send_json({"ok": True})
         except Exception as exc:
             self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)

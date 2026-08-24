@@ -1,6 +1,6 @@
 # Folha de Estudo
 
-Plataforma local para enviar PDF ou Word, extrair as informações principais, revisar o conteúdo em campos editáveis e baixar uma nova folha em PDF.
+Plataforma para enviar PDF ou Word, extrair as informações principais, revisar o conteúdo em campos editáveis, salvar online e baixar uma nova folha em PDF ou Word.
 
 ## Como usar
 
@@ -30,9 +30,8 @@ python3 server.py
 http://127.0.0.1:8787
 ```
 
-3. Escolha **Life Group** ou **TADEL**.
-4. Selecione um arquivo PDF, DOCX, DOC, RTF ou ODT.
-5. Clique em **Extrair informações**, revise os campos e clique em **Baixar PDF** ou **Baixar Resumo**.
+3. Selecione um arquivo PDF, DOCX, DOC, RTF ou ODT.
+4. Clique em **Gerar Folha de Estudo**, revise os campos e clique em **Baixar** ou **Salvar Arquivo Online**.
 
 ## Campos gerados
 
@@ -45,12 +44,15 @@ http://127.0.0.1:8787
 - Perguntas
 - Conclusão
 
-## Modos
-
-- **Life Group**: gera folha de estudo com generosidade, avisos, visão, resumo, 4 perguntas e conclusão.
-- **TADEL**: gera resumo com data, título, conteúdo e conclusão, seguindo os modelos da pasta `TADEL`.
-
 ## Vercel
 
 No painel da Vercel, adicione `OPENAI_API_KEY` em **Project Settings > Environment Variables**.
 Depois faça um novo deploy. O front continua o mesmo; apenas o backend passa a chamar a API da OpenAI.
+
+Para que **Arquivos salvos** apareça para todos, adicione também estas variáveis na Vercel:
+
+- `GITHUB_TOKEN`: token do GitHub com permissão de escrita no repositório.
+- `GITHUB_REPO`: `ashlleymichel/estudo-life`
+- `GITHUB_BRANCH`: `main`
+
+Os arquivos salvos ficam registrados em `data/saved-files.json` no próprio repositório.

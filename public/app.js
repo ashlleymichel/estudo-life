@@ -16,10 +16,6 @@ const state = {
   editingSavedId: "",
 };
 
-const DB_NAME = "folha-estudo-arquivos";
-const DB_VERSION = 1;
-const STORE_NAME = "arquivos";
-
 const $ = (id) => document.getElementById(id);
 
 function setStatus(message, type = "") {
@@ -175,42 +171,22 @@ function downloadBlob(blob, filename) {
   URL.revokeObjectURL(url);
 }
 
-function openSavedDb() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: "id" });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+async function savePdfOnline(data) {
+  const response = await fetch("/api/saved", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id: state.editingSavedId,
+      name: getFileName(),
+      data,
+    }),
   });
-}
-
-async function savePdfOnline(blob, data) {
-  const db = await openSavedDb();
-  const id = state.editingSavedId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  const file = {
-    id,
-    name: getFileName(),
-    title: data.titulo || "Arquivo sem título",
-    type: data.tipo,
-    size: blob.size,
-    createdAt: new Date().toISOString(),
-    data,
-    blob,
-  };
-
-  await new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    tx.objectStore(STORE_NAME).put(file);
-    tx.oncomplete = resolve;
-    tx.onerror = () => reject(tx.error);
-  });
-  db.close();
-  return file;
+  const saved = await response.json();
+  if (!response.ok) {
+    throw new Error(saved.erro || "Não foi possível salvar o arquivo online.");
+  }
+  state.editingSavedId = saved.id || state.editingSavedId;
+  return saved;
 }
 
 function loadSavedDraftForEditing() {
@@ -372,12 +348,11 @@ $("saveOnlineBtn").addEventListener("click", async () => {
     return;
   }
 
-  setStatus("Gerando e salvando o arquivo...");
+  setStatus("Salvando o arquivo online...");
   setBusy(true, "save");
   try {
-    const blob = await generatePdfBlob(data);
-    await savePdfOnline(blob, data);
-    setStatus("Arquivo salvo. Abra a página Arquivos salvos para ver seus PDFs.", "ok");
+    await savePdfOnline(data);
+    setStatus("Arquivo salvo online. Todos podem ver em Arquivos salvos.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
   } finally {
