@@ -1,17 +1,17 @@
 :root {
-  color-scheme: dark;
-  --ink: #f7f5ef;
-  --muted: #b7b3aa;
-  --soft: #817d75;
-  --line: rgba(247, 245, 239, 0.13);
-  --surface: #080807;
-  --card: #11110f;
-  --wash: #1c1b18;
-  --brand: #f7f5ef;
-  --brand-2: #d8d3c8;
+  color-scheme: light;
+  --ink: #161616;
+  --muted: #686868;
+  --soft: #9a9a9a;
+  --line: #e5e5e5;
+  --surface: #f3f3f1;
+  --card: #ffffff;
+  --wash: #eeeeec;
+  --brand: #161616;
+  --brand-2: #2b2b2b;
   --danger: #a51d16;
-  --danger-soft: rgba(165, 29, 22, 0.16);
-  --focus: rgba(247, 245, 239, 0.18);
+  --danger-soft: #f8e8e7;
+  --focus: rgba(22, 22, 22, 0.12);
   --button-font-size: 0.875rem;
 }
 
@@ -24,9 +24,7 @@ body {
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 72% 8%, rgba(255, 255, 255, 0.1), transparent 26rem),
-    linear-gradient(180deg, #151411 0%, #080807 34rem);
+  background: var(--surface);
 }
 
 button,
@@ -47,7 +45,7 @@ textarea {
 .sidebarBrand img {
   width: 26px;
   height: 26px;
-  filter: brightness(0) invert(1);
+  filter: none;
 }
 
 .sidebarBrand span {
@@ -62,13 +60,13 @@ textarea {
 }
 
 .shell {
-  padding: 20px 0 56px;
+  padding: 24px 0 56px;
 }
 
 .appFrame {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 292px minmax(0, 1fr);
+  gap: 14px;
   align-items: start;
 }
 
@@ -78,18 +76,18 @@ textarea {
 .emptyState {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 24px;
 }
 
 .leftSidebar {
   position: sticky;
-  top: 20px;
+  top: 24px;
   display: flex;
   flex-direction: column;
   gap: 22px;
-  min-height: calc(100vh - 40px);
-  padding: 18px;
-  background: rgba(17, 17, 15, 0.94);
+  min-height: calc(100vh - 48px);
+  padding: 18px 16px;
+  background: #fbfbfa;
 }
 
 .sidebarNav,
@@ -119,13 +117,13 @@ textarea {
   padding: 0 12px;
   color: var(--muted);
   text-decoration: none;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .sideItem:hover,
 .sideItem.active {
   color: var(--ink);
-  background: #1d1c18;
+  background: var(--wash);
 }
 
 .sideIcon {
@@ -133,8 +131,9 @@ textarea {
   place-items: center;
   width: 24px;
   height: 24px;
-  color: #11110f;
-  background: var(--ink);
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
   border-radius: 8px;
   font-weight: 850;
   line-height: 1;
@@ -149,9 +148,9 @@ h2 {
 h1 {
   max-width: 620px;
   color: var(--ink);
-  font-size: clamp(3.8rem, 9vw, 7.6rem);
+  font-size: clamp(3.4rem, 7vw, 6.2rem);
   font-weight: 780;
-  line-height: 0.92;
+  line-height: 0.9;
 }
 
 h2 {
@@ -176,15 +175,15 @@ h2 {
   min-height: 132px;
   padding: 22px 16px;
   text-align: center;
-  background: #181713;
-  border: 1px dashed rgba(247, 245, 239, 0.22);
-  border-radius: 18px;
+  background: #f7f7f5;
+  border: 1px dashed #cfcfca;
+  border-radius: 20px;
   cursor: pointer;
 }
 
 .dropzone:hover {
-  background: #201f1a;
-  border-color: rgba(247, 245, 239, 0.48);
+  background: #ffffff;
+  border-color: var(--ink);
 }
 
 .dropIcon {
@@ -193,8 +192,8 @@ h2 {
   width: 42px;
   height: 42px;
   margin-bottom: 12px;
-  color: #11110f;
-  background: var(--ink);
+  color: #ffffff;
+  background: var(--brand);
   border-radius: 14px;
   font-size: 0.72rem;
   font-weight: 850;
@@ -226,7 +225,7 @@ button,
 .backButton {
   min-height: 46px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
   font-weight: 800;
   font-size: var(--button-font-size);
@@ -251,8 +250,8 @@ button.loading {
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(17, 17, 15, 0.38);
-  border-top-color: #11110f;
+  border: 2px solid rgba(255, 255, 255, 0.42);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -270,7 +269,7 @@ body.isBusy {
 .primary,
 .download,
 .backButton {
-  color: #11110f;
+  color: #ffffff;
   background: var(--brand);
 }
 
@@ -294,19 +293,19 @@ body.isBusy {
   width: auto;
   padding: 0 18px;
   color: var(--ink);
-  background: rgba(247, 245, 239, 0.06);
+  background: #ffffff;
   border: 1px solid var(--line);
 }
 
 .savedLink:hover {
-  color: #11110f;
+  color: #ffffff;
 }
 
 .status {
   min-height: 0;
   padding: 14px 16px;
   color: var(--muted);
-  background: #181713;
+  background: #f7f7f5;
   border: 1px solid var(--line);
   border-radius: 14px;
   font-size: 0.9rem;
@@ -314,7 +313,7 @@ body.isBusy {
 }
 
 .status.ok {
-  color: #f7f5ef;
+  color: var(--brand);
 }
 
 .status.error {
@@ -340,7 +339,7 @@ body.isBusy {
 }
 
 .recentHeader a:hover {
-  color: var(--brand-2);
+  color: var(--ink);
 }
 
 .recentFiles {
@@ -359,11 +358,11 @@ body.isBusy {
   text-align: left;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .recentItem:hover {
-  background: #1d1c18;
+  background: var(--wash);
   border-color: var(--line);
 }
 
@@ -372,8 +371,9 @@ body.isBusy {
   place-items: center;
   width: 28px;
   height: 28px;
-  color: #11110f;
-  background: var(--ink);
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
   border-radius: 9px;
   font-size: 0.62rem;
   font-weight: 850;
@@ -421,7 +421,7 @@ body.isBusy {
   display: grid;
   gap: 22px;
   padding: 28px;
-  background: rgba(17, 17, 15, 0.92);
+  background: #ffffff;
 }
 
 .topbar {
@@ -429,6 +429,8 @@ body.isBusy {
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 16px;
   align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
 }
 
 .topbar h1 {
@@ -441,9 +443,9 @@ body.isBusy {
   display: inline-flex;
   gap: 4px;
   padding: 4px;
-  background: #1b1a16;
+  background: var(--wash);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
 }
 
 .viewBtn {
@@ -456,7 +458,7 @@ body.isBusy {
 
 .viewBtn.active,
 .viewBtn:hover {
-  color: #11110f;
+  color: #ffffff;
   background: var(--ink);
 }
 
@@ -479,13 +481,13 @@ body.isBusy {
 .secondaryAction,
 .ghost {
   color: var(--ink);
-  background: #1b1a16;
+  background: var(--wash);
   border: 1px solid var(--line);
 }
 
 .secondaryAction:hover,
 .ghost:hover {
-  color: #11110f;
+  color: #ffffff;
   background: var(--ink);
 }
 
@@ -506,7 +508,7 @@ body.isBusy {
   gap: 6px;
   min-width: 140px;
   padding: 8px;
-  background: #171613;
+  background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 14px;
 }
@@ -520,7 +522,7 @@ body.isBusy {
 }
 
 .downloadOptions button:hover {
-  background: #24231e;
+  background: var(--wash);
 }
 
 .reviewLayout {
@@ -537,9 +539,9 @@ body.isBusy {
 .previewPane {
   min-height: 560px;
   padding: 30px;
-  background: #0c0c0b;
+  background: #f5f5f2;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 22px;
 }
 
 .previewEmpty {
@@ -550,9 +552,9 @@ body.isBusy {
   padding: 32px;
   color: var(--muted);
   text-align: center;
-  background: #141310;
+  background: #ffffff;
   border: 1px dashed var(--line);
-  border-radius: 16px;
+  border-radius: 20px;
   font-size: 1rem;
   line-height: 1.45;
 }
@@ -560,24 +562,24 @@ body.isBusy {
 .previewSheet {
   max-width: 760px;
   margin: 0 auto;
-  padding: 42px;
+  padding: 46px;
   color: #161616;
-  background: #f8f6ef;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e3e3df;
+  border-radius: 20px;
 }
 
 .previewHeader {
   padding-bottom: 18px;
   margin-bottom: 18px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid #e3e3df;
   text-align: center;
 }
 
 .previewHeader span {
   display: inline-flex;
   margin-bottom: 10px;
-  color: var(--muted);
+  color: #777777;
   font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -592,14 +594,14 @@ body.isBusy {
 
 .previewHeader p {
   margin: 8px 0 0;
-  color: var(--muted);
+  color: #777777;
 }
 
 .previewSection {
   display: grid;
   gap: 6px;
   padding: 16px 0;
-  border-bottom: 1px solid #ddd8cc;
+  border-bottom: 1px solid #e7e7e3;
 }
 
 .previewSection:last-child {
@@ -672,9 +674,9 @@ input,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   color: var(--ink);
-  background: #151410;
+  background: #fbfbfa;
   outline: 0;
 }
 
@@ -693,7 +695,7 @@ textarea {
 
 input:focus,
 textarea:focus {
-  border-color: rgba(247, 245, 239, 0.62);
+  border-color: var(--ink);
   box-shadow: 0 0 0 4px var(--focus);
 }
 
@@ -721,8 +723,8 @@ textarea:focus {
   width: 42px;
   height: 42px;
   color: #ffffff;
-  background: #2c2a24;
-  border-radius: 12px;
+  background: var(--ink);
+  border-radius: 14px;
   font-weight: 800;
 }
 
@@ -746,16 +748,16 @@ textarea:focus {
 
 .chatPanel {
   position: sticky;
-  top: 98px;
+  top: 24px;
   display: flex;
   flex-direction: column;
   min-height: 560px;
   max-height: calc(100vh - 122px);
   padding: 18px;
   color: var(--ink);
-  background: #0a0a09;
+  background: #fbfbfa;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 24px;
 }
 
 .chatHeader {
@@ -799,15 +801,15 @@ textarea:focus {
 
 .chatMessage.bot {
   align-self: flex-start;
-  color: #e9e5dc;
-  background: #1c1b18;
+  color: var(--ink);
+  background: #eeeeec;
   border-bottom-left-radius: 6px;
 }
 
 .chatMessage.user {
   align-self: flex-end;
-  color: #11110f;
-  background: #f7f5ef;
+  color: #ffffff;
+  background: var(--ink);
   border-bottom-right-radius: 6px;
 }
 
@@ -822,7 +824,7 @@ textarea:focus {
   min-height: 104px;
   height: 104px;
   color: var(--ink);
-  background: #161511;
+  background: #ffffff;
   border-color: var(--line);
 }
 
@@ -831,18 +833,18 @@ textarea:focus {
 }
 
 .chatComposer textarea:focus {
-  border-color: rgba(247, 245, 239, 0.62);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.13);
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px var(--focus);
 }
 
 .chatSend {
   min-height: 46px;
-  color: #11110f;
+  color: #ffffff;
   background: var(--ink);
 }
 
 .chatSend:hover {
-  color: #11110f;
+  color: #ffffff;
   background: var(--brand-2);
 }
 
