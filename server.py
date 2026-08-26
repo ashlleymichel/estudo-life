@@ -469,6 +469,40 @@ def life_group_schema():
     }
 
 
+def life_group_full_schema():
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "titulo": {"type": "string"},
+            "subtitulo": {"type": "string"},
+            "momentoGenerosidade": {"type": "string"},
+            "avisos": {"type": "string"},
+            "momentoVisao": {"type": "string"},
+            "resumo": {"type": "string"},
+            "perguntas": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+            "conclusao": {"type": "string"},
+            "tipo": {"type": "string"},
+            "textoExtraido": {"type": "string"},
+        },
+        "required": [
+            "titulo",
+            "subtitulo",
+            "momentoGenerosidade",
+            "avisos",
+            "momentoVisao",
+            "resumo",
+            "perguntas",
+            "conclusao",
+            "tipo",
+            "textoExtraido",
+        ],
+    }
+
+
 def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
@@ -512,6 +546,55 @@ Texto extraído do arquivo:
 {truncate_for_model(text)}
 """.strip()
     return call_chatgpt_json(system_prompt, user_prompt, life_group_schema())
+
+
+def normalize_editable_payload(data):
+    data = data or {}
+    perguntas = data.get("perguntas") if isinstance(data.get("perguntas"), list) else []
+    return {
+        "titulo": str(data.get("titulo") or ""),
+        "subtitulo": str(data.get("subtitulo") or ""),
+        "momentoGenerosidade": str(data.get("momentoGenerosidade") or ""),
+        "avisos": str(data.get("avisos") or ""),
+        "momentoVisao": str(data.get("momentoVisao") or ""),
+        "resumo": str(data.get("resumo") or ""),
+        "perguntas": [str(item) for item in perguntas],
+        "conclusao": str(data.get("conclusao") or ""),
+        "tipo": "life_group",
+        "textoExtraido": str(data.get("textoExtraido") or ""),
+    }
+
+
+def revise_life_group_with_chatgpt(data, instruction):
+    current = normalize_editable_payload(data)
+    instruction = clean_block(instruction)
+    if not instruction:
+        raise ValueError("Escreva o que deseja alterar na folhinha.")
+
+    system_prompt = (
+        "Você é um editor pastoral da PAZ Church. Receberá uma Folha de Estudo Life Group em JSON "
+        "e uma instrução de ajuste escrita pelo usuário. Altere somente o que foi solicitado. "
+        "Preserve todos os campos que não foram mencionados na instrução. "
+        "Mantenha o conteúdo em português do Brasil, com tom bíblico, claro, simples e pastoral. "
+        "Se ajustar perguntas com referência bíblica, mantenha sempre a estrutura: pergunta primeiro e passagem bíblica logo abaixo. "
+        "Quando houver versículos, escreva-os entre aspas e preserve a referência bíblica. "
+        "Não inclua markdown, comentários ou explicações fora do JSON."
+    )
+    user_prompt = f"""
+Pedido do usuário:
+{instruction}
+
+Folha atual em JSON:
+{json.dumps(current, ensure_ascii=False, indent=2)}
+""".strip()
+
+    revised = call_chatgpt_json(system_prompt, user_prompt, life_group_full_schema(), timeout=45)
+    if revised is None:
+        raise RuntimeError("Configure OPENAI_API_KEY para usar o chat de ajustes.")
+    merged = current.copy()
+    merged.update(normalize_editable_payload(revised))
+    merged["tipo"] = "life_group"
+    return merged
 
 
 def split_questions(value):
@@ -1528,6 +1611,13 @@ class Handler(SimpleHTTPRequestHandler):
                     self.send_json(payload)
                 finally:
                     temp_path.unlink(missing_ok=True)
+                return
+
+            if self.path == "/api/revise":
+                length = int(self.headers.get("Content-Length", "0"))
+                data = json.loads(self.rfile.read(length).decode("utf-8"))
+                payload = revise_life_group_with_chatgpt(data.get("data") or {}, data.get("instruction") or "")
+                self.send_json(payload)
                 return
 
             if self.path == "/api/pdf":

@@ -50,6 +50,8 @@ function setBusy(isBusy, action = "") {
   const saveOnlineBtn = $("saveOnlineBtn");
   const addQuestion = $("addQuestion");
   const fileInput = $("pdfFile");
+  const chatInput = $("chatInput");
+  const chatSendBtn = $("chatSendBtn");
   const fieldsToToggle = [
     ...fields.map((field) => $(field)),
     ...document.querySelectorAll("#questions textarea, .questionRow button"),
@@ -62,6 +64,8 @@ function setBusy(isBusy, action = "") {
   saveOnlineBtn.disabled = isBusy;
   addQuestion.disabled = isBusy;
   fileInput.disabled = isBusy;
+  chatInput.disabled = isBusy;
+  chatSendBtn.disabled = isBusy;
   fieldsToToggle.forEach((field) => {
     field.disabled = isBusy;
   });
@@ -69,9 +73,11 @@ function setBusy(isBusy, action = "") {
   extractBtn.classList.toggle("loading", isBusy && action === "extract");
   downloadMenuBtn.classList.toggle("loading", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
+  chatSendBtn.classList.toggle("loading", isBusy && action === "chat");
   extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : getExtractLabel(), isBusy && action === "extract");
   downloadMenuBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
+  chatSendBtn.innerHTML = buttonContent(action === "chat" ? "Ajustando..." : "Enviar", isBusy && action === "chat");
   document.body.classList.toggle("isBusy", isBusy);
 }
 
@@ -221,6 +227,35 @@ function validatePdfData(data) {
     return false;
   }
   return true;
+}
+
+function appendChatMessage(role, message) {
+  const messages = $("chatMessages");
+  const item = document.createElement("div");
+  item.className = `chatMessage ${role}`;
+  item.textContent = message;
+  messages.append(item);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function hasGeneratedContent(data) {
+  return fields.some((field) => data[field]) || data.perguntas.length > 0;
+}
+
+async function reviseWithChat(instruction) {
+  const response = await fetch("/api/revise", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      instruction,
+      data: collectData(),
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.erro || "Não foi possível ajustar a folhinha.");
+  }
+  return data;
 }
 
 async function generatePdfBlob(data) {
@@ -469,6 +504,45 @@ $("saveOnlineBtn").addEventListener("click", async () => {
     setStatus(error.message, "error");
   } finally {
     setBusy(false);
+  }
+});
+
+$("chatForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (state.busy) {
+    return;
+  }
+
+  const input = $("chatInput");
+  const instruction = input.value.trim();
+  if (!instruction) {
+    return;
+  }
+
+  const currentData = collectData();
+  if (!hasGeneratedContent(currentData)) {
+    appendChatMessage("bot", "Gere uma folhinha primeiro. Depois disso eu consigo ajustar título, introdução, perguntas, conclusão e demais campos.");
+    input.focus();
+    return;
+  }
+
+  appendChatMessage("user", instruction);
+  input.value = "";
+  setStatus("Aplicando o ajuste pedido no chat...");
+  setBusy(true, "chat");
+
+  try {
+    const data = await reviseWithChat(instruction);
+    fillForm(data);
+    setView("preview");
+    appendChatMessage("bot", "Pronto, ajustei a folhinha. Confira a prévia e me diga se quiser refinar mais alguma parte.");
+    setStatus("Ajuste aplicado. Revise a prévia antes de baixar ou salvar.", "ok");
+  } catch (error) {
+    appendChatMessage("bot", error.message);
+    setStatus(error.message, "error");
+  } finally {
+    setBusy(false);
+    input.focus();
   }
 });
 

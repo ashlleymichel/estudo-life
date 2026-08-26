@@ -409,6 +409,17 @@ body.isBusy {
   background: var(--wash);
 }
 
+.reviewLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 18px;
+  align-items: start;
+}
+
+.reviewMain {
+  min-width: 0;
+}
+
 .previewPane {
   min-height: 560px;
   padding: 30px;
@@ -619,6 +630,108 @@ textarea:focus {
   background: var(--danger-soft);
 }
 
+.chatPanel {
+  position: sticky;
+  top: 98px;
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
+  max-height: calc(100vh - 122px);
+  padding: 18px;
+  color: #ffffff;
+  background: #101010;
+  border: 1px solid #232323;
+  border-radius: 28px;
+}
+
+.chatHeader {
+  display: grid;
+  gap: 4px;
+  padding: 4px 4px 16px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.chatHeader span {
+  color: #a4a4a4;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.chatHeader strong {
+  color: #ffffff;
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.chatMessages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 260px;
+  padding: 18px 0;
+  overflow-y: auto;
+}
+
+.chatMessage {
+  width: fit-content;
+  max-width: 92%;
+  padding: 12px 14px;
+  border-radius: 18px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.chatMessage.bot {
+  align-self: flex-start;
+  color: #e9e9e9;
+  background: #242424;
+  border-bottom-left-radius: 6px;
+}
+
+.chatMessage.user {
+  align-self: flex-end;
+  color: var(--ink);
+  background: #ffffff;
+  border-bottom-right-radius: 6px;
+}
+
+.chatComposer {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.chatComposer textarea {
+  min-height: 104px;
+  height: 104px;
+  color: #ffffff;
+  background: #181818;
+  border-color: #333333;
+}
+
+.chatComposer textarea::placeholder {
+  color: #8d8d8d;
+}
+
+.chatComposer textarea:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.13);
+}
+
+.chatSend {
+  min-height: 46px;
+  color: var(--ink);
+  background: #ffffff;
+}
+
+.chatSend:hover {
+  color: #ffffff;
+  background: #333333;
+}
+
 .hidden {
   display: none !important;
 }
@@ -811,7 +924,8 @@ textarea:focus {
 
   .topActions button,
   .savedActions button,
-  .editButtons button {
+  .editButtons button,
+  .chatSend {
     width: 100%;
   }
 
@@ -822,6 +936,16 @@ textarea:focus {
 
   .previewPane {
     padding: 16px;
+  }
+
+  .reviewLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .chatPanel {
+    position: static;
+    min-height: 420px;
+    max-height: none;
   }
 
   .previewSheet {
