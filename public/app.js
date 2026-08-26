@@ -15,6 +15,7 @@ const state = {
   busy: false,
   editingSavedId: "",
   view: "preview",
+  chatHistory: [],
 };
 
 const DB_NAME = "folha-estudo-arquivos";
@@ -189,9 +190,10 @@ function renderPreview() {
     <article class="previewSheet">
       <header class="previewHeader">
         <span>Estudo Life Group</span>
-        <h3>${escapeHtml(data.titulo || "Sem título")}</h3>
-        ${data.subtitulo ? `<p>${escapeHtml(data.subtitulo)}</p>` : ""}
+        <h3>Estudo Life Group</h3>
       </header>
+      ${data.titulo ? `<p class="previewSeries"><strong>Série:</strong> “${escapeHtml(data.titulo)}”</p>` : ""}
+      ${data.subtitulo ? `<p class="previewSubtitle">${escapeHtml(data.subtitulo)}</p>` : ""}
       ${renderPreviewSection("Momento Generosidade", data.momentoGenerosidade)}
       ${renderPreviewSection("Avisos / Agenda", data.avisos)}
       ${renderPreviewSection("Momento da Visão", data.momentoVisao)}
@@ -208,6 +210,16 @@ function setView(view) {
   $("formEditor").classList.toggle("hidden", view !== "edit");
   $("previewViewBtn").classList.toggle("active", view === "preview");
   $("editViewBtn").classList.toggle("active", view === "edit");
+  const stepLabel = $("stepLabel");
+  if (stepLabel && !$("reviewLayout").classList.contains("hidden")) {
+    stepLabel.textContent = "Revisão de conteúdo";
+  }
+}
+
+function showReview() {
+  $("uploadForm").classList.add("hidden");
+  $("reviewLayout").classList.remove("hidden");
+  $("stepLabel").textContent = "Revisão de conteúdo";
 }
 
 function collectData() {
@@ -242,13 +254,14 @@ function hasGeneratedContent(data) {
   return fields.some((field) => data[field]) || data.perguntas.length > 0;
 }
 
-async function reviseWithChat(instruction) {
+async function talkWithAssistant(message) {
   const response = await fetch("/api/revise", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      instruction,
+      message,
       data: collectData(),
+      history: state.chatHistory.slice(-8),
     }),
   });
   const data = await response.json();
@@ -429,6 +442,7 @@ function loadSavedDraftForEditing() {
     }
     state.editingSavedId = saved.id || "";
     fillForm(saved.data);
+    showReview();
     setStatus("Arquivo salvo aberto para edição. Ajuste o que precisar e salve novamente.", "ok");
     return true;
   } catch (error) {
@@ -484,6 +498,7 @@ $("uploadForm").addEventListener("submit", async (event) => {
       throw new Error(data.erro || "Não foi possível extrair o arquivo.");
     }
     fillForm(data);
+    showReview();
     setView("preview");
     setStatus("Conteúdo extraído. Revise e ajuste o que precisar antes de baixar.", "ok");
   } catch (error) {
@@ -603,24 +618,25 @@ $("chatForm").addEventListener("submit", async (event) => {
     return;
   }
 
-  const currentData = collectData();
-  if (!hasGeneratedContent(currentData)) {
-    appendChatMessage("bot", "Gere uma folhinha primeiro. Depois disso eu consigo ajustar título, introdução, perguntas, conclusão e demais campos.");
-    input.focus();
-    return;
-  }
-
   appendChatMessage("user", instruction);
+  state.chatHistory.push({ role: "user", content: instruction });
   input.value = "";
-  setStatus("Aplicando o ajuste pedido no chat...");
+  setStatus("O assistente está analisando sua mensagem...");
   setBusy(true, "chat");
 
   try {
-    const data = await reviseWithChat(instruction);
-    fillForm(data);
-    setView("preview");
-    appendChatMessage("bot", "Pronto, ajustei a folhinha. Confira a prévia e me diga se quiser refinar mais alguma parte.");
-    setStatus("Ajuste aplicado. Revise a prévia antes de baixar ou salvar.", "ok");
+    const result = await talkWithAssistant(instruction);
+    if (result.action === "updated" && result.data) {
+      fillForm(result.data);
+      showReview();
+      setView("preview");
+      setStatus("Alteração aplicada pelo assistente.", "ok");
+    } else {
+      setStatus("Resposta recebida do assistente.", "ok");
+    }
+    const reply = result.reply || "Como posso ajudar?";
+    appendChatMessage("bot", reply);
+    state.chatHistory.push({ role: "assistant", content: reply });
   } catch (error) {
     appendChatMessage("bot", error.message);
     setStatus(error.message, "error");
@@ -648,5 +664,39 @@ fields.forEach((field) => {
 $("previewViewBtn").addEventListener("click", () => setView("preview"));
 $("editViewBtn").addEventListener("click", () => setView("edit"));
 setView("preview");
+
+const dropzone = document.querySelector(".dropzone");
+["dragenter", "dragover"].forEach((name) => dropzone.addEventListener(name, (event) => {
+  event.preventDefault();
+  dropzone.classList.add("dragging");
+}));
+["dragleave", "drop"].forEach((name) => dropzone.addEventListener(name, (event) => {
+  event.preventDefault();
+  dropzone.classList.remove("dragging");
+}));
+dropzone.addEventListener("drop", (event) => {
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  $("pdfFile").files = transfer.files;
+  $("fileName").textContent = file.name;
+});
+
+const themeToggle = $("themeToggle");
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  const dark = document.body.classList.contains("dark");
+  themeToggle.innerHTML = dark ? "<span>☾</span> Modo escuro" : "<span>☼</span> Modo claro";
+  localStorage.setItem("folhaTheme", dark ? "dark" : "light");
+});
+if (localStorage.getItem("folhaTheme") === "dark") {
+  document.body.classList.add("dark");
+  themeToggle.innerHTML = "<span>☾</span> Modo escuro";
+}
+
+const previewStyle = document.createElement("style");
+previewStyle.textContent = ".previewHeader p{display:none}.previewSeries{text-align:center;margin:0 70px 24px}.previewSubtitle{margin:0 70px 24px}@media(max-width:900px){.previewSeries,.previewSubtitle{margin-left:20px;margin-right:20px}}";
+document.head.append(previewStyle);
 loadSavedDraftForEditing();
 renderRecentFiles();

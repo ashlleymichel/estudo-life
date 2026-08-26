@@ -15,7 +15,7 @@ from server import (  # noqa: E402
     extract_text_from_document,
     parse_multipart_file,
     parse_pdf_text,
-    revise_life_group_with_chatgpt,
+    assist_life_group_with_chatgpt,
 )
 
 
@@ -55,7 +55,11 @@ class handler(BaseHTTPRequestHandler):
             if self.path.startswith("/api/revise"):
                 length = int(self.headers.get("Content-Length", "0"))
                 data = json.loads(self.rfile.read(length).decode("utf-8"))
-                payload = revise_life_group_with_chatgpt(data.get("data") or {}, data.get("instruction") or "")
+                payload = assist_life_group_with_chatgpt(
+                    data.get("data") or {},
+                    data.get("message") or data.get("instruction") or "",
+                    data.get("history") or [],
+                )
                 self.send_json(payload)
                 return
 

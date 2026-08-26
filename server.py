@@ -503,6 +503,19 @@ def life_group_full_schema():
     }
 
 
+def life_group_chat_schema():
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "reply": {"type": "string"},
+            "action": {"type": "string", "enum": ["answered", "updated"]},
+            "data": life_group_full_schema(),
+        },
+        "required": ["reply", "action", "data"],
+    }
+
+
 def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
@@ -595,6 +608,53 @@ Folha atual em JSON:
     merged.update(normalize_editable_payload(revised))
     merged["tipo"] = "life_group"
     return merged
+
+
+def assist_life_group_with_chatgpt(data, message, history=None):
+    current = normalize_editable_payload(data)
+    message = clean_block(message)
+    if not message:
+        raise ValueError("Escreva uma mensagem para o assistente.")
+
+    history = history if isinstance(history, list) else []
+    safe_history = []
+    for item in history[-8:]:
+        if not isinstance(item, dict):
+            continue
+        role = item.get("role")
+        content = clean_block(item.get("content"))
+        if role in {"user", "assistant"} and content:
+            safe_history.append({"role": role, "content": content[:1500]})
+
+    system_prompt = (
+        "Você é o assistente pastoral e editorial da plataforma Folha de Estudo da PAZ Church. "
+        "Converse em português do Brasil, seja acolhedor, objetivo e útil. Responda dúvidas sobre o conteúdo, "
+        "sugira melhorias, explique como usar a plataforma e auxilie na preparação do Life Group. "
+        "Quando o usuário pedir uma alteração concreta na folha, aplique a mudança e use action='updated'. "
+        "Quando ele fizer uma pergunta, pedir opinião, explicação ou orientação sem solicitar mudança, "
+        "responda sem alterar a folha e use action='answered'. Preserve rigorosamente os campos não mencionados. "
+        "Nunca invente que uma alteração foi feita. A resposta ao usuário deve dizer claramente se a folha foi alterada. "
+        "Mantenha tom bíblico, pastoral, claro e simples. O campo data deve sempre conter a folha completa, "
+        "mesmo quando nenhuma alteração for feita. Não use markdown complexo na resposta."
+    )
+    user_prompt = f"""
+Conversa recente:
+{json.dumps(safe_history, ensure_ascii=False, indent=2)}
+
+Mensagem atual:
+{message}
+
+Folha atual:
+{json.dumps(current, ensure_ascii=False, indent=2)}
+""".strip()
+
+    result = call_chatgpt_json(system_prompt, user_prompt, life_group_chat_schema(), timeout=45)
+    if result is None:
+        raise RuntimeError("Configure OPENAI_API_KEY para usar o assistente do chat.")
+    result["data"] = normalize_editable_payload(result.get("data"))
+    result["action"] = "updated" if result.get("action") == "updated" else "answered"
+    result["reply"] = clean_block(result.get("reply")) or "Como posso ajudar com esta folha de estudo?"
+    return result
 
 
 def split_questions(value):
@@ -1616,7 +1676,11 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path == "/api/revise":
                 length = int(self.headers.get("Content-Length", "0"))
                 data = json.loads(self.rfile.read(length).decode("utf-8"))
-                payload = revise_life_group_with_chatgpt(data.get("data") or {}, data.get("instruction") or "")
+                payload = assist_life_group_with_chatgpt(
+                    data.get("data") or {},
+                    data.get("message") or data.get("instruction") or "",
+                    data.get("history") or [],
+                )
                 self.send_json(payload)
                 return
 
