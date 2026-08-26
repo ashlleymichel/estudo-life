@@ -1,19 +1,19 @@
 :root {
   color-scheme: light;
   --ink: #1d1d1f;
-  --muted: #6e6e73;
-  --soft: #86868b;
-  --line: #d2d2d7;
-  --surface: #f5f5f7;
+  --muted: #55565a;
+  --soft: #76777b;
+  --line: #d7d7d2;
+  --surface: #f4f2ee;
   --card: #ffffff;
-  --card-soft: #fbfbfd;
-  --brand: #183a64;
-  --brand-2: #0f2b4d;
-  --accent: #0071e3;
-  --accent-soft: #e8f2ff;
+  --card-soft: #faf9f6;
+  --brand: #111111;
+  --brand-2: #333333;
+  --accent: #111111;
+  --accent-soft: #f0eee9;
   --danger: #b42318;
   --danger-soft: #fff1f0;
-  --focus: rgba(0, 113, 227, 0.18);
+  --focus: rgba(17, 17, 17, 0.14);
   --button-font-size: 0.875rem;
 }
 
@@ -26,9 +26,7 @@ body {
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
   color: var(--ink);
-  background:
-    linear-gradient(180deg, #ffffff 0, var(--surface) 320px),
-    var(--surface);
+  background: var(--surface);
 }
 
 button,
@@ -45,13 +43,13 @@ textarea {
 }
 
 .shell {
-  padding: 48px 0;
+  padding: 34px 0;
 }
 
 .workspace {
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: 350px minmax(0, 1fr);
+  gap: 18px;
   align-items: start;
 }
 
@@ -60,15 +58,16 @@ textarea {
 .savedItem,
 .emptyState {
   background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(210, 210, 215, 0.78);
-  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
 }
 
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 24px;
+  gap: 20px;
+  min-height: calc(100vh - 68px);
+  padding: 28px;
 }
 
 .brandMark {
@@ -78,17 +77,17 @@ textarea {
   gap: 8px;
   width: 100%;
   min-width: 0;
-  min-height: 58px;
-  margin-bottom: 28px;
-  padding: 14px 18px;
+  min-height: 54px;
+  margin-bottom: 34px;
+  padding: 12px 18px;
   background: var(--card-soft);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 18px;
 }
 
 .brandMark span {
   color: var(--brand);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
@@ -101,8 +100,8 @@ textarea {
 }
 
 .eyebrow {
-  margin: 12px 0 0;
-  color: var(--accent);
+  margin: 16px 0 0;
+  color: var(--muted);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0;
@@ -116,26 +115,27 @@ h2 {
 }
 
 h1 {
-  max-width: 250px;
+  max-width: 260px;
   color: var(--ink);
-  font-size: 3.25rem;
-  font-weight: 750;
-  line-height: 0.98;
+  font-size: 4.15rem;
+  font-weight: 800;
+  line-height: 0.9;
 }
 
 h2 {
   color: var(--ink);
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .muted {
   max-width: 100%;
   color: var(--muted);
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 400;
-  line-height: 1.42;
-  margin: 28px 0 8px;
+  line-height: 1.35;
+  margin: 42px 0 10px;
 }
 
 .upload {
@@ -147,18 +147,18 @@ h2 {
 .dropzone {
   display: grid;
   place-items: center;
-  min-height: 150px;
+  min-height: 170px;
   padding: 34px 18px;
   text-align: center;
-  background: #ffffff;
-  border: 1px dashed #b8c5d6;
-  border-radius: 8px;
+  background: var(--card-soft);
+  border: 1px dashed #b9b8b2;
+  border-radius: 22px;
   cursor: pointer;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
 .dropzone:hover {
-  background: #fbfdff;
+  background: #ffffff;
   border-color: var(--accent);
   transform: translateY(-1px);
 }
@@ -189,9 +189,9 @@ input[type="file"] {
 }
 
 button {
-  min-height: 42px;
+  min-height: 48px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 16px;
   cursor: pointer;
   font-weight: 700;
   font-size: var(--button-font-size);
@@ -247,6 +247,7 @@ body.isBusy {
 .primary {
   width: 100%;
   padding: 0 22px;
+  border-radius: 18px;
 }
 
 .primary:hover,
@@ -264,7 +265,7 @@ body.isBusy {
   padding: 0 18px;
   color: #ffffff;
   background: var(--brand);
-  border-radius: 999px;
+  border-radius: 18px;
   font-size: var(--button-font-size);
   font-weight: 700;
   text-decoration: none;
@@ -283,7 +284,7 @@ body.isBusy {
 
 .ghost {
   width: 132px;
-  min-height: 38px;
+  min-height: 40px;
   padding: 0 18px;
 }
 
@@ -295,11 +296,11 @@ body.isBusy {
 
 .status {
   margin-top: 2px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   color: var(--muted);
   background: var(--card-soft);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 18px;
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -314,16 +315,16 @@ body.isBusy {
 
 .editor {
   display: grid;
-  gap: 16px;
-  padding: 26px;
+  gap: 18px;
+  padding: 28px;
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
   align-items: center;
-  padding-bottom: 18px;
+  padding-bottom: 22px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -331,13 +332,14 @@ body.isBusy {
   display: inline-flex;
   gap: 4px;
   padding: 4px;
-  background: #f2f4f7;
+  background: var(--card-soft);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 16px;
 }
 
 .viewBtn {
   min-height: 34px;
+  border: 1px solid transparent;
   padding: 0 16px;
   color: var(--muted);
   background: transparent;
@@ -348,6 +350,7 @@ body.isBusy {
 .viewBtn:hover {
   color: var(--ink);
   background: #ffffff;
+  border: 1px solid var(--line);
   transform: none;
 }
 
@@ -361,7 +364,7 @@ body.isBusy {
 
 .download,
 .secondaryAction {
-  min-height: 42px;
+  min-height: 48px;
   padding: 0 20px;
   white-space: nowrap;
 }
@@ -385,8 +388,8 @@ body.isBusy {
   padding: 8px;
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 18px 40px rgba(29, 29, 31, 0.12);
+  border-radius: 18px;
+  box-shadow: none;
 }
 
 .downloadOptions button {
@@ -414,9 +417,9 @@ body.isBusy {
   padding: 32px;
   color: var(--muted);
   text-align: center;
-  background: #fbfbfd;
+  background: var(--card-soft);
   border: 1px dashed var(--line);
-  border-radius: 8px;
+  border-radius: 22px;
   font-size: 1rem;
   line-height: 1.45;
 }
@@ -424,11 +427,11 @@ body.isBusy {
 .previewSheet {
   max-width: 760px;
   margin: 0 auto;
-  padding: 34px;
+  padding: 38px;
   color: #1d1d1f;
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 24px;
 }
 
 .previewHeader {
@@ -441,7 +444,7 @@ body.isBusy {
 .previewHeader span {
   display: inline-flex;
   margin-bottom: 10px;
-  color: var(--accent);
+  color: var(--muted);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -450,7 +453,7 @@ body.isBusy {
 .previewHeader h3 {
   margin: 0;
   color: var(--ink);
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   line-height: 1.2;
 }
 
@@ -462,7 +465,7 @@ body.isBusy {
 .previewSection {
   display: grid;
   gap: 6px;
-  padding: 14px 0;
+  padding: 16px 0;
   border-bottom: 1px solid #ececf0;
 }
 
@@ -538,7 +541,7 @@ input,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 18px;
   color: var(--ink);
   background: #ffffff;
   outline: 0;
@@ -546,15 +549,15 @@ textarea {
 }
 
 input {
-  height: 44px;
-  padding: 0 14px;
+  height: 50px;
+  padding: 0 16px;
 }
 
 textarea {
   resize: vertical;
   height: 124px;
   min-height: 124px;
-  padding: 13px 14px;
+  padding: 15px 16px;
   line-height: 1.5;
 }
 
@@ -590,7 +593,7 @@ textarea:focus {
   height: 42px;
   color: #ffffff;
   background: var(--brand);
-  border-radius: 999px;
+  border-radius: 14px;
   font-weight: 700;
 }
 
@@ -629,7 +632,7 @@ textarea:focus {
 }
 
 .savedPage {
-  padding: 48px 0;
+  padding: 34px 0;
 }
 
 .savedToolbar {
@@ -644,9 +647,9 @@ textarea:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  min-height: 48px;
   padding: 0 22px;
-  border-radius: 999px;
+  border-radius: 16px;
   font-size: var(--button-font-size);
   font-weight: 700;
   text-decoration: none;
@@ -665,8 +668,8 @@ textarea:focus {
   justify-content: space-between;
   column-gap: 20px;
   row-gap: 16px;
-  min-height: 118px;
-  padding: 24px;
+  min-height: 124px;
+  padding: 26px;
 }
 
 .savedInfo {
@@ -710,7 +713,7 @@ textarea:focus {
 }
 
 .deleteSaved {
-  min-height: 42px;
+  min-height: 48px;
   padding: 0 18px;
   color: var(--danger);
   background: var(--danger-soft);
@@ -722,12 +725,12 @@ textarea:focus {
 }
 
 .editPage {
-  padding: 60px 0 44px;
+  padding: 34px 0 44px;
 }
 
 .editEditor {
   gap: 16px;
-  padding: 26px;
+  padding: 28px;
 }
 
 .editHeading {
