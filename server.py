@@ -479,6 +479,7 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "Quando o texto trouxer o versículo completo, preserve o versículo completo, sem cortes e sem reticências. "
         "Use apenas referências bíblicas presentes no texto enviado; se o texto não trouxer o versículo completo, use a referência sem inventar conteúdo. "
         "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, sempre apoiadas nos textos bíblicos citados. "
+        "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo de pelo menos duas perguntas, preferencialmente nas perguntas 2, 3 e 4. "
         "Evite perguntas rasas, genéricas ou que possam ser respondidas com sim/não. "
         "Não inclua markdown, títulos de seção, numeração externa ou explicações fora dos campos JSON."
     )
@@ -494,7 +495,9 @@ Contexto e regras por trás:
 - Logo após essa introdução, formule exatamente quatro perguntas para pequenos grupos discutirem o assunto e aprenderem mais profundamente.
 - A primeira pergunta deve ser exatamente: Compartilhe conosco o que essa Palavra de domingo falou com você.
 - As perguntas 2 a 4 devem ser simples de discutir em grupo, mas profundas; devem usar os versículos como apoio e fazer a pessoa ler o texto bíblico antes de responder.
-- Nas perguntas 2 a 4, escreva a pergunta e logo abaixo o versículo de apoio, da mesma forma que na introdução.
+- Quando houver passagens bíblicas no esboço, pelo menos duas perguntas devem trazer o versículo completo logo abaixo da pergunta.
+- Se houver três ou mais passagens bíblicas relevantes, coloque versículo de apoio nas perguntas 2, 3 e 4.
+- Nas perguntas que tiverem versículo de apoio, escreva primeiro a pergunta e logo abaixo a passagem bíblica, da mesma forma que na introdução.
 - Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas na versão NAA. Escreva o versículo completo, sem cortes, sempre que ele estiver disponível no texto.
 - No final, faça uma conclusão curta, com no máximo cinco linhas, sobre os principais destaques e revelações do texto, focando naquilo que é o título.
 - Não comece a conclusão com "Concluímos que", "Em resumo" ou "Então".
@@ -541,8 +544,8 @@ def scripture_quote_for_ref(text, ref):
     escaped_ref = re.escape(ref)
     quote_chars = r"[“\"]"
     patterns = [
-        rf"{quote_chars}([^”\"]{{20,420}}?)[”\"]\s*\(?{escaped_ref}(?:\s+[A-Z]{{2,5}})?\)?",
         rf"{escaped_ref}(?:\s+[A-Z]{{2,5}})?\)?\s*[—:-]?\s*{quote_chars}([^”\"]{{20,420}}?)[”\"]",
+        rf"{quote_chars}([^”\"]{{20,420}}?)[”\"][ \t]*\(?{escaped_ref}(?:\s+[A-Z]{{2,5}})?\)?",
     ]
     for pattern in patterns:
         match = re.search(pattern, text, flags=re.IGNORECASE)
