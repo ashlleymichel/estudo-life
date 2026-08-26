@@ -581,6 +581,27 @@ def scripture_line(text, ref):
     return f"{ref} NAA"
 
 
+def is_scripture_line(text):
+    value = compact_text(text)
+    if not biblical_references(value):
+        return False
+    return bool(
+        re.match(r'^["“][^"”]{12,}["”]\s*\(?', value)
+        or re.fullmatch(r"\(?[1-3]?\s*[A-Za-zÀ-ÿ]+\s+\d{1,3}:\d{1,3}(?:-\d{1,3})?\s+NAA\)?", value)
+    )
+
+
+def reorder_question_and_scripture(text):
+    lines = [line.strip() for line in str(text or "").splitlines() if compact_text(line)]
+    if len(lines) < 2:
+        return normalize_scripture_version_labels(str(text or "").strip())
+    scripture_lines = [line for line in lines if is_scripture_line(line)]
+    question_lines = [line for line in lines if line not in scripture_lines]
+    if not scripture_lines or not question_lines:
+        return normalize_scripture_version_labels(str(text or "").strip())
+    return normalize_scripture_version_labels("\n".join(question_lines + scripture_lines))
+
+
 def normalize_scripture_version_labels(text):
     return re.sub(r"\b(?:ARC|ARA|NVI|NVT|NTLH|ACF|KJA)\b", "NAA", text or "")
 
@@ -626,6 +647,8 @@ def broken_generated_question(question):
         return True
     if value.count('"') % 2 != 0:
         return True
+    if is_scripture_line(value):
+        return True
     return False
 
 
@@ -652,7 +675,13 @@ def question_already_has_quote_for_ref(question, ref):
     return bool(re.search(rf"[“\"][^”\"]+[”\"]\s*\({escaped_ref}(?:\s+NAA)?\)", question, re.IGNORECASE))
 
 
+def question_has_support_for_ref(question, ref):
+    ref_lower = ref.lower()
+    return any(is_scripture_line(line) and ref_lower in line.lower() for line in str(question or "").splitlines())
+
+
 def question_with_scripture(question, source_text, refs, index):
+    question = reorder_question_and_scripture(question)
     if "\n" in str(question):
         question = normalize_scripture_version_labels(str(question).strip())
     else:
@@ -662,10 +691,14 @@ def question_with_scripture(question, source_text, refs, index):
         additions = []
         for ref in question_refs:
             quote = scripture_quote_for_ref(source_text, ref)
-            if quote and quote not in question and not question_already_has_quote_for_ref(question, ref):
+            if question_has_support_for_ref(question, ref) or question_already_has_quote_for_ref(question, ref):
+                continue
+            if quote and quote not in question:
+                additions.append(scripture_fragment(source_text, ref))
+            elif not quote:
                 additions.append(scripture_fragment(source_text, ref))
         if additions:
-            return f"{compact_text(question)}\n" + "\n".join(additions)
+            return reorder_question_and_scripture(f"{compact_text(question)}\n" + "\n".join(additions))
         return question
 
     if refs:
@@ -750,6 +783,9 @@ def normalize_questions(text, questions=None):
     filtered = []
     for question in questions:
         normalized = re.sub(r"^\d+\)\s*", "", question).strip()
+        if is_scripture_line(normalized) and filtered:
+            filtered[-1] = reorder_question_and_scripture(f"{filtered[-1]}\n{normalized}")
+            continue
         if broken_generated_question(normalized):
             continue
         if normalized.lower() == FIRST_QUESTION.lower():
@@ -1295,8 +1331,8 @@ def build_life_group_pdf(data, output_path):
     doc = make_doc(output_path, data.get("titulo", "Folha de Estudo Life Group"))
     styles, regular_font, bold_font = document_styles()
 
-    source_for_questions = " ".join(
-        compact_text(data.get(key, ""))
+    source_for_questions = "\n".join(
+        normalize_pdf_chars(data.get(key, "")).strip()
         for key in ("textoExtraido", "resumo")
     )
     final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
@@ -1376,7 +1412,7 @@ def docx_document_xml(data):
     if subtitle:
         body.append(word_paragraph(subtitle, "Subtitle"))
 
-    source_for_questions = " ".join(compact_text(data.get(key, "")) for key in ("textoExtraido", "resumo"))
+    source_for_questions = "\n".join(normalize_pdf_chars(data.get(key, "")).strip() for key in ("textoExtraido", "resumo"))
     final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
     body.extend(word_section("Momento Generosidade", data.get("momentoGenerosidade")))
     body.extend(word_section("Avisos / Agenda", data.get("avisos")))
