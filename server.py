@@ -1,11 +1,9 @@
-import base64
 import json
 import os
 import re
 import shutil
 import subprocess
 import tempfile
-import uuid
 import xml.etree.ElementTree as ET
 import zipfile
 from http import HTTPStatus
@@ -13,7 +11,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
@@ -34,9 +32,6 @@ ROOT = Path(__file__).resolve().parent
 STATIC_DIR = ROOT / "public"
 LOGO_PATH = ROOT / "LOGO" / "LOGO.svg"
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-SAVED_FILES_PATH = os.environ.get("SAVED_FILES_PATH", "data/saved-files.json")
-GITHUB_REPO = os.environ.get("GITHUB_REPO", "ashlleymichel/estudo-life")
-GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
 
 DEFAULT_GENEROSIDADE = (
     'Todas as ofertas dos "Life Groups" são destinadas ao ministério Amor em Ação. '
@@ -452,130 +447,6 @@ def call_chatgpt_json(system_prompt, user_prompt, schema, timeout=45):
     if not output:
         raise RuntimeError("A OpenAI não retornou conteúdo para a folha.")
     return json.loads(output)
-
-
-def github_api_request(path, method="GET", payload=None):
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
-        raise RuntimeError("Configure GITHUB_TOKEN na Vercel para salvar arquivos online.")
-
-    data = json.dumps(payload).encode("utf-8") if payload is not None else None
-    request = Request(
-        f"https://api.github.com{path}",
-        data=data,
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github+json",
-            "Content-Type": "application/json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        },
-        method=method,
-    )
-    try:
-        with urlopen(request, timeout=25) as response:
-            body = response.read().decode("utf-8")
-            return json.loads(body) if body else {}
-    except HTTPError as exc:
-        if exc.code == 404:
-            raise FileNotFoundError from exc
-        details = exc.read().decode("utf-8", "ignore")
-        raise RuntimeError(f"Erro ao acessar os arquivos salvos: {details or exc}") from exc
-    except URLError as exc:
-        raise RuntimeError("Não foi possível conectar ao GitHub para salvar os arquivos.") from exc
-
-
-def local_saved_path():
-    return ROOT / SAVED_FILES_PATH
-
-
-def use_local_saved_storage():
-    return not os.environ.get("GITHUB_TOKEN") and not os.environ.get("VERCEL")
-
-
-def read_saved_records():
-    if use_local_saved_storage():
-        path = local_saved_path()
-        if not path.exists():
-            return [], None
-        return json.loads(path.read_text(encoding="utf-8")), None
-
-    path = f"/repos/{GITHUB_REPO}/contents/{SAVED_FILES_PATH}?ref={GITHUB_BRANCH}"
-    try:
-        payload = github_api_request(path)
-    except FileNotFoundError:
-        return [], None
-    content = base64.b64decode(payload.get("content", "")).decode("utf-8")
-    return json.loads(content or "[]"), payload.get("sha")
-
-
-def write_saved_records(records, sha=None):
-    if use_local_saved_storage():
-        path = local_saved_path()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
-        return
-
-    content = base64.b64encode(json.dumps(records, ensure_ascii=False, indent=2).encode("utf-8")).decode("ascii")
-    payload = {
-        "message": "Atualizar arquivos salvos",
-        "content": content,
-        "branch": GITHUB_BRANCH,
-    }
-    if sha:
-        payload["sha"] = sha
-    github_api_request(f"/repos/{GITHUB_REPO}/contents/{SAVED_FILES_PATH}", method="PUT", payload=payload)
-
-
-def saved_file_size(data):
-    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp:
-        output_path = Path(temp.name)
-    try:
-        build_pdf(data, output_path)
-        return output_path.stat().st_size
-    finally:
-        output_path.unlink(missing_ok=True)
-
-
-def list_saved_files():
-    records, _sha = read_saved_records()
-    return sorted(records, key=lambda item: item.get("createdAt", ""), reverse=True)
-
-
-def save_shared_file(payload):
-    data = payload.get("data") or {}
-    if not data.get("titulo") or not data.get("resumo"):
-        raise ValueError("Preencha pelo menos o título e o resumo antes de salvar.")
-
-    records, sha = read_saved_records()
-    file_id = payload.get("id") or str(uuid.uuid4())
-    current = next((item for item in records if item.get("id") == file_id), None)
-    created_at = current.get("createdAt") if current else payload.get("createdAt")
-    record = {
-        "id": file_id,
-        "name": payload.get("name") or "folha-de-estudo-life-group.pdf",
-        "title": data.get("titulo") or "Arquivo sem título",
-        "type": "life_group",
-        "size": saved_file_size(data),
-        "createdAt": created_at or payload.get("updatedAt") or current_timestamp(),
-        "updatedAt": current_timestamp(),
-        "data": data,
-    }
-    next_records = [item for item in records if item.get("id") != file_id]
-    next_records.append(record)
-    write_saved_records(sorted(next_records, key=lambda item: item.get("createdAt", ""), reverse=True), sha)
-    return record
-
-
-def delete_shared_file(file_id):
-    records, sha = read_saved_records()
-    next_records = [item for item in records if item.get("id") != file_id]
-    write_saved_records(next_records, sha)
-
-
-def current_timestamp():
-    from datetime import datetime, timezone
-
-    return datetime.now(timezone.utc).isoformat()
 
 
 def life_group_schema():
@@ -1591,24 +1462,8 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def do_GET(self):
-        parsed = urlparse(self.path)
-        if parsed.path == "/api/saved":
-            try:
-                self.send_json({"arquivos": list_saved_files()})
-            except Exception as exc:
-                self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
-            return
-        super().do_GET()
-
     def do_POST(self):
         try:
-            if self.path == "/api/saved":
-                length = int(self.headers.get("Content-Length", "0"))
-                payload = json.loads(self.rfile.read(length).decode("utf-8"))
-                self.send_json(save_shared_file(payload))
-                return
-
             if self.path == "/api/extract":
                 length = int(self.headers.get("Content-Length", "0"))
                 filename, payload, fields = parse_multipart_file(
@@ -1668,20 +1523,6 @@ class Handler(SimpleHTTPRequestHandler):
                 return
 
             self.send_error(HTTPStatus.NOT_FOUND)
-        except Exception as exc:
-            self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
-
-    def do_DELETE(self):
-        parsed = urlparse(self.path)
-        if parsed.path != "/api/saved":
-            self.send_error(HTTPStatus.NOT_FOUND)
-            return
-        try:
-            file_id = parse_qs(parsed.query).get("id", [""])[0]
-            if not file_id:
-                raise ValueError("Arquivo não informado.")
-            delete_shared_file(file_id)
-            self.send_json({"ok": True})
         except Exception as exc:
             self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
 

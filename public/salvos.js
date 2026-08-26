@@ -1,22 +1,44 @@
+const DB_NAME = "folha-estudo-arquivos";
+const DB_VERSION = 1;
+const STORE_NAME = "arquivos";
+
 const list = document.getElementById("savedList");
 
+function openSavedDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "id" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
 async function getSavedFiles() {
-  const response = await fetch("/api/saved");
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new Error(payload.erro || "Não foi possível carregar os arquivos salvos.");
-  }
-  return payload.arquivos || [];
+  const db = await openSavedDb();
+  const files = await new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const request = tx.objectStore(STORE_NAME).getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  db.close();
+  return files.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
 async function deleteFile(id) {
-  const response = await fetch(`/api/saved?id=${encodeURIComponent(id)}`, {
-    method: "DELETE",
+  const db = await openSavedDb();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).delete(id);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
   });
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new Error(payload.erro || "Não foi possível excluir o arquivo.");
-  }
+  db.close();
 }
 
 function formatDate(value) {
@@ -40,6 +62,17 @@ function formatSize(bytes) {
   return `${(kb / 1024).toFixed(1)} MB`;
 }
 
+function downloadFile(file) {
+  const url = URL.createObjectURL(file.blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = file.name || "arquivo-salvo.pdf";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -51,9 +84,9 @@ function downloadBlob(blob, filename) {
   URL.revokeObjectURL(url);
 }
 
-async function generateDownload(file, format, button) {
+async function downloadWordFile(file, button) {
   if (!file.data) {
-    alert("Este arquivo não possui dados editáveis para gerar o download.");
+    alert("Este arquivo foi salvo antes da função de DOCX. Gere e salve novamente para baixar em Word.");
     return;
   }
 
@@ -61,17 +94,17 @@ async function generateDownload(file, format, button) {
   button.disabled = true;
   button.textContent = "Gerando...";
   try {
-    const response = await fetch(format === "docx" ? "/api/word" : "/api/pdf", {
+    const response = await fetch("/api/word", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(file.data),
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.erro || "Não foi possível gerar o arquivo.");
+      throw new Error(error.erro || "Não foi possível gerar o Word.");
     }
     const blob = await response.blob();
-    const filename = format === "docx" ? "folha-de-estudo-life-group.docx" : file.name || "folha-de-estudo-life-group.pdf";
+    const filename = "folha-de-estudo-life-group.docx";
     downloadBlob(blob, filename);
   } catch (error) {
     alert(error.message);
@@ -83,7 +116,7 @@ async function generateDownload(file, format, button) {
 
 function editFile(file) {
   if (!file.data) {
-    alert("Este arquivo não possui dados editáveis.");
+    alert("Este arquivo foi salvo antes da função de edição. Gere e salve novamente para editar online.");
     return;
   }
   sessionStorage.setItem(
@@ -96,11 +129,6 @@ function editFile(file) {
     }),
   );
   window.location.href = "/editar.html";
-}
-
-async function refreshFiles() {
-  list.innerHTML = '<p class="emptyState">Carregando arquivos...</p>';
-  renderFiles(await getSavedFiles());
 }
 
 function renderFiles(files) {
@@ -126,12 +154,6 @@ function renderFiles(files) {
     const actions = document.createElement("div");
     actions.className = "savedActions";
 
-    const edit = document.createElement("button");
-    edit.className = "secondaryAction";
-    edit.type = "button";
-    edit.textContent = "Editar";
-    edit.addEventListener("click", () => editFile(file));
-
     const downloadMenu = document.createElement("div");
     downloadMenu.className = "downloadMenu";
 
@@ -150,7 +172,7 @@ function renderFiles(files) {
     pdf.addEventListener("click", () => {
       downloadOptions.classList.add("hidden");
       download.setAttribute("aria-expanded", "false");
-      generateDownload(file, "pdf", pdf);
+      downloadFile(file);
     });
 
     const docx = document.createElement("button");
@@ -159,7 +181,7 @@ function renderFiles(files) {
     docx.addEventListener("click", () => {
       downloadOptions.classList.add("hidden");
       download.setAttribute("aria-expanded", "false");
-      generateDownload(file, "docx", docx);
+      downloadWordFile(file, docx);
     });
 
     download.addEventListener("click", () => {
@@ -176,17 +198,19 @@ function renderFiles(files) {
     downloadOptions.append(pdf, docx);
     downloadMenu.append(download, downloadOptions);
 
+    const edit = document.createElement("button");
+    edit.className = "secondaryAction";
+    edit.type = "button";
+    edit.textContent = "Editar";
+    edit.addEventListener("click", () => editFile(file));
+
     const remove = document.createElement("button");
     remove.className = "deleteSaved";
     remove.type = "button";
     remove.textContent = "Excluir";
     remove.addEventListener("click", async () => {
-      try {
-        await deleteFile(file.id);
-        await refreshFiles();
-      } catch (error) {
-        alert(error.message);
-      }
+      await deleteFile(file.id);
+      renderFiles(await getSavedFiles());
     });
 
     info.append(title, meta);
@@ -208,6 +232,8 @@ document.addEventListener("click", (event) => {
   });
 });
 
-refreshFiles().catch((error) => {
-  list.innerHTML = `<p class="emptyState">${error.message}</p>`;
-});
+getSavedFiles()
+  .then(renderFiles)
+  .catch(() => {
+    list.innerHTML = '<p class="emptyState">Não foi possível carregar os arquivos salvos.</p>';
+  });
