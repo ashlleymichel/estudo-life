@@ -490,11 +490,12 @@ Título detectado: {title or "não informado"}
 Subtítulo detectado: {subtitle or "não informado"}
 
 Contexto e regras por trás:
-- Faça um resumo introdutório claro e de fácil entendimento do texto extraído, em no máximo 10 linhas.
-- Esse resumo será apenas a introdução de um pequeno PDF de estudos, de aproximadamente meia página, para reunião da PAZ Church nas casas.
+- Faça um resumo introdutório claro e de fácil entendimento do texto extraído, que foi o sermão de domingo do pastor, em no máximo 10 linhas, dando ênfase aos versículos.
+- Esse texto será apenas a introdução de um pequeno PDF de estudos para uma reunião da igreja PAZ Church nas casas.
 - A introdução deve ser coesa, pastoral e conectada ao tema do sermão, não apenas uma lista de versículos.
 - Dê ênfase maior aos versículos; use preferencialmente os primeiros versículos principais que aparecem no documento.
-- Logo após essa introdução, formule exatamente quatro perguntas para pequenos grupos discutirem o assunto e aprenderem mais profundamente.
+- Logo após essa introdução, formule exatamente quatro perguntas para que pequenos grupos discutam esse assunto e aprendam mais profundamente.
+- As perguntas devem dar ênfase aos textos bíblicos citados no texto.
 - A primeira pergunta deve ser exatamente: Compartilhe conosco o que essa Palavra de domingo falou com você.
 - As perguntas 2 a 4 devem ser simples de discutir em grupo, mas profundas; devem usar os versículos como apoio e fazer a pessoa ler o texto bíblico antes de responder.
 - Quando houver passagens bíblicas no esboço, pelo menos duas perguntas devem trazer o versículo completo logo abaixo da pergunta.
@@ -502,7 +503,8 @@ Contexto e regras por trás:
 - Nas perguntas que tiverem versículo de apoio, escreva primeiro a pergunta e logo abaixo a passagem bíblica, da mesma forma que na introdução.
 - Use este estilo para perguntas com referência bíblica: Leia Mateus 7:24-25 e responda: o que significa construir sua vida sobre a rocha? Quais ações práticas podem solidificar essa construção?
 - Na linha logo abaixo da pergunta, escreva a passagem: "Texto completo do versículo" (Mateus 7:24-25 NAA).
-- Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas na versão NAA. Escreva o versículo completo, sem cortes, sempre que ele estiver disponível no texto.
+- Escreva todos os versículos citados nos textos da introdução e nas perguntas em itálico entre aspas na versão NAA (Nova Almeida Atualizada).
+- Escreva o versículo completo, sem cortes, sempre que ele estiver disponível no texto.
 - No final, faça uma conclusão curta, com no máximo cinco linhas, sobre os principais destaques e revelações do texto, focando naquilo que é o título.
 - Não comece a conclusão com "Concluímos que", "Em resumo" ou "Então".
 
