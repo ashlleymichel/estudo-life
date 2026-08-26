@@ -327,6 +327,30 @@ body.isBusy {
   border-bottom: 1px solid var(--line);
 }
 
+.viewSwitch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: #f2f4f7;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.viewBtn {
+  min-height: 34px;
+  padding: 0 16px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 0.82rem;
+}
+
+.viewBtn.active,
+.viewBtn:hover {
+  color: var(--ink);
+  background: #ffffff;
+  transform: none;
+}
+
 .topActions {
   display: flex;
   gap: 10px;
@@ -371,6 +395,118 @@ body.isBusy {
   color: var(--ink);
   background: transparent;
   text-align: left;
+}
+
+.formEditor {
+  display: grid;
+  gap: 16px;
+}
+
+.previewPane {
+  min-height: 520px;
+}
+
+.previewEmpty {
+  display: grid;
+  place-items: center;
+  min-height: 420px;
+  margin: 0;
+  padding: 32px;
+  color: var(--muted);
+  text-align: center;
+  background: #fbfbfd;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.previewSheet {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 34px;
+  color: #1d1d1f;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.previewHeader {
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.previewHeader span {
+  display: inline-flex;
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.previewHeader h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.previewHeader p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.previewSection {
+  display: grid;
+  gap: 6px;
+  padding: 14px 0;
+  border-bottom: 1px solid #ececf0;
+}
+
+.previewSection:last-child {
+  border-bottom: 0;
+}
+
+.previewSection h3 {
+  margin: 0;
+  color: var(--brand);
+  font-size: 0.94rem;
+  font-weight: 750;
+}
+
+.previewSection p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.previewQuestions {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.previewQuestions li {
+  display: grid;
+  gap: 5px;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.previewQuestions strong {
+  font-weight: 650;
+}
+
+.previewQuestions span {
+  color: var(--muted);
+  font-style: italic;
 }
 
 .downloadOptions button:hover {
@@ -661,6 +797,18 @@ textarea:focus {
   .topbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .viewSwitch {
+    width: 100%;
+  }
+
+  .viewBtn {
+    flex: 1;
+  }
+
+  .previewSheet {
+    padding: 22px;
   }
 
   .topActions,

@@ -14,6 +14,7 @@ const state = {
   textoExtraido: "",
   busy: false,
   editingSavedId: "",
+  view: "preview",
 };
 
 const DB_NAME = "folha-estudo-arquivos";
@@ -84,6 +85,7 @@ function fillForm(data) {
   state.perguntas = Array.isArray(data.perguntas) ? data.perguntas : [];
   state.textoExtraido = data.textoExtraido || "";
   renderQuestions();
+  renderPreview();
 }
 
 function renderQuestions() {
@@ -102,6 +104,7 @@ function renderQuestions() {
     input.value = question;
     input.addEventListener("input", () => {
       state.perguntas[index] = input.value;
+      renderPreview();
     });
 
     const remove = document.createElement("button");
@@ -112,11 +115,93 @@ function renderQuestions() {
     remove.addEventListener("click", () => {
       state.perguntas.splice(index, 1);
       renderQuestions();
+      renderPreview();
     });
 
     row.append(number, input, remove);
     container.append(row);
   });
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function previewLines(value) {
+  return String(value || "")
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function previewText(value) {
+  const lines = previewLines(value);
+  if (!lines.length) {
+    return "";
+  }
+  return lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+}
+
+function renderPreviewSection(label, value) {
+  const body = previewText(value);
+  if (!body) {
+    return "";
+  }
+  return `<section class="previewSection"><h3>${escapeHtml(label)}</h3>${body}</section>`;
+}
+
+function renderPreview() {
+  const preview = $("previewPane");
+  if (!preview) {
+    return;
+  }
+  const data = collectData();
+  const hasContent = fields.some((field) => data[field]) || data.perguntas.length > 0;
+  if (!hasContent) {
+    preview.innerHTML = '<p class="previewEmpty">A prévia aparecerá aqui depois que você anexar um arquivo e gerar a folhinha.</p>';
+    return;
+  }
+
+  const questions = data.perguntas
+    .map((question, index) => {
+      const lines = previewLines(question);
+      if (!lines.length) {
+        return "";
+      }
+      const first = `<strong>${index + 1}) ${escapeHtml(lines[0])}</strong>`;
+      const rest = lines.slice(1).map((line) => `<span>${escapeHtml(line)}</span>`).join("");
+      return `<li>${first}${rest}</li>`;
+    })
+    .filter(Boolean)
+    .join("");
+
+  preview.innerHTML = `
+    <article class="previewSheet">
+      <header class="previewHeader">
+        <span>Estudo Life Group</span>
+        <h3>${escapeHtml(data.titulo || "Sem título")}</h3>
+        ${data.subtitulo ? `<p>${escapeHtml(data.subtitulo)}</p>` : ""}
+      </header>
+      ${renderPreviewSection("Momento Generosidade", data.momentoGenerosidade)}
+      ${renderPreviewSection("Avisos / Agenda", data.avisos)}
+      ${renderPreviewSection("Momento da Visão", data.momentoVisao)}
+      ${renderPreviewSection("Introdução", data.resumo)}
+      ${questions ? `<section class="previewSection"><h3>Perguntas</h3><ol class="previewQuestions">${questions}</ol></section>` : ""}
+      ${renderPreviewSection("Conclusão", data.conclusao)}
+    </article>
+  `;
+}
+
+function setView(view) {
+  state.view = view;
+  $("previewPane").classList.toggle("hidden", view !== "preview");
+  $("formEditor").classList.toggle("hidden", view !== "edit");
+  $("previewViewBtn").classList.toggle("active", view === "preview");
+  $("editViewBtn").classList.toggle("active", view === "edit");
 }
 
 function collectData() {
@@ -281,6 +366,7 @@ $("uploadForm").addEventListener("submit", async (event) => {
       throw new Error(data.erro || "Não foi possível extrair o arquivo.");
     }
     fillForm(data);
+    setView("preview");
     setStatus("Conteúdo extraído. Revise e ajuste o que precisar antes de baixar.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
@@ -295,6 +381,7 @@ $("addQuestion").addEventListener("click", () => {
   }
   state.perguntas.push("");
   renderQuestions();
+  renderPreview();
 });
 
 function closeDownloadMenu() {
@@ -397,4 +484,10 @@ fillForm({
 });
 
 setMode();
+fields.forEach((field) => {
+  $(field).addEventListener("input", renderPreview);
+});
+$("previewViewBtn").addEventListener("click", () => setView("preview"));
+$("editViewBtn").addEventListener("click", () => setView("edit"));
+setView("preview");
 loadSavedDraftForEditing();
