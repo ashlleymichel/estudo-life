@@ -566,8 +566,8 @@ def scripture_quote_for_ref(text, ref):
 def scripture_fragment(text, ref):
     quote = scripture_quote_for_ref(text, ref)
     if quote:
-        return f' "{quote}" ({ref} NAA)'
-    return f" ({ref})"
+        return f'"{normalize_scripture_quotes(quote)}" {ref} NAA'
+    return f"{ref} NAA"
 
 
 def scripture_line(text, ref):
@@ -661,12 +661,12 @@ def question_with_scripture(question, source_text, refs, index):
             if quote and quote not in question and not question_already_has_quote_for_ref(question, ref):
                 additions.append(scripture_fragment(source_text, ref))
         if additions:
-            return compact_text(f"{question} {' '.join(additions)}")
+            return f"{compact_text(question)}\n" + "\n".join(additions)
         return question
 
     if refs:
         ref = refs[min(index, len(refs) - 1)]
-        return compact_text(f"{question}{scripture_fragment(source_text, ref)}")
+        return f"{compact_text(question)}\n{scripture_fragment(source_text, ref)}"
 
     return question
 
