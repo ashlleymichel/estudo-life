@@ -10,30 +10,30 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:title" content="Folha de Estudo" />
     <meta name="twitter:description" content="Plataforma para gerar folhas de estudo da PAZ Church Barueri." />
-    <link rel="stylesheet" href="/styles.css?v=19" />
+    <link rel="stylesheet" href="/styles.css?v=20" />
   </head>
   <body>
-    <header class="appHeader">
-      <a class="brandMark" href="/" aria-label="PAZ Church Barueri">
-        <img src="/paz-logo.svg" alt="Paz Church" />
-        <span>PAZ Church Barueri</span>
-      </a>
-      <nav class="headerNav" aria-label="Navegação">
-        <a class="savedLink" href="/salvos.html">Arquivos salvos</a>
-      </nav>
-    </header>
+    <main class="shell appFrame">
+      <aside class="leftSidebar" aria-label="Ferramentas e arquivos recentes">
+        <a class="sidebarBrand" href="/" aria-label="PAZ Church Barueri">
+          <img src="/paz-logo.svg" alt="Paz Church" />
+          <span>PAZ Church Barueri</span>
+        </a>
 
-    <main class="shell">
-      <section class="heroPanel">
-        <div class="heroCopy">
-          <p class="eyebrow" id="modeEyebrow">Life Group</p>
-          <h1>Folha de Estudo</h1>
-          <p class="muted">
-            Envie o esboço em PDF ou Word e gere uma folhinha pronta para revisar, salvar e compartilhar.
-          </p>
-        </div>
+        <nav class="sidebarNav" aria-label="Navegação principal">
+          <span class="sidebarLabel">Ferramentas</span>
+          <a class="sideItem active" href="/">
+            <span class="sideIcon">+</span>
+            <span>Nova folhinha</span>
+          </a>
+          <a class="sideItem" href="/salvos.html">
+            <span class="sideIcon">□</span>
+            <span>Arquivos salvos</span>
+          </a>
+        </nav>
 
-        <form id="uploadForm" class="uploadCard">
+        <form id="uploadForm" class="sidebarUpload">
+          <span class="sidebarLabel">Documento</span>
           <label class="dropzone" for="pdfFile">
             <span class="dropIcon">DOC</span>
             <strong>Selecionar arquivo</strong>
@@ -43,15 +43,25 @@
           <button id="extractBtn" class="primary" type="submit">Gerar Folha de Estudo</button>
           <div class="status" id="status">Anexe um PDF ou Word e clique em Gerar Folha de Estudo.</div>
         </form>
-      </section>
 
-      <section class="workspace">
+        <section class="recentPanel" aria-label="Arquivos recentes">
+          <div class="recentHeader">
+            <span class="sidebarLabel">Recentes</span>
+            <a href="/salvos.html">Ver todos</a>
+          </div>
+          <div id="recentFiles" class="recentFiles">
+            <p class="recentEmpty">Nenhum PDF salvo ainda.</p>
+          </div>
+        </section>
+      </aside>
+
+      <section class="contentArea">
         <section class="editor" aria-label="Editor da folha de estudo">
           <div>
             <div class="topbar">
               <div>
-                <span class="sectionKicker">Conteúdo gerado</span>
-                <h2>Prévia e ajustes</h2>
+                <span class="sectionKicker" id="modeEyebrow">Life Group</span>
+                <h1>Folha de Estudo</h1>
               </div>
               <div class="viewSwitch" aria-label="Modo de visualização">
                 <button id="previewViewBtn" class="viewBtn active" type="button">Prévia</button>
@@ -142,6 +152,6 @@
       </section>
     </main>
 
-    <script src="/app.js?v=14"></script>
+    <script src="/app.js?v=15"></script>
   </body>
 </html>

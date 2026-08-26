@@ -333,6 +333,89 @@ async function savePdfOnline(blob, data) {
   return file;
 }
 
+function formatRecentDate(value) {
+  if (!value) {
+    return "";
+  }
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+async function getRecentSavedFiles() {
+  const db = await openSavedDb();
+  const files = await new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const request = tx.objectStore(STORE_NAME).getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+  db.close();
+  return files
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
+}
+
+function openRecentFile(file) {
+  if (!file.data) {
+    window.location.href = "/salvos.html";
+    return;
+  }
+  sessionStorage.setItem(
+    "folhaEstudoEditDraft",
+    JSON.stringify({
+      id: file.id,
+      name: file.name,
+      createdAt: file.createdAt,
+      data: file.data,
+    }),
+  );
+  window.location.href = "/editar.html";
+}
+
+async function renderRecentFiles() {
+  const container = $("recentFiles");
+  if (!container) {
+    return;
+  }
+  try {
+    const files = await getRecentSavedFiles();
+    if (!files.length) {
+      container.innerHTML = '<p class="recentEmpty">Nenhum PDF salvo ainda.</p>';
+      return;
+    }
+    container.innerHTML = "";
+    files.forEach((file) => {
+      const button = document.createElement("button");
+      button.className = "recentItem";
+      button.type = "button";
+      button.addEventListener("click", () => openRecentFile(file));
+
+      const icon = document.createElement("span");
+      icon.className = "recentIcon";
+      icon.textContent = "PDF";
+
+      const text = document.createElement("span");
+      text.className = "recentText";
+
+      const title = document.createElement("strong");
+      title.textContent = file.title || "Folha salva";
+
+      const meta = document.createElement("span");
+      meta.textContent = formatRecentDate(file.createdAt);
+
+      text.append(title, meta);
+      button.append(icon, text);
+      container.append(button);
+    });
+  } catch (error) {
+    container.innerHTML = '<p class="recentEmpty">Não foi possível carregar os recentes.</p>';
+  }
+}
+
 function loadSavedDraftForEditing() {
   const raw = sessionStorage.getItem("folhaEstudoEditDraft");
   if (!raw) {
@@ -499,6 +582,7 @@ $("saveOnlineBtn").addEventListener("click", async () => {
   try {
     const blob = await generatePdfBlob(data);
     await savePdfOnline(blob, data);
+    await renderRecentFiles();
     setStatus("Arquivo salvo. Abra a página Arquivos salvos para ver seus PDFs.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
@@ -565,3 +649,4 @@ $("previewViewBtn").addEventListener("click", () => setView("preview"));
 $("editViewBtn").addEventListener("click", () => setView("edit"));
 setView("preview");
 loadSavedDraftForEditing();
+renderRecentFiles();

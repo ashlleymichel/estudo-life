@@ -35,45 +35,23 @@ textarea {
   font: inherit;
 }
 
-.appHeader {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  width: min(1240px, calc(100% - 40px));
-  min-height: 78px;
-  margin: 0 auto;
-  background: rgba(8, 8, 7, 0.78);
-  border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(20px);
-}
-
-.brandMark {
+.sidebarBrand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   color: var(--ink);
   font-weight: 800;
   text-decoration: none;
 }
 
-.brandMark img {
-  width: 24px;
-  height: 24px;
+.sidebarBrand img {
+  width: 26px;
+  height: 26px;
   filter: brightness(0) invert(1);
 }
 
-.brandMark span {
+.sidebarBrand span {
   white-space: nowrap;
-}
-
-.headerNav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .shell,
@@ -84,19 +62,17 @@ textarea {
 }
 
 .shell {
-  padding: 32px 0 56px;
+  padding: 20px 0 56px;
 }
 
-.heroPanel {
+.appFrame {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 410px;
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 16px;
-  align-items: stretch;
-  margin-bottom: 16px;
+  align-items: start;
 }
 
-.heroCopy,
-.uploadCard,
+.leftSidebar,
 .editor,
 .savedItem,
 .emptyState {
@@ -105,25 +81,63 @@ textarea {
   border-radius: 20px;
 }
 
-.heroCopy {
-  min-height: 360px;
-  padding: 44px;
+.leftSidebar {
+  position: sticky;
+  top: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 45%),
-    #11110f;
+  gap: 22px;
+  min-height: calc(100vh - 40px);
+  padding: 18px;
+  background: rgba(17, 17, 15, 0.94);
+}
+
+.sidebarNav,
+.sidebarUpload,
+.recentPanel {
+  display: grid;
+  gap: 10px;
 }
 
 .eyebrow,
-.sectionKicker {
+.sectionKicker,
+.sidebarLabel {
   margin: 0;
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.sideItem {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  color: var(--muted);
+  text-decoration: none;
+  border-radius: 12px;
+}
+
+.sideItem:hover,
+.sideItem.active {
+  color: var(--ink);
+  background: #1d1c18;
+}
+
+.sideIcon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: #11110f;
+  background: var(--ink);
+  border-radius: 8px;
+  font-weight: 850;
+  line-height: 1;
 }
 
 h1,
@@ -156,20 +170,11 @@ h2 {
   line-height: 1.42;
 }
 
-.uploadCard {
-  display: grid;
-  align-content: center;
-  gap: 14px;
-  min-height: 360px;
-  padding: 26px;
-  background: rgba(17, 17, 15, 0.9);
-}
-
 .dropzone {
   display: grid;
   place-items: center;
-  min-height: 178px;
-  padding: 30px 20px;
+  min-height: 132px;
+  padding: 22px 16px;
   text-align: center;
   background: #181713;
   border: 1px dashed rgba(247, 245, 239, 0.22);
@@ -185,9 +190,9 @@ h2 {
 .dropIcon {
   display: inline-grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 14px;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 12px;
   color: #11110f;
   background: var(--ink);
   border-radius: 14px;
@@ -298,7 +303,7 @@ body.isBusy {
 }
 
 .status {
-  min-height: 56px;
+  min-height: 0;
   padding: 14px 16px;
   color: var(--muted);
   background: #181713;
@@ -316,8 +321,100 @@ body.isBusy {
   color: var(--danger);
 }
 
+.recentPanel {
+  margin-top: auto;
+}
+
+.recentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.recentHeader a {
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.recentHeader a:hover {
+  color: var(--brand-2);
+}
+
+.recentFiles {
+  display: grid;
+  gap: 6px;
+}
+
+.recentItem {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px;
+  color: var(--ink);
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+}
+
+.recentItem:hover {
+  background: #1d1c18;
+  border-color: var(--line);
+}
+
+.recentIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: #11110f;
+  background: var(--ink);
+  border-radius: 9px;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.recentText {
+  min-width: 0;
+}
+
+.recentText strong,
+.recentText span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recentText strong {
+  color: var(--ink);
+  font-size: 0.88rem;
+  line-height: 1.2;
+}
+
+.recentText span,
+.recentEmpty {
+  color: var(--soft);
+  font-size: 0.78rem;
+}
+
+.recentEmpty {
+  margin: 0;
+  padding: 8px;
+  line-height: 1.35;
+}
+
 .workspace {
   display: grid;
+}
+
+.contentArea {
+  min-width: 0;
 }
 
 .editor {
@@ -332,6 +429,12 @@ body.isBusy {
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 16px;
   align-items: center;
+}
+
+.topbar h1 {
+  max-width: none;
+  font-size: clamp(2.4rem, 5vw, 4.8rem);
+  line-height: 0.95;
 }
 
 .viewSwitch {
@@ -422,7 +525,7 @@ body.isBusy {
 
 .reviewLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 18px;
   align-items: start;
 }
@@ -875,36 +978,25 @@ textarea:focus {
 }
 
 @media (max-width: 900px) {
-  .appHeader,
   .shell,
   .savedPage,
   .editPage {
     width: min(100% - 28px, 680px);
   }
 
-  .appHeader {
-    min-height: 70px;
-  }
-
-  .brandMark span {
-    font-size: 0.92rem;
-  }
-
-  .heroPanel,
+  .appFrame,
   .grid {
     grid-template-columns: 1fr;
   }
 
-  .heroCopy,
-  .uploadCard,
+  .leftSidebar {
+    position: static;
+    min-height: auto;
+  }
+
   .editor,
   .editEditor {
     padding: 22px;
-  }
-
-  .heroCopy,
-  .uploadCard {
-    min-height: auto;
   }
 
   h1 {
