@@ -386,15 +386,13 @@ $("saveOnlineBtn").addEventListener("click", async () => {
 });
 
 fillForm({
-  titulo: "Folha de Estudo Life Group",
-  subtitulo: "Culto Presencial e On-Line / Life Group",
-  momentoGenerosidade:
-    'Todas as ofertas dos "Life Groups" são destinadas ao ministério Amor em Ação. A sua oferta tem impactado e alcançado muitas vidas para Jesus! Glórias a Deus por isso!',
-  avisos: "Encontro com Deus: 14 a 16 de agosto / inscrições abertas / informações com seu líder",
-  momentoVisao:
-    "Nossa Missão: Fazer discípulos de Jesus que impactam o mundo inteiro com uma paixão contagiante por Deus. Nossa Visão: Ser um movimento de plantação de igrejas saudáveis e multiplicadoras.",
+  titulo: "",
+  subtitulo: "",
+  momentoGenerosidade: "",
+  avisos: "",
+  momentoVisao: "",
   resumo: "",
-  perguntas: ["Compartilhe conosco o que essa Palavra de domingo falou com você."],
+  perguntas: [],
   conclusao: "",
 });
 
