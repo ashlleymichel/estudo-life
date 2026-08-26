@@ -480,6 +480,8 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "Use apenas referências bíblicas presentes no texto enviado; se o texto não trouxer o versículo completo, use a referência sem inventar conteúdo. "
         "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, sempre apoiadas nos textos bíblicos citados. "
         "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo de pelo menos duas perguntas, preferencialmente nas perguntas 2, 3 e 4. "
+        "Quando uma pergunta tiver referência bíblica, escreva a pergunta em uma linha e o versículo logo abaixo. "
+        "Prefira o formato: Leia Mateus 7:24-25 e responda: [pergunta]. Na linha seguinte, escreva o versículo entre aspas com a referência entre parênteses. "
         "Evite perguntas rasas, genéricas ou que possam ser respondidas com sim/não. "
         "Não inclua markdown, títulos de seção, numeração externa ou explicações fora dos campos JSON."
     )
@@ -498,6 +500,8 @@ Contexto e regras por trás:
 - Quando houver passagens bíblicas no esboço, pelo menos duas perguntas devem trazer o versículo completo logo abaixo da pergunta.
 - Se houver três ou mais passagens bíblicas relevantes, coloque versículo de apoio nas perguntas 2, 3 e 4.
 - Nas perguntas que tiverem versículo de apoio, escreva primeiro a pergunta e logo abaixo a passagem bíblica, da mesma forma que na introdução.
+- Use este estilo para perguntas com referência bíblica: Leia Mateus 7:24-25 e responda: o que significa construir sua vida sobre a rocha? Quais ações práticas podem solidificar essa construção?
+- Na linha logo abaixo da pergunta, escreva a passagem: "Texto completo do versículo" (Mateus 7:24-25 NAA).
 - Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas na versão NAA. Escreva o versículo completo, sem cortes, sempre que ele estiver disponível no texto.
 - No final, faça uma conclusão curta, com no máximo cinco linhas, sobre os principais destaques e revelações do texto, focando naquilo que é o título.
 - Não comece a conclusão com "Concluímos que", "Em resumo" ou "Então".
@@ -566,8 +570,8 @@ def scripture_quote_for_ref(text, ref):
 def scripture_fragment(text, ref):
     quote = scripture_quote_for_ref(text, ref)
     if quote:
-        return f'"{normalize_scripture_quotes(quote)}" {ref} NAA'
-    return f"{ref} NAA"
+        return f'"{normalize_scripture_quotes(quote)}" ({ref} NAA)'
+    return f"({ref} NAA)"
 
 
 def scripture_line(text, ref):
@@ -666,7 +670,7 @@ def question_with_scripture(question, source_text, refs, index):
 
     if refs:
         ref = refs[min(index, len(refs) - 1)]
-        return f"{compact_text(question)}\n{scripture_fragment(source_text, ref)}"
+        return f"Leia {ref} e responda: {compact_text(question)}\n{scripture_fragment(source_text, ref)}"
 
     return question
 
@@ -706,11 +710,11 @@ def simplify_group_question(question, source_text, refs, index):
         ref = ""
 
     if ref:
-        verse = scripture_line(source_text, ref)
+        verse = scripture_fragment(source_text, ref)
         simple_prompts = [
-            f"Segundo {ref}, que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
-            f"Em {ref}, que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
-            f"A partir de {ref}, quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
+            f"Leia {ref} e responda: que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
+            f"Leia {ref} e responda: que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
+            f"Leia {ref} e responda: quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
         ]
         return simple_prompts[index % len(simple_prompts)]
 
@@ -723,11 +727,11 @@ def simplify_group_question(question, source_text, refs, index):
 
 
 def discussion_question_for_ref(text, ref, title="", index=0):
-    verse = scripture_line(text, ref)
+    verse = scripture_fragment(text, ref)
     prompts = [
-        f"Segundo {ref}, que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
-        f"Em {ref}, que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
-        f"A partir de {ref}, quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
+        f"Leia {ref} e responda: que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
+        f"Leia {ref} e responda: que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
+        f"Leia {ref} e responda: quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
     ]
     return prompts[index % len(prompts)]
 
