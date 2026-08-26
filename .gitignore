@@ -9,3 +9,5 @@ output/
 !vercel.json
 EXEMPLOS/
 TADEL/
+.vercel
+.env*

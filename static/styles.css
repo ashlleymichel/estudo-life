@@ -1,15 +1,19 @@
 :root {
   color-scheme: light;
-  --ink: #16263d;
-  --muted: #5f6f82;
-  --line: #dce3eb;
-  --surface: #f4f7fb;
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --soft: #86868b;
+  --line: #d2d2d7;
+  --surface: #f5f5f7;
   --card: #ffffff;
+  --card-soft: #fbfbfd;
   --brand: #183a64;
   --brand-2: #0f2b4d;
-  --accent: #2f80c8;
+  --accent: #0071e3;
+  --accent-soft: #e8f2ff;
   --danger: #b42318;
-  --focus: rgba(24, 58, 100, 0.16);
+  --danger-soft: #fff1f0;
+  --focus: rgba(0, 113, 227, 0.18);
   --button-font-size: 0.875rem;
 }
 
@@ -20,9 +24,11 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
   color: var(--ink);
-  background: var(--surface);
+  background:
+    linear-gradient(180deg, #ffffff 0, var(--surface) 320px),
+    var(--surface);
 }
 
 button,
@@ -31,68 +37,74 @@ textarea {
   font: inherit;
 }
 
-.shell {
-  width: min(970px, 100%);
+.shell,
+.savedPage,
+.editPage {
+  width: min(1120px, calc(100% - 40px));
   margin: 0 auto;
-  padding: 40px 0;
+}
+
+.shell {
+  padding: 48px 0;
 }
 
 .workspace {
   display: grid;
-  grid-template-columns: 320px 630px;
-  gap: 20px;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 24px;
   align-items: start;
 }
 
 .panel,
-.editor {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+.editor,
+.savedItem,
+.emptyState {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(210, 210, 215, 0.78);
+  border-radius: 8px;
 }
 
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px 10px;
+  gap: 18px;
+  padding: 24px;
 }
 
 .brandMark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
-  min-height: 49px;
-  margin-bottom: 10px;
-  padding: 15px 20px;
-  background: #f9fafc;
+  min-height: 58px;
+  margin-bottom: 28px;
+  padding: 14px 18px;
+  background: var(--card-soft);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 999px;
 }
 
 .brandMark span {
   color: var(--brand);
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 700;
   line-height: 1;
   white-space: nowrap;
 }
 
 .brandMark img {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
-  transform: scale(1.9);
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
 }
 
 .eyebrow {
-  margin: 2px 0 0;
+  margin: 12px 0 0;
   color: var(--accent);
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -104,48 +116,51 @@ h2 {
 }
 
 h1 {
-  max-width: 170px;
-  color: var(--brand);
-  font-size: 2.25rem;
-  line-height: 1.15;
+  max-width: 250px;
+  color: var(--ink);
+  font-size: 3.25rem;
+  font-weight: 750;
+  line-height: 0.98;
 }
 
 h2 {
-  color: var(--brand);
-  font-size: 1rem;
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .muted {
   max-width: 100%;
   color: var(--muted);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.18;
-  margin: 28px 10px 34px;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.42;
+  margin: 28px 0 8px;
 }
 
 .upload {
   display: grid;
-  gap: 10px;
-  justify-items: center;
+  gap: 14px;
+  justify-items: stretch;
 }
 
 .dropzone {
   display: grid;
-  gap: 0;
   place-items: center;
-  width: 100%;
-  min-height: 132px;
-  padding: 40px 10px;
+  min-height: 150px;
+  padding: 34px 18px;
   text-align: center;
-  background: #f8fafc;
-  border: 1px dashed #a9b8c9;
-  border-radius: 20px;
+  background: #ffffff;
+  border: 1px dashed #b8c5d6;
+  border-radius: 8px;
   cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
 .dropzone:hover {
-  border-color: var(--brand);
+  background: #fbfdff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .dropIcon {
@@ -154,14 +169,15 @@ h2 {
 
 .dropzone strong {
   color: var(--ink);
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   line-height: 1.2;
 }
 
 .dropzone small {
   margin-top: 10px;
-  color: var(--ink);
-  font-size: 0.75rem;
+  color: var(--soft);
+  font-size: 0.8rem;
   overflow-wrap: anywhere;
 }
 
@@ -173,19 +189,26 @@ input[type="file"] {
 }
 
 button {
-  min-height: 37px;
+  min-height: 42px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 999px;
   cursor: pointer;
-  font-weight: 800;
+  font-weight: 700;
   font-size: var(--button-font-size);
+  transition: background 160ms ease, color 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+button:hover,
+.savedLink:hover,
+.backButton:hover {
+  transform: translateY(-1px);
 }
 
 button:disabled,
 input:disabled,
 textarea:disabled {
   cursor: wait;
-  opacity: 0.68;
+  opacity: 0.62;
 }
 
 button.loading {
@@ -198,7 +221,7 @@ button.loading {
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.38);
+  border: 2px solid rgba(255, 255, 255, 0.42);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -216,20 +239,18 @@ body.isBusy {
 
 .primary,
 .download,
-.secondaryAction,
 .backButton {
   color: #ffffff;
   background: var(--brand);
 }
 
 .primary {
-  width: 207px;
-  padding: 0 18px;
+  width: 100%;
+  padding: 0 22px;
 }
 
 .primary:hover,
 .download:hover,
-.secondaryAction:hover,
 .backButton:hover {
   background: var(--brand-2);
 }
@@ -238,38 +259,48 @@ body.isBusy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 35px;
+  min-height: 42px;
   width: 100%;
-  margin: 0 0 32px;
-  padding: 0 14px;
+  padding: 0 18px;
   color: #ffffff;
   background: var(--brand);
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: var(--button-font-size);
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease;
 }
 
 .savedLink:hover {
   background: var(--brand-2);
 }
 
-.ghost {
-  width: 143px;
-  min-height: 35px;
-  padding: 0 20px;
+.ghost,
+.secondaryAction {
   color: var(--brand);
-  background: #c8daee;
+  background: #e8eef6;
+}
+
+.ghost {
+  width: 132px;
+  min-height: 38px;
+  padding: 0 18px;
+}
+
+.ghost:hover,
+.secondaryAction:hover {
+  color: #ffffff;
+  background: var(--brand);
 }
 
 .status {
-  margin-top: 10px;
-  padding: 10px;
+  margin-top: 2px;
+  padding: 12px 14px;
   color: var(--muted);
-  background: #f8fafc;
+  background: var(--card-soft);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  font-size: 0.875rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   line-height: 1.4;
 }
 
@@ -283,8 +314,8 @@ body.isBusy {
 
 .editor {
   display: grid;
-  gap: 10px;
-  padding: 20px 10px;
+  gap: 16px;
+  padding: 26px;
 }
 
 .topbar {
@@ -292,7 +323,7 @@ body.isBusy {
   justify-content: space-between;
   gap: 20px;
   align-items: center;
-  padding-bottom: 10px;
+  padding-bottom: 18px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -304,7 +335,9 @@ body.isBusy {
   justify-content: flex-end;
 }
 
-.download {
+.download,
+.secondaryAction {
+  min-height: 42px;
   padding: 0 20px;
   white-space: nowrap;
 }
@@ -314,7 +347,7 @@ body.isBusy {
 }
 
 .downloadMenu .download {
-  min-width: 90px;
+  min-width: 104px;
 }
 
 .downloadOptions {
@@ -324,91 +357,82 @@ body.isBusy {
   z-index: 10;
   display: grid;
   gap: 6px;
-  min-width: 132px;
+  min-width: 140px;
   padding: 8px;
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  box-shadow: 0 12px 24px rgba(22, 38, 61, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 18px 40px rgba(29, 29, 31, 0.12);
 }
 
 .downloadOptions button {
-  min-height: 35px;
+  min-height: 38px;
   padding: 0 14px;
-  color: var(--brand);
-  background: #eaf1f9;
+  color: var(--ink);
+  background: transparent;
   text-align: left;
 }
 
 .downloadOptions button:hover {
-  color: #ffffff;
-  background: var(--brand);
-}
-
-.secondaryAction {
-  padding: 0 16px;
   color: var(--brand);
-  background: #c8daee;
-  white-space: nowrap;
-}
-
-.secondaryAction:hover {
-  color: #ffffff;
+  background: var(--accent-soft);
+  transform: none;
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 18px;
 }
 
 label {
   display: grid;
-  gap: 0;
+  gap: 7px;
 }
 
 label span,
 .questionsHeader span {
-  color: var(--brand);
-  font-size: 0.875rem;
-  font-weight: 800;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 700;
   line-height: 1.2;
-  padding: 10px 0;
 }
 
 input,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 8px;
   color: var(--ink);
   background: #ffffff;
   outline: 0;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
 input {
-  height: 36px;
-  padding: 0 12px;
+  height: 44px;
+  padding: 0 14px;
 }
 
 textarea {
   resize: vertical;
-  height: 116px;
-  min-height: 116px;
-  padding: 12px;
+  height: 124px;
+  min-height: 124px;
+  padding: 13px 14px;
   line-height: 1.5;
 }
 
 input:focus,
 textarea:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--focus);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--focus);
 }
 
 .questionsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 2px;
 }
 
 .questions {
@@ -418,7 +442,7 @@ textarea:focus {
 
 .questionRow {
   display: grid;
-  grid-template-columns: 37px minmax(0, 1fr) 18px;
+  grid-template-columns: 42px minmax(0, 1fr) 24px;
   gap: 10px;
   align-items: start;
 }
@@ -426,26 +450,31 @@ textarea:focus {
 .number {
   display: grid;
   place-items: center;
-  width: 37px;
-  height: 37px;
+  width: 42px;
+  height: 42px;
   color: #ffffff;
   background: var(--brand);
-  border-radius: 10px;
-  font-weight: 800;
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .questionRow textarea {
-  height: 70px;
-  min-height: 70px;
+  height: 76px;
+  min-height: 76px;
 }
 
 .remove {
-  width: 18px;
-  min-height: 18px;
+  width: 24px;
+  min-height: 24px;
   padding: 0;
   color: var(--danger);
   background: transparent;
   line-height: 1;
+}
+
+.remove:hover {
+  background: var(--danger-soft);
+  transform: none;
 }
 
 .hidden {
@@ -464,34 +493,33 @@ textarea:focus {
 }
 
 .savedPage {
-  width: min(970px, 100%);
-  margin: 0 auto;
-  padding: 40px 0;
+  padding: 48px 0;
 }
 
 .savedToolbar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  min-height: 39px;
-  margin-bottom: 20px;
+  min-height: 42px;
+  margin-bottom: 24px;
 }
 
 .backButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 37px;
-  padding: 0 20px;
-  border-radius: 10px;
+  min-height: 42px;
+  padding: 0 22px;
+  border-radius: 999px;
   font-size: var(--button-font-size);
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease;
 }
 
 .savedList {
   display: grid;
-  gap: 20px;
+  gap: 18px;
 }
 
 .savedItem {
@@ -500,12 +528,9 @@ textarea:focus {
   align-items: end;
   justify-content: space-between;
   column-gap: 20px;
-  row-gap: 14px;
-  min-height: 108px;
-  padding: 20px 10px 18px;
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  row-gap: 16px;
+  min-height: 118px;
+  padding: 24px;
 }
 
 .savedInfo {
@@ -515,17 +540,18 @@ textarea:focus {
 .savedInfo h2 {
   grid-column: 1 / -1;
   margin: 0;
-  padding-bottom: 8px;
-  color: var(--brand);
-  font-size: 1rem;
+  padding-bottom: 10px;
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 700;
   border-bottom: 1px solid var(--line);
 }
 
 .savedInfo p,
 .emptyState {
   margin: 0;
-  color: #9aaec5;
-  font-size: 0.875rem;
+  color: var(--soft);
+  font-size: 0.92rem;
 }
 
 .savedInfo p {
@@ -533,12 +559,9 @@ textarea:focus {
 }
 
 .emptyState {
-  min-height: 96px;
-  padding: 20px 10px;
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--brand);
+  min-height: 118px;
+  padding: 24px;
+  color: var(--ink);
   font-weight: 700;
 }
 
@@ -551,48 +574,52 @@ textarea:focus {
 }
 
 .deleteSaved {
-  padding: 0 16px;
+  min-height: 42px;
+  padding: 0 18px;
   color: var(--danger);
-  background: #f9e8e6;
+  background: var(--danger-soft);
+}
+
+.deleteSaved:hover {
+  color: #ffffff;
+  background: var(--danger);
 }
 
 .editPage {
-  width: min(970px, 100%);
-  margin: 0 auto;
-  padding: 80px 0 40px;
+  padding: 60px 0 44px;
 }
 
 .editEditor {
-  gap: 10px;
-  padding: 20px 10px;
+  gap: 16px;
+  padding: 26px;
 }
 
 .editHeading {
-  padding-bottom: 10px;
+  padding-bottom: 18px;
   border-bottom: 1px solid var(--line);
 }
 
 .editHeading h1 {
   max-width: none;
-  font-size: 1rem;
+  font-size: 1.25rem;
   line-height: 1.2;
 }
 
 .editGrid {
-  gap: 20px;
+  gap: 18px;
 }
 
 .editEditor textarea {
-  height: 116px;
-  min-height: 116px;
+  height: 124px;
+  min-height: 124px;
 }
 
 .editActions {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 40px;
-  margin-top: 20px;
+  gap: 32px;
+  margin-top: 24px;
 }
 
 .editButtons {
@@ -605,9 +632,15 @@ textarea:focus {
   align-self: flex-end;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
+  .shell,
+  .savedPage,
+  .editPage {
+    width: min(100% - 28px, 620px);
+  }
+
   .shell {
-    padding: 14px;
+    padding: 20px 0;
   }
 
   .workspace,
@@ -615,8 +648,14 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
-  .panel {
-    min-height: auto;
+  .panel,
+  .editor,
+  .editEditor {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2.85rem;
   }
 
   .topbar {
@@ -650,11 +689,6 @@ textarea:focus {
 
   .savedItem {
     grid-template-columns: 1fr;
-  }
-
-  .savedPage,
-  .editPage {
-    padding: 14px;
   }
 
   .savedToolbar {
