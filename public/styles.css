@@ -1,18 +1,16 @@
 :root {
   color-scheme: light;
-  --ink: #1d1d1f;
-  --muted: #55565a;
-  --soft: #76777b;
-  --line: #d7d7d2;
-  --surface: #f4f2ee;
+  --ink: #111111;
+  --muted: #686868;
+  --soft: #8a8a8a;
+  --line: #dfded9;
+  --surface: #f6f4ef;
   --card: #ffffff;
-  --card-soft: #faf9f6;
+  --wash: #eeece5;
   --brand: #111111;
-  --brand-2: #333333;
-  --accent: #111111;
-  --accent-soft: #f0eee9;
-  --danger: #b42318;
-  --danger-soft: #fff1f0;
+  --brand-2: #2b2b2b;
+  --danger: #a51d16;
+  --danger-soft: #f8e7e5;
   --focus: rgba(17, 17, 17, 0.14);
   --button-font-size: 0.875rem;
 }
@@ -35,75 +33,88 @@ textarea {
   font: inherit;
 }
 
-.shell,
-.savedPage,
-.editPage {
-  width: min(1120px, calc(100% - 40px));
-  margin: 0 auto;
-}
-
-.shell {
-  padding: 34px 0;
-}
-
-.workspace {
-  display: grid;
-  grid-template-columns: 350px minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
-}
-
-.panel,
-.editor,
-.savedItem,
-.emptyState {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--line);
-  border-radius: 26px;
-}
-
-.panel {
+.appHeader {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-height: calc(100vh - 68px);
-  padding: 28px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: min(1180px, calc(100% - 40px));
+  min-height: 78px;
+  margin: 0 auto;
+  background: rgba(246, 244, 239, 0.92);
+  border-bottom: 1px solid var(--line);
 }
 
 .brandMark {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-  min-height: 54px;
-  margin-bottom: 34px;
-  padding: 12px 18px;
-  background: var(--card-soft);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-}
-
-.brandMark span {
-  color: var(--brand);
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
+  gap: 10px;
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .brandMark img {
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
+  width: 24px;
+  height: 24px;
 }
 
-.eyebrow {
-  margin: 16px 0 0;
+.brandMark span {
+  white-space: nowrap;
+}
+
+.headerNav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shell,
+.savedPage,
+.editPage {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.shell {
+  padding: 32px 0 56px;
+}
+
+.heroPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 28px;
+  align-items: stretch;
+  margin-bottom: 28px;
+}
+
+.heroCopy,
+.uploadCard,
+.editor,
+.savedItem,
+.emptyState {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+}
+
+.heroCopy {
+  min-height: 360px;
+  padding: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.eyebrow,
+.sectionKicker {
+  margin: 0;
   color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -115,69 +126,78 @@ h2 {
 }
 
 h1 {
-  max-width: 260px;
+  max-width: 620px;
   color: var(--ink);
-  font-size: 4.15rem;
-  font-weight: 800;
-  line-height: 0.9;
+  font-size: clamp(4rem, 10vw, 8.4rem);
+  font-weight: 850;
+  line-height: 0.86;
 }
 
 h2 {
+  margin-top: 4px;
   color: var(--ink);
-  font-size: 1.15rem;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-size: clamp(1.65rem, 3vw, 2.5rem);
+  font-weight: 850;
+  line-height: 1;
 }
 
 .muted {
-  max-width: 100%;
+  max-width: 460px;
+  margin: 0;
   color: var(--muted);
   font-size: 1.05rem;
-  font-weight: 400;
-  line-height: 1.35;
-  margin: 42px 0 10px;
+  line-height: 1.42;
 }
 
-.upload {
+.uploadCard {
   display: grid;
+  align-content: center;
   gap: 14px;
-  justify-items: stretch;
+  min-height: 360px;
+  padding: 26px;
 }
 
 .dropzone {
   display: grid;
   place-items: center;
-  min-height: 170px;
-  padding: 34px 18px;
+  min-height: 178px;
+  padding: 30px 20px;
   text-align: center;
-  background: var(--card-soft);
-  border: 1px dashed #b9b8b2;
-  border-radius: 22px;
+  background: var(--wash);
+  border: 1px dashed #aaa79f;
+  border-radius: 24px;
   cursor: pointer;
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
 .dropzone:hover {
-  background: #ffffff;
-  border-color: var(--accent);
-  transform: translateY(-1px);
+  background: #f8f7f3;
+  border-color: var(--ink);
 }
 
 .dropIcon {
-  display: none;
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+  color: #ffffff;
+  background: var(--ink);
+  border-radius: 16px;
+  font-size: 0.72rem;
+  font-weight: 850;
 }
 
 .dropzone strong {
   color: var(--ink);
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .dropzone small {
-  margin-top: 10px;
-  color: var(--soft);
-  font-size: 0.8rem;
+  max-width: 100%;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.84rem;
   overflow-wrap: anywhere;
 }
 
@@ -188,20 +208,17 @@ input[type="file"] {
   opacity: 0;
 }
 
-button {
-  min-height: 48px;
+button,
+.savedLink,
+.backButton {
+  min-height: 46px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 999px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 800;
   font-size: var(--button-font-size);
-  transition: background 160ms ease, color 160ms ease, opacity 160ms ease, transform 160ms ease;
-}
-
-button:hover,
-.savedLink:hover,
-.backButton:hover {
-  transform: translateY(-1px);
+  text-decoration: none;
+  transition: background 140ms ease, color 140ms ease, opacity 140ms ease;
 }
 
 button:disabled,
@@ -244,65 +261,43 @@ body.isBusy {
   background: var(--brand);
 }
 
-.primary {
+.primary,
+.savedLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   padding: 0 22px;
-  border-radius: 18px;
 }
 
 .primary:hover,
 .download:hover,
+.savedLink:hover,
 .backButton:hover {
   background: var(--brand-2);
 }
 
 .savedLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  width: 100%;
+  width: auto;
   padding: 0 18px;
-  color: #ffffff;
-  background: var(--brand);
-  border-radius: 18px;
-  font-size: var(--button-font-size);
-  font-weight: 700;
-  text-decoration: none;
-  transition: background 160ms ease, transform 160ms ease;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
 }
 
 .savedLink:hover {
-  background: var(--brand-2);
-}
-
-.ghost,
-.secondaryAction {
-  color: var(--brand);
-  background: #e8eef6;
-}
-
-.ghost {
-  width: 132px;
-  min-height: 40px;
-  padding: 0 18px;
-}
-
-.ghost:hover,
-.secondaryAction:hover {
   color: #ffffff;
-  background: var(--brand);
 }
 
 .status {
-  margin-top: 2px;
+  min-height: 56px;
   padding: 14px 16px;
   color: var(--muted);
-  background: var(--card-soft);
+  background: #faf9f6;
   border: 1px solid var(--line);
   border-radius: 18px;
   font-size: 0.9rem;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .status.ok {
@@ -313,60 +308,71 @@ body.isBusy {
   color: var(--danger);
 }
 
+.workspace {
+  display: grid;
+}
+
 .editor {
   display: grid;
-  gap: 18px;
+  gap: 22px;
   padding: 28px;
 }
 
 .topbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
-  padding-bottom: 22px;
-  border-bottom: 1px solid var(--line);
 }
 
 .viewSwitch {
   display: inline-flex;
   gap: 4px;
   padding: 4px;
-  background: var(--card-soft);
-  border: 1px solid var(--line);
-  border-radius: 16px;
+  background: var(--wash);
+  border-radius: 999px;
 }
 
 .viewBtn {
-  min-height: 34px;
-  border: 1px solid transparent;
-  padding: 0 16px;
+  min-height: 38px;
+  padding: 0 18px;
   color: var(--muted);
   background: transparent;
-  font-size: 0.82rem;
+  border: 1px solid transparent;
 }
 
 .viewBtn.active,
 .viewBtn:hover {
   color: var(--ink);
   background: #ffffff;
-  border: 1px solid var(--line);
-  transform: none;
 }
 
 .topActions {
   display: flex;
   gap: 10px;
   align-items: center;
-  flex-wrap: wrap;
   justify-content: flex-end;
 }
 
 .download,
-.secondaryAction {
-  min-height: 48px;
+.secondaryAction,
+.ghost,
+.deleteSaved {
+  min-height: 46px;
   padding: 0 20px;
   white-space: nowrap;
+}
+
+.secondaryAction,
+.ghost {
+  color: var(--ink);
+  background: var(--wash);
+}
+
+.secondaryAction:hover,
+.ghost:hover {
+  color: #ffffff;
+  background: var(--ink);
 }
 
 .downloadMenu {
@@ -389,7 +395,6 @@ body.isBusy {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 18px;
-  box-shadow: none;
 }
 
 .downloadOptions button {
@@ -400,24 +405,27 @@ body.isBusy {
   text-align: left;
 }
 
-.formEditor {
-  display: grid;
-  gap: 16px;
+.downloadOptions button:hover {
+  background: var(--wash);
 }
 
 .previewPane {
-  min-height: 520px;
+  min-height: 560px;
+  padding: 30px;
+  background: #f9f8f4;
+  border: 1px solid var(--line);
+  border-radius: 24px;
 }
 
 .previewEmpty {
   display: grid;
   place-items: center;
-  min-height: 420px;
+  min-height: 500px;
   margin: 0;
   padding: 32px;
   color: var(--muted);
   text-align: center;
-  background: var(--card-soft);
+  background: #ffffff;
   border: 1px dashed var(--line);
   border-radius: 22px;
   font-size: 1rem;
@@ -427,11 +435,11 @@ body.isBusy {
 .previewSheet {
   max-width: 760px;
   margin: 0 auto;
-  padding: 38px;
-  color: #1d1d1f;
+  padding: 42px;
+  color: var(--ink);
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: 22px;
 }
 
 .previewHeader {
@@ -446,15 +454,15 @@ body.isBusy {
   margin-bottom: 10px;
   color: var(--muted);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
 .previewHeader h3 {
   margin: 0;
   color: var(--ink);
-  font-size: 1.7rem;
-  line-height: 1.2;
+  font-size: 1.85rem;
+  line-height: 1.12;
 }
 
 .previewHeader p {
@@ -466,7 +474,7 @@ body.isBusy {
   display: grid;
   gap: 6px;
   padding: 16px 0;
-  border-bottom: 1px solid #ececf0;
+  border-bottom: 1px solid #ecebe6;
 }
 
 .previewSection:last-child {
@@ -475,9 +483,9 @@ body.isBusy {
 
 .previewSection h3 {
   margin: 0;
-  color: var(--brand);
-  font-size: 0.94rem;
-  font-weight: 750;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 850;
 }
 
 .previewSection p {
@@ -504,7 +512,7 @@ body.isBusy {
 }
 
 .previewQuestions strong {
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .previewQuestions span {
@@ -512,10 +520,9 @@ body.isBusy {
   font-style: italic;
 }
 
-.downloadOptions button:hover {
-  color: var(--brand);
-  background: var(--accent-soft);
-  transform: none;
+.formEditor {
+  display: grid;
+  gap: 16px;
 }
 
 .grid {
@@ -533,8 +540,7 @@ label span,
 .questionsHeader span {
   color: var(--ink);
   font-size: 0.92rem;
-  font-weight: 700;
-  line-height: 1.2;
+  font-weight: 800;
 }
 
 input,
@@ -545,7 +551,6 @@ textarea {
   color: var(--ink);
   background: #ffffff;
   outline: 0;
-  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
 input {
@@ -563,7 +568,7 @@ textarea {
 
 input:focus,
 textarea:focus {
-  border-color: var(--accent);
+  border-color: var(--ink);
   box-shadow: 0 0 0 4px var(--focus);
 }
 
@@ -571,7 +576,6 @@ textarea:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 2px;
 }
 
 .questions {
@@ -592,9 +596,9 @@ textarea:focus {
   width: 42px;
   height: 42px;
   color: #ffffff;
-  background: var(--brand);
+  background: var(--ink);
   border-radius: 14px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .questionRow textarea {
@@ -613,7 +617,6 @@ textarea:focus {
 
 .remove:hover {
   background: var(--danger-soft);
-  transform: none;
 }
 
 .hidden {
@@ -631,15 +634,16 @@ textarea:focus {
   border: 0;
 }
 
-.savedPage {
-  padding: 34px 0;
+.savedPage,
+.editPage {
+  padding: 34px 0 44px;
 }
 
 .savedToolbar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  min-height: 42px;
+  min-height: 46px;
   margin-bottom: 24px;
 }
 
@@ -647,13 +651,7 @@ textarea:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
   padding: 0 22px;
-  border-radius: 16px;
-  font-size: var(--button-font-size);
-  font-weight: 700;
-  text-decoration: none;
-  transition: background 160ms ease, transform 160ms ease;
 }
 
 .savedList {
@@ -665,7 +663,6 @@ textarea:focus {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  justify-content: space-between;
   column-gap: 20px;
   row-gap: 16px;
   min-height: 124px;
@@ -682,7 +679,7 @@ textarea:focus {
   padding-bottom: 10px;
   color: var(--ink);
   font-size: 1.08rem;
-  font-weight: 700;
+  font-weight: 800;
   border-bottom: 1px solid var(--line);
 }
 
@@ -693,15 +690,11 @@ textarea:focus {
   font-size: 0.92rem;
 }
 
-.savedInfo p {
-  align-self: center;
-}
-
 .emptyState {
   min-height: 118px;
   padding: 24px;
   color: var(--ink);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .savedActions {
@@ -713,8 +706,6 @@ textarea:focus {
 }
 
 .deleteSaved {
-  min-height: 48px;
-  padding: 0 18px;
   color: var(--danger);
   background: var(--danger-soft);
 }
@@ -724,13 +715,13 @@ textarea:focus {
   background: var(--danger);
 }
 
-.editPage {
-  padding: 34px 0 44px;
-}
-
 .editEditor {
+  display: grid;
   gap: 16px;
   padding: 28px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 28px;
 }
 
 .editHeading {
@@ -740,24 +731,15 @@ textarea:focus {
 
 .editHeading h1 {
   max-width: none;
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   line-height: 1.2;
-}
-
-.editGrid {
-  gap: 18px;
-}
-
-.editEditor textarea {
-  height: 124px;
-  min-height: 124px;
 }
 
 .editActions {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 32px;
+  gap: 28px;
   margin-top: 24px;
 }
 
@@ -767,51 +749,56 @@ textarea:focus {
   justify-content: flex-end;
 }
 
-.editActions .backButton {
-  align-self: flex-end;
-}
-
 @media (max-width: 900px) {
+  .appHeader,
   .shell,
   .savedPage,
   .editPage {
-    width: min(100% - 28px, 620px);
+    width: min(100% - 28px, 680px);
   }
 
-  .shell {
-    padding: 20px 0;
+  .appHeader {
+    min-height: 70px;
   }
 
-  .workspace,
+  .brandMark span {
+    font-size: 0.92rem;
+  }
+
+  .heroPanel,
   .grid {
     grid-template-columns: 1fr;
   }
 
-  .panel,
+  .heroCopy,
+  .uploadCard,
   .editor,
   .editEditor {
-    padding: 20px;
+    padding: 22px;
+  }
+
+  .heroCopy,
+  .uploadCard {
+    min-height: auto;
   }
 
   h1 {
-    font-size: 2.85rem;
+    font-size: clamp(3.6rem, 16vw, 5.4rem);
   }
 
   .topbar {
+    grid-template-columns: 1fr;
     align-items: stretch;
-    flex-direction: column;
   }
 
-  .viewSwitch {
+  .viewSwitch,
+  .downloadMenu,
+  .downloadOptions {
     width: 100%;
   }
 
   .viewBtn {
     flex: 1;
-  }
-
-  .previewSheet {
-    padding: 22px;
   }
 
   .topActions,
@@ -828,14 +815,17 @@ textarea:focus {
     width: 100%;
   }
 
-  .downloadMenu,
-  .downloadOptions {
-    width: 100%;
-  }
-
   .downloadOptions {
     position: static;
     margin-top: 8px;
+  }
+
+  .previewPane {
+    padding: 16px;
+  }
+
+  .previewSheet {
+    padding: 24px;
   }
 
   .savedItem {
@@ -849,6 +839,5 @@ textarea:focus {
   .savedToolbar .backButton,
   .editActions .backButton {
     align-self: stretch;
-    margin-top: 0;
   }
 }

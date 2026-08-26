@@ -10,55 +10,61 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:title" content="Folha de Estudo" />
     <meta name="twitter:description" content="Plataforma para gerar folhas de estudo da PAZ Church Barueri." />
-    <link rel="stylesheet" href="/styles.css?v=16" />
+    <link rel="stylesheet" href="/styles.css?v=17" />
   </head>
   <body>
+    <header class="appHeader">
+      <a class="brandMark" href="/" aria-label="PAZ Church Barueri">
+        <img src="/paz-logo.svg" alt="Paz Church" />
+        <span>PAZ Church Barueri</span>
+      </a>
+      <nav class="headerNav" aria-label="Navegação">
+        <a class="savedLink" href="/salvos.html">Arquivos salvos</a>
+      </nav>
+    </header>
+
     <main class="shell">
-      <section class="workspace">
-        <aside class="panel">
-          <div>
-            <div class="brandMark">
-              <img src="/paz-logo.svg" alt="Paz Church" />
-              <span>PAZ Church Barueri</span>
-            </div>
-            <h1>Folha de Estudo</h1>
-            <p class="eyebrow" id="modeEyebrow">Life Group</p>
-            <p class="muted">
-              Envie o esboço em PDF ou Word, revise os campos gerados e baixe a folha de estudo pronta.
-            </p>
-          </div>
+      <section class="heroPanel">
+        <div class="heroCopy">
+          <p class="eyebrow" id="modeEyebrow">Life Group</p>
+          <h1>Folha de Estudo</h1>
+          <p class="muted">
+            Envie o esboço em PDF ou Word e gere uma folhinha pronta para revisar, salvar e compartilhar.
+          </p>
+        </div>
 
-          <a class="savedLink" href="/salvos.html">Arquivos salvos</a>
-
-          <form id="uploadForm" class="upload">
-            <label class="dropzone" for="pdfFile">
-              <span class="dropIcon">DOC</span>
-              <strong>Selecionar arquivo</strong>
-              <small id="fileName">Nenhum arquivo escolhido</small>
-            </label>
-            <input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-            <button id="extractBtn" class="primary" type="submit">Gerar Folha de Estudo</button>
-          </form>
-
+        <form id="uploadForm" class="uploadCard">
+          <label class="dropzone" for="pdfFile">
+            <span class="dropIcon">DOC</span>
+            <strong>Selecionar arquivo</strong>
+            <small id="fileName">Nenhum arquivo escolhido</small>
+          </label>
+          <input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+          <button id="extractBtn" class="primary" type="submit">Gerar Folha de Estudo</button>
           <div class="status" id="status">Anexe um PDF ou Word e clique em Gerar Folha de Estudo.</div>
-        </aside>
+        </form>
+      </section>
 
+      <section class="workspace">
         <section class="editor" aria-label="Editor da folha de estudo">
-          <div class="topbar">
-            <div>
-              <h2>Revisão do conteúdo</h2>
-            </div>
-            <div class="viewSwitch" aria-label="Modo de visualização">
-              <button id="previewViewBtn" class="viewBtn active" type="button">Prévia</button>
-              <button id="editViewBtn" class="viewBtn" type="button">Editar</button>
-            </div>
-            <div class="topActions">
-              <button id="saveOnlineBtn" class="secondaryAction" type="button">Salvar Arquivo Online</button>
-              <div class="downloadMenu">
-                <button id="downloadMenuBtn" class="download" type="button" aria-expanded="false">Baixar</button>
-                <div id="downloadOptions" class="downloadOptions hidden">
-                  <button id="downloadPdfBtn" type="button">PDF</button>
-                  <button id="downloadDocxBtn" type="button">DOCX</button>
+          <div>
+            <div class="topbar">
+              <div>
+                <span class="sectionKicker">Conteúdo gerado</span>
+                <h2>Prévia e ajustes</h2>
+              </div>
+              <div class="viewSwitch" aria-label="Modo de visualização">
+                <button id="previewViewBtn" class="viewBtn active" type="button">Prévia</button>
+                <button id="editViewBtn" class="viewBtn" type="button">Editar</button>
+              </div>
+              <div class="topActions">
+                <button id="saveOnlineBtn" class="secondaryAction" type="button">Salvar Arquivo Online</button>
+                <div class="downloadMenu">
+                  <button id="downloadMenuBtn" class="download" type="button" aria-expanded="false">Baixar</button>
+                  <div id="downloadOptions" class="downloadOptions hidden">
+                    <button id="downloadPdfBtn" type="button">PDF</button>
+                    <button id="downloadDocxBtn" type="button">DOCX</button>
+                  </div>
                 </div>
               </div>
             </div>
