@@ -570,7 +570,8 @@ Texto extraído do arquivo:
 def normalize_editable_payload(data):
     data = data or {}
     perguntas = data.get("perguntas") if isinstance(data.get("perguntas"), list) else []
-    perguntas = remove_repeated_question_references([str(item) for item in perguntas])
+    source_text = "\n".join(str(data.get(key) or "") for key in ("textoExtraido", "resumo"))
+    perguntas = normalize_questions(source_text, [str(item) for item in perguntas])
     return {
         "titulo": str(data.get("titulo") or ""),
         "subtitulo": str(data.get("subtitulo") or ""),
@@ -764,6 +765,17 @@ def reorder_question_and_scripture(text):
     return normalize_scripture_version_labels("\n".join(question_lines + scripture_lines))
 
 
+def strip_question_number_prefix(text):
+    lines = []
+    for line in str(text or "").splitlines():
+        line = line.strip()
+        if is_scripture_line(line):
+            lines.append(line)
+        else:
+            lines.append(re.sub(r"^\s*\d+\s*[\).]\s*", "", line).strip())
+    return clean_block("\n".join(line for line in lines if line))
+
+
 def normalize_scripture_version_labels(text):
     return re.sub(r"\b(?:ARC|ARA|NVI|NVT|NTLH|ACF|KJA)\b", "NAA", text or "")
 
@@ -887,6 +899,7 @@ def remove_repeated_question_references(questions):
     cleaned = []
     used_refs = set()
     for question in questions or []:
+        question = strip_question_number_prefix(question)
         lines = str(question or "").splitlines()
         question_refs = biblical_references(question)
         duplicate_refs = [ref for ref in question_refs if normalize_reference_key(ref) in used_refs]
@@ -902,9 +915,9 @@ def remove_repeated_question_references(questions):
                 next_lines.append(line)
             for ref in line_refs:
                 refs_in_this_question.add(normalize_reference_key(ref))
-        cleaned.append(clean_block("\n".join(next_lines)))
+        cleaned.append(strip_question_number_prefix("\n".join(next_lines)))
         used_refs.update(refs_in_this_question)
-    return cleaned
+    return [question for question in cleaned if compact_text(question)]
 
 
 def pluralize_question(question):
@@ -978,10 +991,10 @@ def sermon_source_text(text):
 
 
 def normalize_questions(text, questions=None):
-    questions = [str(question).strip() for question in (questions or []) if compact_text(question)]
+    questions = [strip_question_number_prefix(question) for question in (questions or []) if compact_text(question)]
     filtered = []
     for question in questions:
-        normalized = re.sub(r"^\d+\)\s*", "", question).strip()
+        normalized = strip_question_number_prefix(question)
         if is_scripture_line(normalized) and filtered:
             filtered[-1] = reorder_question_and_scripture(f"{filtered[-1]}\n{normalized}")
             continue
@@ -1019,7 +1032,25 @@ def normalize_questions(text, questions=None):
             break
         if question not in result:
             result.append(question_with_scripture(question, text, refs, len(result) - 1))
-    return remove_repeated_question_references(result[:4])
+    result = remove_repeated_question_references(result)
+    for question in fallback:
+        if len(result) == 4:
+            break
+        candidate = strip_question_number_prefix(question_with_scripture(question, text, refs, len(result) - 1))
+        if candidate and candidate not in result:
+            result.append(candidate)
+    generic_fallback = [
+        "O que essa mensagem revela sobre Deus e como essa verdade confronta a maneira de viver a fé no dia a dia?",
+        "Quais atitudes práticas podem ser aplicadas nesta semana para obedecer ao que foi ministrado?",
+        "Como essa Palavra pode fortalecer a fé, a família e o testemunho cristão durante a semana?",
+    ]
+    result = remove_repeated_question_references(result)
+    while len(result) < 4:
+        candidate = generic_fallback[(len(result) - 1) % len(generic_fallback)]
+        if candidate in result:
+            candidate = f"{candidate} Compartilhe um exemplo prático."
+        result.append(candidate)
+    return [strip_question_number_prefix(question) for question in result[:4]]
 
 
 def sentence_list(text):
@@ -1254,7 +1285,7 @@ def parse_pdf_text(text):
     chatgpt_payload = generate_life_group_with_chatgpt(text, title, subtitle)
     resumo = (chatgpt_payload or {}).get("resumo") or summarize_with_title(text, title)
     conclusao = (chatgpt_payload or {}).get("conclusao") or short_conclusion(text, title)
-    perguntas = remove_repeated_question_references((chatgpt_payload or {}).get("perguntas") or infer_questions(text))
+    perguntas = normalize_questions(text, (chatgpt_payload or {}).get("perguntas") or infer_questions(text))
 
     return {
         "titulo": (chatgpt_payload or {}).get("titulo") or title,

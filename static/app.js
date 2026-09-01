@@ -155,6 +155,10 @@ function previewLines(value) {
     .filter(Boolean);
 }
 
+function stripQuestionNumberPrefix(value) {
+  return String(value || "").replace(/^\s*\d+\s*[\).]\s*/, "").trim();
+}
+
 function previewText(value) {
   const lines = previewLines(value);
   if (!lines.length) {
@@ -189,7 +193,7 @@ function renderPreview() {
       if (!lines.length) {
         return "";
       }
-      const first = `<strong>${index + 1}) ${escapeHtml(lines[0])}</strong>`;
+      const first = `<strong>${index + 1}) ${escapeHtml(stripQuestionNumberPrefix(lines[0]))}</strong>`;
       const rest = lines.slice(1).map((line) => `<span>${escapeHtml(line)}</span>`).join("");
       return `<li>${first}${rest}</li>`;
     })
@@ -250,7 +254,7 @@ function collectData() {
   fields.forEach((field) => {
     data[field] = $(field).value.trim();
   });
-  data.perguntas = state.perguntas.map((item) => item.trim()).filter(Boolean);
+  data.perguntas = state.perguntas.map((item) => stripQuestionNumberPrefix(item)).filter(Boolean);
   data.tipo = "life_group";
   data.textoExtraido = state.textoExtraido;
   return data;
