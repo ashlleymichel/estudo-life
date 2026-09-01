@@ -772,7 +772,7 @@ def strip_question_number_prefix(text):
         if is_scripture_line(line):
             lines.append(line)
         else:
-            lines.append(re.sub(r"^\s*\d+\s*[\).]\s*", "", line).strip())
+            lines.append(re.sub(r"^(?:\s*\d+\s*[\).]\s*)+", "", line).strip())
     return clean_block("\n".join(line for line in lines if line))
 
 
@@ -1588,7 +1588,8 @@ def build_life_group_pdf(data, output_path):
 
     story.append(Paragraph("<b>- Perguntas:</b>", styles["section"]))
     for index, question in enumerate(final_questions, start=1):
-        story.append(Paragraph(f"{index}) {formatted_paragraph_text(question)}", styles["question"]))
+        clean_question = strip_question_number_prefix(question)
+        story.append(Paragraph(f"{index}) {formatted_paragraph_text(clean_question)}", styles["question"]))
 
     add_bullet_section(story, "Conclusão", data.get("conclusao"), styles["body"], bold_font)
     doc.build(story, onFirstPage=draw_life_group_header, onLaterPages=draw_life_group_header)
@@ -1657,7 +1658,8 @@ def docx_document_xml(data):
     body.extend(word_section("Introdução", data.get("resumo")))
     body.append(word_paragraph("- Perguntas:", "Heading2"))
     for index, question in enumerate(final_questions, start=1):
-        body.append(word_paragraph(f"{index}) {question}"))
+        clean_question = strip_question_number_prefix(question)
+        body.append(word_paragraph(f"{index}) {clean_question}"))
     body.extend(word_section("Conclusão", data.get("conclusao")))
 
     section = (

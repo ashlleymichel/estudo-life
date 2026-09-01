@@ -156,7 +156,7 @@ function previewLines(value) {
 }
 
 function stripQuestionNumberPrefix(value) {
-  return String(value || "").replace(/^\s*\d+\s*[\).]\s*/, "").trim();
+  return String(value || "").replace(/^(?:\s*\d+\s*[\).]\s*)+/, "").trim();
 }
 
 function previewText(value) {
