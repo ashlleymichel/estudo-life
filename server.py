@@ -523,10 +523,13 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "O conteúdo será usado em um pequeno PDF de estudo, então seja objetivo, profundo e fácil de discutir. "
         "Dê ênfase maior aos versículos bíblicos citados no sermão. "
         "Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas, usando a versão NAA. "
-        "Quando o texto trouxer o versículo completo, preserve o versículo completo, sem cortes e sem reticências. "
-        "Use apenas referências bíblicas presentes no texto enviado; se o texto não trouxer o versículo completo, use a referência sem inventar conteúdo. "
+        "O sistema renderiza o itálico no PDF; no JSON, escreva o versículo entre aspas e com a referência bíblica. "
+        "Escreva o versículo completo, sem cortes e sem reticências. "
+        "Use as referências bíblicas presentes no texto enviado. Quando o texto trouxer apenas a referência, use o texto completo da NAA se você o souber com segurança; "
+        "caso contrário, não invente palavras do versículo. "
         "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, sempre apoiadas nos textos bíblicos citados. "
-        "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo de pelo menos duas perguntas, preferencialmente nas perguntas 2, 3 e 4. "
+        "Não repita nas perguntas os mesmos versículos que já foram escritos na introdução, exceto se o usuário pedir depois pelo chat. "
+        "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo das perguntas 2, 3 e/ou 4, usando versículos diferentes dos usados na introdução sempre que possível. "
         "Quando uma pergunta tiver referência bíblica, escreva a pergunta em uma linha e o versículo logo abaixo. "
         "Prefira o formato: Leia Mateus 7:24-25 e responda: [pergunta]. Na linha seguinte, escreva o versículo entre aspas com a referência entre parênteses. "
         "Evite perguntas rasas, genéricas ou que possam ser respondidas com sim/não. "
@@ -537,21 +540,22 @@ Título detectado: {title or "não informado"}
 Subtítulo detectado: {subtitle or "não informado"}
 
 Contexto e regras por trás:
-- Faça um resumo introdutório claro e de fácil entendimento do texto extraído, que foi o sermão de domingo do pastor, em no máximo 10 linhas, dando ênfase aos versículos.
+- Faça um resumo introdutório claro e de fácil entendimento desse texto, que foi o sermão de domingo do pastor, em no máximo 9 linhas, dando ênfase aos versículos.
 - Esse texto será apenas a introdução de um pequeno PDF de estudos para uma reunião da igreja PAZ Church nas casas.
 - A introdução deve ser coesa, pastoral e conectada ao tema do sermão, não apenas uma lista de versículos.
 - Dê ênfase maior aos versículos; use preferencialmente os primeiros versículos principais que aparecem no documento.
 - Logo após essa introdução, formule exatamente quatro perguntas para que pequenos grupos discutam esse assunto e aprendam mais profundamente.
-- As perguntas devem dar ênfase aos textos bíblicos citados no texto.
-- A primeira pergunta deve ser exatamente: Compartilhe conosco o que essa Palavra de domingo falou com você.
+- As perguntas devem dar ênfase aos textos bíblicos citados no texto, escrevendo os versículos da mesma forma que na introdução, exceto os versículos que já foram escritos na introdução.
+- A primeira pergunta deverá ser exatamente: Compartilhe conosco o que essa Palavra de domingo falou com você.
 - As perguntas 2 a 4 devem ser simples de discutir em grupo, mas profundas; devem usar os versículos como apoio e fazer a pessoa ler o texto bíblico antes de responder.
-- Quando houver passagens bíblicas no esboço, pelo menos duas perguntas devem trazer o versículo completo logo abaixo da pergunta.
-- Se houver três ou mais passagens bíblicas relevantes, coloque versículo de apoio nas perguntas 2, 3 e 4.
+- Quando houver passagens bíblicas no esboço, as perguntas 2, 3 e/ou 4 devem trazer o versículo completo logo abaixo da pergunta, usando versículos diferentes dos que já apareceram na introdução sempre que possível.
+- Se houver três ou mais passagens bíblicas relevantes que não foram usadas na introdução, coloque versículo de apoio nas perguntas 2, 3 e 4.
 - Nas perguntas que tiverem versículo de apoio, escreva primeiro a pergunta e logo abaixo a passagem bíblica, da mesma forma que na introdução.
 - Use este estilo para perguntas com referência bíblica: Leia Mateus 7:24-25 e responda: o que significa construir sua vida sobre a rocha? Quais ações práticas podem solidificar essa construção?
 - Na linha logo abaixo da pergunta, escreva a passagem: "Texto completo do versículo" (Mateus 7:24-25 NAA).
-- Escreva todos os versículos citados nos textos da introdução e nas perguntas em itálico entre aspas na versão NAA (Nova Almeida Atualizada).
-- Escreva o versículo completo, sem cortes, sempre que ele estiver disponível no texto.
+- Escreva todos os versículos citados nos textos da introdução e nas perguntas em itálico entre aspas na versão NAA (Nova Almeida Atualizada). O PDF aplicará o itálico; no texto, coloque a passagem entre aspas com a referência.
+- Para obter o texto do versículo, use a versão NAA conforme a referência bíblica enviada. Quando necessário, tome como referência o formato do site Bible.com, por exemplo https://www.bible.com/pt/bible/1840/JHN.1.NAA, mas sem copiar referências que não estejam relacionadas ao sermão.
+- Escreva o versículo completo, sem cortes, sempre.
 - No final, faça uma conclusão curta, com no máximo cinco linhas, sobre os principais destaques e revelações do texto, focando naquilo que é o título.
 - Não comece a conclusão com "Concluímos que", "Em resumo" ou "Então".
 
@@ -633,6 +637,13 @@ def assist_life_group_with_chatgpt(data, message, history=None):
         "Quando o usuário pedir uma alteração concreta na folha, aplique a mudança e use action='updated'. "
         "Quando ele fizer uma pergunta, pedir opinião, explicação ou orientação sem solicitar mudança, "
         "responda sem alterar a folha e use action='answered'. Preserve rigorosamente os campos não mencionados. "
+        "Se alterar introdução, mantenha no máximo 9 linhas e dê ênfase aos versículos. "
+        "Se alterar perguntas, mantenha exatamente quatro perguntas, com a primeira sendo exatamente: "
+        "'Compartilhe conosco o que essa Palavra de domingo falou com você.'. "
+        "Quando uma pergunta tiver versículo, escreva primeiro a pergunta e logo abaixo a passagem bíblica. "
+        "Evite repetir nas perguntas os versículos já usados na introdução, a menos que o usuário peça isso explicitamente. "
+        "Escreva os versículos entre aspas na versão NAA, completos e sem cortes quando souber o texto com segurança. "
+        "Se alterar conclusão, mantenha no máximo cinco linhas e foque no título. "
         "Nunca invente que uma alteração foi feita. A resposta ao usuário deve dizer claramente se a folha foi alterada. "
         "Mantenha tom bíblico, pastoral, claro e simples. O campo data deve sempre conter a folha completa, "
         "mesmo quando nenhuma alteração for feita. Não use markdown complexo na resposta."
