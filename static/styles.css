@@ -430,6 +430,13 @@ input[type="file"] {
 
 .previewPane {
   min-height: 600px;
+  border-radius: 18px;
+  transition: box-shadow 0.25s ease, outline-color 0.25s ease;
+}
+
+.previewPane.previewUpdated {
+  outline: 2px solid #111111;
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.08);
 }
 
 .previewEmpty {

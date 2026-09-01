@@ -214,6 +214,18 @@ function renderPreview() {
   `;
 }
 
+function highlightPreviewUpdate() {
+  const preview = $("previewPane");
+  if (!preview) {
+    return;
+  }
+  preview.classList.remove("previewUpdated");
+  window.requestAnimationFrame(() => {
+    preview.classList.add("previewUpdated");
+    window.setTimeout(() => preview.classList.remove("previewUpdated"), 1200);
+  });
+}
+
 function setView(view) {
   state.view = view;
   $("previewPane").classList.toggle("hidden", view !== "preview");
@@ -640,11 +652,12 @@ $("chatForm").addEventListener("submit", async (event) => {
 
   try {
     const result = await talkWithAssistant(instruction);
-    if (result.action === "updated" && result.data) {
+    if (result.data) {
       fillForm(result.data);
       showReview();
       setView("preview");
-      setStatus("Alteração aplicada pelo assistente.", "ok");
+      highlightPreviewUpdate();
+      setStatus(result.action === "updated" ? "Alteração aplicada na prévia." : "Prévia atualizada pelo assistente.", "ok");
     } else {
       setStatus("Resposta recebida do assistente.", "ok");
     }
