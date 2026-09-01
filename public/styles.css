@@ -798,6 +798,52 @@ body.dark {
   --sidebar: #222222;
   --panel: #292929;
   --line: #444444;
+  --muted: #b8b4ad;
+}
+
+body.dark .leftSidebar {
+  color: #f5f5f5;
+}
+
+body.dark .recentHeader strong,
+body.dark .recentText strong,
+body.dark .recentText span,
+body.dark .recentEmpty,
+body.dark .allFiles,
+body.dark .themeToggle,
+body.dark .status,
+body.dark .dropzone strong,
+body.dark .dropzone small,
+body.dark .breadcrumbs strong,
+body.dark .breadcrumbs b {
+  color: #f5f5f5;
+}
+
+body.dark .recentItem {
+  color: #d6d2ca;
+}
+
+body.dark .recentItem:hover .recentText strong,
+body.dark .allFiles:hover {
+  color: #ffffff;
+}
+
+body.dark .recentIcon {
+  background: #d6d2ca;
+}
+
+body.dark .dropzone small,
+body.dark .status,
+body.dark .recentText strong,
+body.dark .allFiles {
+  color: #b8b4ad;
+}
+
+body.dark .recentHeader img,
+body.dark .themeToggle img,
+body.dark .uploadIcon,
+body.dark .chatLaunchButton img {
+  filter: invert(1);
 }
 
 body.dark .contentArea,
@@ -809,7 +855,8 @@ body.dark .viewBtn {
 }
 
 body.dark .reviewMain,
-body.dark .chatMessage.bot {
+body.dark .chatMessage.bot,
+body.dark .dropzone {
   background: #292929;
 }
 
