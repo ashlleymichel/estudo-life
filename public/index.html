@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Folha de Estudo</title>
     <meta name="description" content="Crie, revise e exporte suas folhas de estudo." />
-    <link rel="stylesheet" href="/styles.css?v=35" />
+    <link rel="stylesheet" href="/styles.css?v=36" />
   </head>
   <body>
     <main class="appFrame">
@@ -64,6 +64,12 @@
             <input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
             <div class="status" id="status">Selecione um documento para começar.</div>
           </form>
+
+          <div id="loadingState" class="centerLoading hidden" role="status" aria-live="polite">
+            <span class="spinner darkSpinner" aria-hidden="true"></span>
+            <strong>Montando estrutura...</strong>
+            <small>Estamos lendo o documento e preparando a folha.</small>
+          </div>
 
           <div class="reviewLayout hidden" id="reviewLayout">
             <div class="reviewMain">
@@ -133,6 +139,6 @@
       </section>
     </main>
 
-    <script src="/app.js?v=35"></script>
+    <script src="/app.js?v=36"></script>
   </body>
 </html>

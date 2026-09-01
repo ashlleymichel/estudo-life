@@ -323,6 +323,10 @@ body.reviewOpen .workspaceHeader {
   margin: 0 auto;
 }
 
+body.isExtracting .uploadStage {
+  display: none;
+}
+
 .dropzone {
   display: flex;
   flex-direction: column;
@@ -382,6 +386,33 @@ input[type="file"] {
 
 .status.error {
   color: var(--danger);
+}
+
+.centerLoading {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  width: min(100%, 520px);
+  min-height: 180px;
+  margin: clamp(80px, 18vh, 180px) auto 0;
+  padding: 32px;
+  color: #111111;
+  text-align: center;
+}
+
+.centerLoading.hidden {
+  display: none;
+}
+
+.centerLoading strong {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.centerLoading small {
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .reviewLayout {
@@ -786,6 +817,13 @@ button.loading {
   gap: 8px;
 }
 
+.darkSpinner {
+  width: 28px;
+  height: 28px;
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: #000000;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -858,6 +896,19 @@ body.dark .reviewMain,
 body.dark .chatMessage.bot,
 body.dark .dropzone {
   background: #292929;
+}
+
+body.dark .centerLoading {
+  color: #f5f5f5;
+}
+
+body.dark .centerLoading small {
+  color: #b8b4ad;
+}
+
+body.dark .darkSpinner {
+  border-color: rgba(245, 245, 245, 0.2);
+  border-top-color: #f5f5f5;
 }
 
 body.dark .chatPanel,

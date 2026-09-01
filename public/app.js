@@ -60,6 +60,7 @@ function setBusy(isBusy, action = "") {
   const fileInput = $("pdfFile");
   const chatInput = $("chatInput");
   const chatSendBtn = $("chatSendBtn");
+  const loadingState = $("loadingState");
   const fieldsToToggle = [
     ...fields.map((field) => $(field)),
     ...document.querySelectorAll("#questions textarea, .questionRow button"),
@@ -82,11 +83,13 @@ function setBusy(isBusy, action = "") {
   downloadMenuBtn.classList.toggle("loading", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
   chatSendBtn.classList.toggle("loading", isBusy && action === "chat");
-  extractBtn.innerHTML = buttonContent(action === "extract" ? "Montando estrutura..." : getExtractLabel(), isBusy && action === "extract");
+  loadingState.classList.toggle("hidden", !(isBusy && action === "extract"));
+  extractBtn.innerHTML = getExtractLabel();
   downloadMenuBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
   chatSendBtn.innerHTML = buttonContent(action === "chat" ? "Ajustando..." : "Enviar", isBusy && action === "chat");
   document.body.classList.toggle("isBusy", isBusy);
+  document.body.classList.toggle("isExtracting", isBusy && action === "extract");
 }
 
 function fillForm(data) {
