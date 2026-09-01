@@ -410,7 +410,7 @@ async function renderRecentFiles() {
 
       const icon = document.createElement("span");
       icon.className = "recentIcon";
-      icon.textContent = "PDF";
+      icon.setAttribute("aria-hidden", "true");
 
       const text = document.createElement("span");
       text.className = "recentText";

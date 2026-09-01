@@ -108,7 +108,7 @@ textarea:disabled {
 .recentItem {
   display: grid;
   grid-template-columns: 5px minmax(0, 1fr);
-  gap: 3px;
+  gap: 5px;
   align-items: center;
   min-height: 18px;
   padding: 0;
@@ -116,6 +116,8 @@ textarea:disabled {
   background: transparent;
   border: 0;
   text-align: left;
+  overflow: hidden;
+  width: 100%;
 }
 
 .recentItem:hover .recentText strong {
@@ -123,10 +125,14 @@ textarea:disabled {
 }
 
 .recentIcon {
+  display: block;
   width: 5px;
   height: 5px;
+  min-width: 5px;
   background: var(--muted);
   border-radius: 50%;
+  font-size: 0;
+  line-height: 0;
 }
 
 .recentText {
