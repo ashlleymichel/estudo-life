@@ -530,6 +530,7 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, sempre apoiadas nos textos bíblicos citados. "
         "Não repita nas perguntas os mesmos versículos que já foram escritos na introdução, exceto se o usuário pedir depois pelo chat. "
         "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo das perguntas 2, 3 e/ou 4, usando versículos diferentes dos usados na introdução sempre que possível. "
+        "Nunca use a mesma passagem bíblica em duas perguntas diferentes. Cada pergunta com passagem bíblica precisa usar uma referência única. "
         "Quando uma pergunta tiver referência bíblica, escreva a pergunta em uma linha e o versículo logo abaixo. "
         "Prefira o formato: Leia Mateus 7:24-25 e responda: [pergunta]. Na linha seguinte, escreva o versículo entre aspas com a referência entre parênteses. "
         "Evite perguntas rasas, genéricas ou que possam ser respondidas com sim/não. "
@@ -549,6 +550,7 @@ Contexto e regras por trás:
 - A primeira pergunta deverá ser exatamente: Compartilhe conosco o que essa Palavra de domingo falou com você.
 - As perguntas 2 a 4 devem ser simples de discutir em grupo, mas profundas; devem usar os versículos como apoio e fazer a pessoa ler o texto bíblico antes de responder.
 - Quando houver passagens bíblicas no esboço, as perguntas 2, 3 e/ou 4 devem trazer o versículo completo logo abaixo da pergunta, usando versículos diferentes dos que já apareceram na introdução sempre que possível.
+- Não repita a mesma passagem bíblica em duas perguntas diferentes. Se não houver outra referência bíblica adequada, deixe a pergunta sem passagem em vez de repetir uma referência já usada.
 - Se houver três ou mais passagens bíblicas relevantes que não foram usadas na introdução, coloque versículo de apoio nas perguntas 2, 3 e 4.
 - Nas perguntas que tiverem versículo de apoio, escreva primeiro a pergunta e logo abaixo a passagem bíblica, da mesma forma que na introdução.
 - Use este estilo para perguntas com referência bíblica: Leia Mateus 7:24-25 e responda: o que significa construir sua vida sobre a rocha? Quais ações práticas podem solidificar essa construção?
@@ -568,6 +570,7 @@ Texto extraído do arquivo:
 def normalize_editable_payload(data):
     data = data or {}
     perguntas = data.get("perguntas") if isinstance(data.get("perguntas"), list) else []
+    perguntas = remove_repeated_question_references([str(item) for item in perguntas])
     return {
         "titulo": str(data.get("titulo") or ""),
         "subtitulo": str(data.get("subtitulo") or ""),
@@ -575,7 +578,7 @@ def normalize_editable_payload(data):
         "avisos": str(data.get("avisos") or ""),
         "momentoVisao": str(data.get("momentoVisao") or ""),
         "resumo": str(data.get("resumo") or ""),
-        "perguntas": [str(item) for item in perguntas],
+        "perguntas": perguntas,
         "conclusao": str(data.get("conclusao") or ""),
         "tipo": "life_group",
         "textoExtraido": str(data.get("textoExtraido") or ""),
@@ -594,6 +597,7 @@ def revise_life_group_with_chatgpt(data, instruction):
         "Preserve todos os campos que não foram mencionados na instrução. "
         "Mantenha o conteúdo em português do Brasil, com tom bíblico, claro, simples e pastoral. "
         "Se ajustar perguntas com referência bíblica, mantenha sempre a estrutura: pergunta primeiro e passagem bíblica logo abaixo. "
+        "Nunca use a mesma passagem bíblica em duas perguntas diferentes; se não houver outra passagem adequada, deixe a pergunta sem passagem. "
         "Quando houver versículos, escreva-os entre aspas e preserve a referência bíblica. "
         "Não inclua markdown, comentários ou explicações fora do JSON."
     )
@@ -642,6 +646,7 @@ def assist_life_group_with_chatgpt(data, message, history=None):
         "Se alterar perguntas, mantenha exatamente quatro perguntas, com a primeira sendo exatamente: "
         "'Compartilhe conosco o que essa Palavra de domingo falou com você.'. "
         "Quando uma pergunta tiver versículo, escreva primeiro a pergunta e logo abaixo a passagem bíblica. "
+        "Nunca repita a mesma passagem bíblica em duas perguntas diferentes. Cada pergunta com versículo deve usar uma referência única. "
         "Evite repetir nas perguntas os versículos já usados na introdução, a menos que o usuário peça isso explicitamente. "
         "Escreva os versículos entre aspas na versão NAA, completos e sem cortes quando souber o texto com segurança. "
         "Se alterar conclusão, mantenha no máximo cinco linhas e foque no título. "
@@ -865,6 +870,43 @@ def question_with_scripture(question, source_text, refs, index):
     return question
 
 
+def normalize_reference_key(ref):
+    return re.sub(r"\s+", " ", normalize_scripture_version_labels(ref or "").lower()).strip()
+
+
+def strip_repeated_reference_from_question_line(line, duplicate_refs):
+    result = str(line or "")
+    for ref in duplicate_refs:
+        escaped_ref = re.escape(ref)
+        result = re.sub(rf"^\s*Leia\s+{escaped_ref}\s+e\s+responda\s*:\s*", "", result, flags=re.IGNORECASE)
+        result = re.sub(rf"\s*\({escaped_ref}(?:\s+NAA)?\)", "", result, flags=re.IGNORECASE)
+    return clean_block(result)
+
+
+def remove_repeated_question_references(questions):
+    cleaned = []
+    used_refs = set()
+    for question in questions or []:
+        lines = str(question or "").splitlines()
+        question_refs = biblical_references(question)
+        duplicate_refs = [ref for ref in question_refs if normalize_reference_key(ref) in used_refs]
+        next_lines = []
+        refs_in_this_question = set()
+        for line in lines:
+            line_refs = biblical_references(line)
+            if is_scripture_line(line) and any(normalize_reference_key(ref) in used_refs for ref in line_refs):
+                continue
+            if duplicate_refs and not is_scripture_line(line):
+                line = strip_repeated_reference_from_question_line(line, duplicate_refs)
+            if line:
+                next_lines.append(line)
+            for ref in line_refs:
+                refs_in_this_question.add(normalize_reference_key(ref))
+        cleaned.append(clean_block("\n".join(next_lines)))
+        used_refs.update(refs_in_this_question)
+    return cleaned
+
+
 def pluralize_question(question):
     replacements = [
         (r"\bComo isso se conecta com\b", "Como nós conectamos isso com"),
@@ -977,7 +1019,7 @@ def normalize_questions(text, questions=None):
             break
         if question not in result:
             result.append(question_with_scripture(question, text, refs, len(result) - 1))
-    return result[:4]
+    return remove_repeated_question_references(result[:4])
 
 
 def sentence_list(text):
@@ -1212,7 +1254,7 @@ def parse_pdf_text(text):
     chatgpt_payload = generate_life_group_with_chatgpt(text, title, subtitle)
     resumo = (chatgpt_payload or {}).get("resumo") or summarize_with_title(text, title)
     conclusao = (chatgpt_payload or {}).get("conclusao") or short_conclusion(text, title)
-    perguntas = (chatgpt_payload or {}).get("perguntas") or infer_questions(text)
+    perguntas = remove_repeated_question_references((chatgpt_payload or {}).get("perguntas") or infer_questions(text))
 
     return {
         "titulo": (chatgpt_payload or {}).get("titulo") or title,
