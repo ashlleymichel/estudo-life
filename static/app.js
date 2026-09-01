@@ -38,6 +38,13 @@ function getExtractLabel() {
   return "Criar PDF";
 }
 
+function startFileSelection() {
+  if (state.busy) {
+    return;
+  }
+  $("pdfFile").click();
+}
+
 function getFileName() {
   return "folha-de-estudo-life-group.pdf";
 }
@@ -470,6 +477,9 @@ function setMode() {
 $("pdfFile").addEventListener("change", (event) => {
   const file = event.target.files[0];
   $("fileName").textContent = file ? file.name : "Nenhum arquivo escolhido";
+  if (file) {
+    $("uploadForm").requestSubmit();
+  }
 });
 
 $("uploadForm").addEventListener("submit", async (event) => {
@@ -664,6 +674,7 @@ fields.forEach((field) => {
 });
 $("previewViewBtn").addEventListener("click", () => setView("preview"));
 $("editViewBtn").addEventListener("click", () => setView("edit"));
+$("extractBtn").addEventListener("click", startFileSelection);
 setView("preview");
 
 const dropzone = document.querySelector(".dropzone");
@@ -682,6 +693,7 @@ dropzone.addEventListener("drop", (event) => {
   transfer.items.add(file);
   $("pdfFile").files = transfer.files;
   $("fileName").textContent = file.name;
+  $("uploadForm").requestSubmit();
 });
 
 const themeToggle = $("themeToggle");
