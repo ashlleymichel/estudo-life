@@ -1,5 +1,142 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Folha de Estudo</title><meta name="description" content="Crie, revise e exporte suas folhas de estudo."><link rel="stylesheet" href="/styles.css?v=30"></head><body>
-<main class="appFrame"><aside class="leftSidebar"><a class="createButton" href="/">Criar PDF</a><section class="recentPanel"><div class="recentHeader"><strong><span class="booksIcon">◫</span> PDF Recentes</strong></div><div id="recentFiles" class="recentFiles"><p class="recentEmpty">Nenhum PDF salvo ainda.</p></div><a class="allFiles" href="/salvos.html">Ver todos os PDFs</a></section><div class="sidebarFooter"><div><span class="usageRing"></span> Consumo <span>7%</span></div><button id="themeToggle" class="themeToggle" type="button"><span>☼</span> Modo claro</button></div></aside>
-<section class="contentArea"><header class="workspaceHeader"><div class="breadcrumbs"><span>Gerar PDF</span><b>/</b><strong id="stepLabel">Envio do documento</strong></div><div class="topActions"><div class="viewSwitch"><button id="previewViewBtn" class="viewBtn active" type="button">Prévia</button><button id="editViewBtn" class="viewBtn" type="button">Editar PDF</button></div><button id="saveOnlineBtn" class="secondaryAction" type="button">Salvar</button><div class="downloadMenu"><button id="downloadMenuBtn" class="download" type="button" aria-expanded="false">Baixar</button><div id="downloadOptions" class="downloadOptions hidden"><button id="downloadPdfBtn" type="button">PDF</button><button id="downloadDocxBtn" type="button">DOCX</button></div></div></div></header>
-<section class="editor"><form id="uploadForm" class="uploadStage"><label class="dropzone" for="pdfFile"><span class="uploadGlyph">↑</span><strong>Arraste seu documento</strong><span>ou clique para selecionar um arquivo</span><small id="fileName">PDF, DOC ou DOCX</small></label><input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><button id="extractBtn" class="primary" type="submit">Gerar PDF</button><div class="status" id="status">Selecione um documento para começar.</div></form>
-<div class="reviewLayout hidden" id="reviewLayout"><div class="reviewMain"><section id="previewPane" class="previewPane"><p class="previewEmpty">A prévia aparecerá aqui depois que você gerar o PDF.</p></section><div id="formEditor" class="formEditor hidden"><label><span id="tituloLabel">Título da série</span><input id="titulo" type="text"></label><label><span id="subtituloLabel">Linha do culto</span><input id="subtitulo" type="text"></label><label class="lifeOnly"><span>Momento Generosidade</span><textarea id="momentoGenerosidade" rows="5"></textarea></label><label class="lifeOnly"><span>Aviso/Agenda</span><textarea id="avisos" rows="4"></textarea></label><label class="lifeOnly"><span>Momento da visão</span><textarea id="momentoVisao" rows="5"></textarea></label><label><span id="resumoLabel">Resumo</span><textarea id="resumo" rows="7"></textarea></label><div class="questionsHeader lifeOnly"><span>Perguntas</span><button id="addQuestion" class="ghost" type="button">+ Adicionar</button></div><div id="questions" class="questions lifeOnly"></div><label><span>Conclusão</span><textarea id="conclusao" rows="5"></textarea></label></div></div><aside class="chatPanel"><div class="chatHeader"><span>Assistente de edição</span><strong>Ajuste o conteúdo pelo chat</strong></div><div id="chatMessages" class="chatMessages" aria-live="polite"><div class="chatMessage bot">Diga o que deseja mudar no documento. Por exemplo: “deixe a pergunta 3 mais profunda”.</div></div><form id="chatForm" class="chatComposer"><textarea id="chatInput" rows="3" placeholder="Escreva seu ajuste..."></textarea><button id="chatSendBtn" class="chatSend" type="submit">Enviar</button></form></aside></div><span class="sectionKicker srOnly" id="modeEyebrow">Life Group</span></section></section></main><script src="/app.js?v=30"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Folha de Estudo</title>
+    <meta name="description" content="Crie, revise e exporte suas folhas de estudo." />
+    <link rel="stylesheet" href="/styles.css?v=31" />
+  </head>
+  <body>
+    <main class="appFrame">
+      <aside class="leftSidebar" aria-label="Menu da plataforma">
+        <button id="extractBtn" class="createButton" type="submit" form="uploadForm">Criar PDF</button>
+
+        <section class="recentPanel" aria-label="PDFs recentes">
+          <div class="recentHeader">
+            <img src="/figma-assets/recent-pdf.svg" alt="" />
+            <strong>PDF Recentes</strong>
+          </div>
+          <div id="recentFiles" class="recentFiles">
+            <p class="recentEmpty">Nenhum PDF salvo ainda.</p>
+          </div>
+          <a class="allFiles" href="/salvos.html">Ver todos os PDFs</a>
+        </section>
+
+        <div class="sidebarFooter" aria-label="Preferências">
+          <div class="footerTool">
+            <img src="/figma-assets/usage.svg" alt="" />
+            <span>Consumo <strong>30%</strong></span>
+          </div>
+          <button id="themeToggle" class="themeToggle" type="button">
+            <img src="/figma-assets/light-mode.svg" alt="" />
+            <span>Modo claro</span>
+          </button>
+        </div>
+      </aside>
+
+      <section class="contentArea">
+        <header class="workspaceHeader">
+          <div class="breadcrumbs">
+            <span>Gerar PDF</span>
+            <b>/</b>
+            <strong id="stepLabel">Revisão de conteúdo</strong>
+          </div>
+          <div class="topActions">
+            <div class="viewSwitch" aria-label="Modo de visualização">
+              <button id="previewViewBtn" class="viewBtn active" type="button">Prévia</button>
+              <button id="editViewBtn" class="viewBtn" type="button">Editar PDF</button>
+            </div>
+            <button id="saveOnlineBtn" class="secondaryAction" type="button">Salvar</button>
+            <div class="downloadMenu">
+              <button id="downloadMenuBtn" class="download" type="button" aria-expanded="false">Baixar</button>
+              <div id="downloadOptions" class="downloadOptions hidden">
+                <button id="downloadPdfBtn" type="button">PDF</button>
+                <button id="downloadDocxBtn" type="button">DOCX</button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section class="editor" aria-label="Área de criação da folha">
+          <form id="uploadForm" class="uploadStage">
+            <label class="dropzone" for="pdfFile">
+              <img class="uploadIcon" src="/figma-assets/add-document.svg" alt="" />
+              <strong>Arraste seu documento ou clique duas vezes para adicionar</strong>
+              <small id="fileName">Nenhum arquivo escolhido</small>
+            </label>
+            <input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+            <div class="status" id="status">Selecione um documento para começar.</div>
+          </form>
+
+          <div class="reviewLayout hidden" id="reviewLayout">
+            <div class="reviewMain">
+              <section id="previewPane" class="previewPane" aria-label="Prévia da folha de estudo">
+                <p class="previewEmpty">A prévia aparecerá aqui depois que você gerar o PDF.</p>
+              </section>
+
+              <div id="formEditor" class="formEditor hidden">
+                <label>
+                  <span id="tituloLabel">Título da série</span>
+                  <input id="titulo" type="text" />
+                </label>
+                <label>
+                  <span id="subtituloLabel">Linha do culto</span>
+                  <input id="subtitulo" type="text" />
+                </label>
+                <label class="lifeOnly">
+                  <span>Momento Generosidade</span>
+                  <textarea id="momentoGenerosidade" rows="5"></textarea>
+                </label>
+                <label class="lifeOnly">
+                  <span>Aviso/Agenda</span>
+                  <textarea id="avisos" rows="4"></textarea>
+                </label>
+                <label class="lifeOnly">
+                  <span>Momento da visão</span>
+                  <textarea id="momentoVisao" rows="5"></textarea>
+                </label>
+                <label>
+                  <span id="resumoLabel">Resumo</span>
+                  <textarea id="resumo" rows="7"></textarea>
+                </label>
+                <div class="questionsHeader lifeOnly">
+                  <span>Perguntas</span>
+                  <button id="addQuestion" class="ghost" type="button">+ Adicionar</button>
+                </div>
+                <div id="questions" class="questions lifeOnly"></div>
+                <label>
+                  <span>Conclusão</span>
+                  <textarea id="conclusao" rows="5"></textarea>
+                </label>
+              </div>
+            </div>
+
+            <aside class="chatPanel" aria-label="Chat de ajustes">
+              <div class="chatHeader">
+                <span>Assistente de edição</span>
+                <strong>Ajuste o conteúdo pelo chat</strong>
+              </div>
+              <div id="chatMessages" class="chatMessages" aria-live="polite">
+                <div class="chatMessage bot">Diga o que deseja mudar no documento. Por exemplo: “deixe a pergunta 3 mais profunda”.</div>
+              </div>
+              <form id="chatForm" class="chatComposer">
+                <textarea id="chatInput" rows="3" placeholder="Escreva seu ajuste..."></textarea>
+                <button id="chatSendBtn" class="chatSend" type="submit">Enviar</button>
+              </form>
+            </aside>
+          </div>
+
+          <span class="sectionKicker srOnly" id="modeEyebrow">Life Group</span>
+        </section>
+
+        <button id="chatLaunchButton" class="chatLaunchButton" type="button">
+          <img src="/figma-assets/chat.svg" alt="" />
+          <span>Pedir para o Chat</span>
+        </button>
+      </section>
+    </main>
+
+    <script src="/app.js?v=31"></script>
+  </body>
+</html>

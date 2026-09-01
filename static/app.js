@@ -35,7 +35,7 @@ function buttonContent(label, loading = false) {
 }
 
 function getExtractLabel() {
-  return "Gerar Folha de Estudo";
+  return "Criar PDF";
 }
 
 function getFileName() {
@@ -219,6 +219,7 @@ function setView(view) {
 function showReview() {
   $("uploadForm").classList.add("hidden");
   $("reviewLayout").classList.remove("hidden");
+  document.body.classList.add("reviewOpen");
   $("stepLabel").textContent = "Revisão de conteúdo";
 }
 
@@ -687,12 +688,22 @@ const themeToggle = $("themeToggle");
 themeToggle.addEventListener("click", () => {
   document.body.classList.toggle("dark");
   const dark = document.body.classList.contains("dark");
-  themeToggle.innerHTML = dark ? "<span>☾</span> Modo escuro" : "<span>☼</span> Modo claro";
+  themeToggle.innerHTML = dark
+    ? '<img src="/figma-assets/light-mode.svg" alt=""><span>Modo escuro</span>'
+    : '<img src="/figma-assets/light-mode.svg" alt=""><span>Modo claro</span>';
   localStorage.setItem("folhaTheme", dark ? "dark" : "light");
 });
 if (localStorage.getItem("folhaTheme") === "dark") {
   document.body.classList.add("dark");
-  themeToggle.innerHTML = "<span>☾</span> Modo escuro";
+  themeToggle.innerHTML = '<img src="/figma-assets/light-mode.svg" alt=""><span>Modo escuro</span>';
+}
+
+const chatLaunchButton = $("chatLaunchButton");
+if (chatLaunchButton) {
+  chatLaunchButton.addEventListener("click", () => {
+    setStatus("Gere uma folha primeiro. Depois disso o chat abre para você pedir ajustes no conteúdo.", "error");
+    $("pdfFile").focus();
+  });
 }
 
 const previewStyle = document.createElement("style");
