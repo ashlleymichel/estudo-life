@@ -1404,7 +1404,14 @@ def bullet_paragraph(label, text, style, bold_font):
     escaped_label = str(label or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     quoted_text = italicize_scripture_lines(italicize_quoted_scripture(escape_pdf_text(text)))
     highlighted_text = highlight_required_terms(quoted_text, bold_font)
-    return Paragraph(f'{bold_underline(f"- {escaped_label}:", bold_font)} {highlighted_text}', style)
+    return [
+        Paragraph(bold_underline(f"- {escaped_label}:", bold_font), style),
+        Paragraph(highlighted_text, style),
+    ]
+
+
+def add_bullet_section(story, label, text, style, bold_font):
+    story.extend(bullet_paragraph(label, text, style, bold_font))
 
 
 def plain_bullet(text, style):
@@ -1541,18 +1548,18 @@ def build_life_group_pdf(data, output_path):
         paragraph(data.get("subtitulo") or "Culto Presencial e On-Line / Life Group", styles["meta"]),
     ]
 
-    story.append(bullet_paragraph("Momento Generosidade", data.get("momentoGenerosidade"), styles["body"], bold_font))
+    add_bullet_section(story, "Momento Generosidade", data.get("momentoGenerosidade"), styles["body"], bold_font)
     story.append(agenda_box(agenda_lines(data.get("avisos")), doc.width, styles))
 
     story.append(Spacer(1, 6))
-    story.append(bullet_paragraph("Momento Visão e Missão Paz Church", data.get("momentoVisao"), styles["body"], bold_font))
-    story.append(bullet_paragraph("Introdução", data.get("resumo"), styles["body"], bold_font))
+    add_bullet_section(story, "Momento Visão e Missão Paz Church", data.get("momentoVisao"), styles["body"], bold_font)
+    add_bullet_section(story, "Introdução", data.get("resumo"), styles["body"], bold_font)
 
     story.append(Paragraph("<b>- Perguntas:</b>", styles["section"]))
     for index, question in enumerate(final_questions, start=1):
         story.append(Paragraph(f"{index}) {formatted_paragraph_text(question)}", styles["question"]))
 
-    story.append(bullet_paragraph("Conclusão", data.get("conclusao"), styles["body"], bold_font))
+    add_bullet_section(story, "Conclusão", data.get("conclusao"), styles["body"], bold_font)
     doc.build(story, onFirstPage=draw_life_group_header, onLaterPages=draw_life_group_header)
 
 
@@ -1594,7 +1601,7 @@ def split_word_paragraphs(text):
 
 
 def word_section(label, text):
-    blocks = [word_paragraph(f"- {label}:", "Heading2")]
+    blocks = [word_paragraph(f"- {label}:", "Heading2"), word_paragraph("")]
     for paragraph_text in split_word_paragraphs(text):
         blocks.append(word_paragraph(paragraph_text))
     return blocks
