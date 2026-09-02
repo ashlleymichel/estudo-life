@@ -238,10 +238,6 @@ function setView(view) {
   $("formEditor").classList.toggle("hidden", view !== "edit");
   $("previewViewBtn").classList.toggle("active", view === "preview");
   $("editViewBtn").classList.toggle("active", view === "edit");
-  const stepLabel = $("stepLabel");
-  if (stepLabel && !$("reviewLayout").classList.contains("hidden")) {
-    stepLabel.textContent = "04 — Revisão de Conteúdo";
-  }
 }
 
 function showReviewLoading() {
@@ -250,7 +246,6 @@ function showReviewLoading() {
   reviewLayout.classList.remove("hidden", "isBuilding");
   document.body.classList.add("reviewOpen");
   document.body.classList.add("reviewBuilding");
-  $("stepLabel").textContent = "04 — Revisão de Conteúdo";
   setView("preview");
   void reviewLayout.offsetWidth;
   reviewLayout.classList.add("isBuilding");
@@ -298,7 +293,6 @@ function showReview() {
   $("uploadForm").classList.add("hidden");
   $("reviewLayout").classList.remove("hidden");
   document.body.classList.add("reviewOpen");
-  $("stepLabel").textContent = "04 — Revisão de Conteúdo";
 }
 
 function collectData() {

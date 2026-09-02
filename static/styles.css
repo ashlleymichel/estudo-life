@@ -467,16 +467,6 @@ body.reviewOpen .workspaceHeader {
   display: flex;
 }
 
-.reviewSteps span:first-child {
-  color: var(--gray);
-  background: transparent;
-}
-
-.reviewSteps span.active {
-  color: #ffffff;
-  background: var(--blue);
-}
-
 .viewSwitch {
   flex: 0 0 auto;
 }
@@ -520,14 +510,8 @@ body.reviewOpen .workspaceHeader {
 }
 
 body.reviewBuilding .workspaceHeader {
-  justify-content: center;
-  width: 100%;
-}
-
-body.reviewBuilding .workspaceHeader .viewSwitch,
-body.reviewBuilding .workspaceHeader .secondaryAction,
-body.reviewBuilding .workspaceHeader .downloadMenu {
   display: none;
+  width: 100%;
 }
 
 body.reviewBuilding .reviewLayout {
