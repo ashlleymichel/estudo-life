@@ -1,23 +1,23 @@
 :root {
   color-scheme: light;
-  --ink: #282130;
-  --muted: #7f7371;
-  --line: #e2d0cf;
-  --sidebar: #f4eeee;
-  --panel: #ece6e3;
-  --paper: #fbf8f7;
+  --ink: #06141b;
+  --muted: #5f737d;
+  --line: #d6ecf0;
+  --sidebar: #eef7f9;
+  --panel: #e5f2f5;
+  --paper: #f8fbfc;
   --surface: #ffffff;
-  --accent: #a18b89;
-  --accent-strong: #472731;
-  --accent-soft: #d6b2b0;
-  --navy: #472731;
+  --accent: #008bc2;
+  --accent-strong: #005275;
+  --accent-soft: #9fd3df;
+  --navy: #005275;
   --success: #4f8a5b;
-  --danger: #9a342f;
+  --danger: #a83d34;
   --radius-sm: 14px;
   --radius-md: 24px;
   --radius-lg: 34px;
-  --shadow-soft: 0 20px 60px rgba(71, 39, 49, 0.1);
-  --shadow-card: 0 12px 35px rgba(71, 39, 49, 0.08);
+  --shadow-soft: 0 20px 60px rgba(0, 82, 117, 0.1);
+  --shadow-card: 0 12px 35px rgba(0, 82, 117, 0.08);
 }
 
 * {
@@ -65,7 +65,7 @@ textarea:disabled {
   min-height: 100vh;
   padding: 40px 20px;
   background: var(--sidebar);
-  border-right: 1px solid rgba(226, 208, 207, 0.75);
+  border-right: 1px solid rgba(214, 236, 240, 0.95);
 }
 
 .createButton {
@@ -307,7 +307,7 @@ body.reviewOpen .workspaceHeader {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 18px;
-  box-shadow: 0 16px 40px rgba(71, 39, 49, 0.14);
+  box-shadow: 0 16px 40px rgba(0, 82, 117, 0.14);
 }
 
 .downloadOptions button {
@@ -351,12 +351,12 @@ body.isExtracting .uploadStage {
   border-radius: var(--radius-lg);
   text-align: center;
   cursor: pointer;
-  box-shadow: inset 0 0 0 1px rgba(161, 139, 137, 0.08), var(--shadow-card);
+  box-shadow: inset 0 0 0 1px rgba(0, 139, 194, 0.08), var(--shadow-card);
 }
 
 .dropzone.dragging {
   outline: 2px solid var(--accent-strong);
-  background: #e8dbd9;
+  background: #dff0f4;
 }
 
 .uploadIcon {
@@ -436,7 +436,7 @@ input[type="file"] {
 .reviewMain {
   min-width: 0;
   padding: 24px;
-  background: #f5f0ef;
+  background: #eef7f9;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
 }
@@ -449,7 +449,7 @@ input[type="file"] {
 
 .previewPane.previewUpdated {
   outline: 2px solid var(--accent-strong);
-  box-shadow: 0 0 0 5px rgba(161, 139, 137, 0.18);
+  box-shadow: 0 0 0 5px rgba(0, 139, 194, 0.18);
 }
 
 .previewEmpty {
@@ -772,7 +772,7 @@ button.loading {
 .darkSpinner {
   width: 28px;
   height: 28px;
-  border-color: rgba(71, 39, 49, 0.15);
+  border-color: rgba(0, 82, 117, 0.15);
   border-top-color: var(--accent-strong);
 }
 
@@ -784,23 +784,23 @@ button.loading {
 
 body.dark {
   --ink: #f8f5f4;
-  --paper: #1f1a20;
-  --sidebar: #282130;
-  --panel: #3a3036;
-  --line: #5b4a4d;
-  --muted: #d6c7c4;
-  --surface: #2f2830;
-  --accent: #d6b2b0;
-  --accent-strong: #e2d0cf;
-  --accent-soft: #a18b89;
-  --navy: #472731;
+  --paper: #06141b;
+  --sidebar: #06141b;
+  --panel: #253745;
+  --line: #4a5c6a;
+  --muted: #ccd0cf;
+  --surface: #11212d;
+  --accent: #88cdf6;
+  --accent-strong: #d6ecf0;
+  --accent-soft: #53a7d8;
+  --navy: #005275;
   --shadow-soft: 0 22px 65px rgba(0, 0, 0, 0.3);
   --shadow-card: 0 14px 40px rgba(0, 0, 0, 0.24);
 }
 
 body.dark .leftSidebar {
   color: var(--ink);
-  border-right-color: rgba(91, 74, 77, 0.8);
+  border-right-color: rgba(74, 92, 106, 0.8);
 }
 
 body.dark .recentHeader strong,
@@ -860,7 +860,7 @@ body.dark .viewBtn.active,
 body.dark .viewBtn:hover,
 body.dark .secondaryAction:hover,
 body.dark .ghost:hover {
-  color: #282130;
+  color: #06141b;
   background: var(--accent-strong);
 }
 
@@ -900,7 +900,7 @@ body.dark .darkSpinner {
 body.dark .formEditor input,
 body.dark .formEditor textarea,
 body.dark .questionRow textarea {
-  background: #241f25;
+  background: #0c1b24;
   color: var(--ink);
   border-color: var(--line);
 }
@@ -921,7 +921,7 @@ body.dark .previewSheet {
     min-height: auto;
     padding: 18px;
     border-right: 0;
-    border-bottom: 1px solid rgba(226, 208, 207, 0.75);
+    border-bottom: 1px solid rgba(214, 236, 240, 0.95);
   }
 
   .recentPanel,
