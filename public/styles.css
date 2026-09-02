@@ -13,6 +13,11 @@
   --navy: #472731;
   --success: #4f8a5b;
   --danger: #9a342f;
+  --radius-sm: 14px;
+  --radius-md: 24px;
+  --radius-lg: 34px;
+  --shadow-soft: 0 20px 60px rgba(71, 39, 49, 0.1);
+  --shadow-card: 0 12px 35px rgba(71, 39, 49, 0.08);
 }
 
 * {
@@ -60,6 +65,7 @@ textarea:disabled {
   min-height: 100vh;
   padding: 40px 20px;
   background: var(--sidebar);
+  border-right: 1px solid rgba(226, 208, 207, 0.75);
 }
 
 .createButton {
@@ -71,10 +77,11 @@ textarea:disabled {
   color: #ffffff;
   background: var(--accent-strong);
   border: 0;
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 400;
   text-decoration: none;
+  box-shadow: var(--shadow-card);
 }
 
 .recentPanel {
@@ -241,7 +248,7 @@ body.reviewOpen .workspaceHeader {
   gap: 4px;
   padding: 4px;
   background: var(--panel);
-  border-radius: 12px;
+  border-radius: 999px;
 }
 
 .viewBtn,
@@ -252,7 +259,7 @@ body.reviewOpen .workspaceHeader {
   min-height: 34px;
   padding: 0 14px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -299,7 +306,7 @@ body.reviewOpen .workspaceHeader {
   padding: 6px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 18px;
   box-shadow: 0 16px 40px rgba(71, 39, 49, 0.14);
 }
 
@@ -309,7 +316,7 @@ body.reviewOpen .workspaceHeader {
   color: var(--ink);
   background: transparent;
   border: 0;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 12px;
   text-align: left;
 }
@@ -341,9 +348,10 @@ body.isExtracting .uploadStage {
   padding: 20px;
   background: var(--panel);
   border: 0;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   text-align: center;
   cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(161, 139, 137, 0.08), var(--shadow-card);
 }
 
 .dropzone.dragging {
@@ -429,12 +437,13 @@ input[type="file"] {
   min-width: 0;
   padding: 24px;
   background: #f5f0ef;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 
 .previewPane {
   min-height: 600px;
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   transition: box-shadow 0.25s ease, outline-color 0.25s ease;
 }
 
@@ -459,7 +468,10 @@ input[type="file"] {
   color: var(--ink);
   background: var(--surface);
   border-bottom: 1px solid var(--accent-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   font-size: 15px;
+  overflow: hidden;
 }
 
 .previewHeader {
@@ -467,7 +479,7 @@ input[type="file"] {
   margin-bottom: 30px;
   color: #ffffff;
   background: var(--navy);
-  border-radius: 0 0 24px 24px;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
   text-align: center;
 }
 
@@ -575,7 +587,7 @@ input[type="file"] {
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 18px;
   outline: 0;
   resize: vertical;
 }
@@ -609,7 +621,7 @@ input[type="file"] {
   height: 38px;
   color: #ffffff;
   background: var(--accent-strong);
-  border-radius: 10px;
+  border-radius: 50%;
 }
 
 .remove {
@@ -655,8 +667,9 @@ input[type="file"] {
   padding: 0 18px;
   color: #ffffff;
   background: var(--accent-strong);
-  border-radius: 12px;
+  border-radius: 999px;
   text-decoration: none;
+  box-shadow: var(--shadow-card);
 }
 
 .savedList {
@@ -675,7 +688,8 @@ input[type="file"] {
   padding: 22px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
 
 .savedInfo h2 {
@@ -710,7 +724,8 @@ input[type="file"] {
   padding: 30px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 
 .editEditor label {
@@ -724,7 +739,7 @@ input[type="file"] {
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 18px;
 }
 
 .editActions {
@@ -779,10 +794,13 @@ body.dark {
   --accent-strong: #e2d0cf;
   --accent-soft: #a18b89;
   --navy: #472731;
+  --shadow-soft: 0 22px 65px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 14px 40px rgba(0, 0, 0, 0.24);
 }
 
 body.dark .leftSidebar {
   color: var(--ink);
+  border-right-color: rgba(91, 74, 77, 0.8);
 }
 
 body.dark .recentHeader strong,
@@ -890,6 +908,7 @@ body.dark .questionRow textarea {
 body.dark .previewSheet {
   background: #ffffff;
   color: #111111;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
 }
 
 @media (max-width: 900px) {
@@ -901,6 +920,8 @@ body.dark .previewSheet {
     position: relative;
     min-height: auto;
     padding: 18px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(226, 208, 207, 0.75);
   }
 
   .recentPanel,
@@ -929,7 +950,7 @@ body.dark .previewSheet {
 
   .dropzone {
     min-height: 220px;
-    border-radius: 18px;
+    border-radius: 28px;
   }
 
   .reviewLayout {
@@ -938,6 +959,7 @@ body.dark .previewSheet {
 
   .reviewMain {
     padding: 18px;
+    border-radius: 28px;
   }
 
   .previewSeries,
