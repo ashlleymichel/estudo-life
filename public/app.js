@@ -719,8 +719,5 @@ if (localStorage.getItem("folhaTheme") === "dark") {
   themeToggle.innerHTML = '<img src="/figma-assets/light-mode.svg" alt=""><span>Modo escuro</span>';
 }
 
-const previewStyle = document.createElement("style");
-previewStyle.textContent = ".previewHeader p{display:none}.previewSeries{text-align:center;margin:0 70px 24px}.previewSubtitle{margin:0 70px 24px}@media(max-width:900px){.previewSeries,.previewSubtitle{margin-left:20px;margin-right:20px}}";
-document.head.append(previewStyle);
 loadSavedDraftForEditing();
 renderRecentFiles();

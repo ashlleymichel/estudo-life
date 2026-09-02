@@ -134,14 +134,22 @@ textarea:disabled {
   min-width: 0;
 }
 
-.uploadStage,
-.reviewLayout {
+.uploadStage {
   display: grid;
   grid-template-columns: minmax(0, 848px) 280px;
   gap: 32px;
   align-items: start;
   width: 100%;
   padding-top: 40px;
+}
+
+.reviewLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+  width: 100%;
+  padding-top: 20px;
 }
 
 .mainCol {
@@ -505,10 +513,6 @@ body.reviewOpen .workspaceHeader {
   background: var(--line);
 }
 
-.reviewLayout {
-  padding-top: 20px;
-}
-
 body.reviewBuilding .workspaceHeader {
   display: none;
   width: 100%;
@@ -523,20 +527,20 @@ body.reviewBuilding .reviewLayout {
 }
 
 body.reviewBuilding .reviewMain {
-  width: min(100%, 848px);
+  width: min(100%, 1120px);
 }
 
-body.reviewBuilding .reviewSideCol {
+.reviewSideCol {
   display: none;
 }
 
 .reviewMain {
-  width: 848px;
+  width: 100%;
   min-height: 480px;
-  padding: 40px 27px;
+  padding: 0;
   background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 16px;
+  border: 0;
+  border-radius: 0;
 }
 
 .previewPane {
@@ -559,10 +563,10 @@ body.reviewBuilding .reviewSideCol {
 }
 
 .previewSheet {
-  width: min(100%, 794px);
-  max-width: 794px;
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
-  padding-bottom: 28px;
+  padding-bottom: 60px;
   color: #111111;
   background: #ffffff;
   border: 0;
@@ -572,12 +576,12 @@ body.reviewBuilding .reviewSideCol {
 }
 
 .previewHeader {
-  padding: 30px 10px;
-  margin-bottom: 34px;
+  padding: 50px 10px 54px;
+  margin-bottom: 58px;
   color: #ffffff;
   background: var(--blue);
-  border-bottom-right-radius: 30px;
-  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 44px;
+  border-bottom-left-radius: 44px;
   text-align: center;
 }
 
@@ -587,7 +591,7 @@ body.reviewBuilding .reviewSideCol {
 
 .previewHeader h3 {
   margin: 0;
-  font-size: 26px;
+  font-size: clamp(34px, 4vw, 52px);
   font-weight: 800;
   line-height: 1.08;
 }
@@ -595,21 +599,22 @@ body.reviewBuilding .reviewSideCol {
 .previewSeries,
 .previewSubtitle,
 .previewSection {
-  margin: 14px 60px;
+  margin: 0 clamp(42px, 7vw, 116px);
 }
 
 .previewSeries {
   color: #6096ba;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: clamp(20px, 2.2vw, 30px);
+  font-weight: 800;
   line-height: 1.18;
   text-align: center;
 }
 
 .previewSubtitle {
+  margin-top: 48px;
   color: var(--gray);
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: clamp(17px, 1.8vw, 26px);
+  line-height: 1.22;
   text-align: center;
 }
 
@@ -617,9 +622,9 @@ body.reviewBuilding .reviewSideCol {
   display: block;
   margin: 0;
   color: var(--blue);
-  font-size: 16px;
+  font-size: clamp(24px, 2.35vw, 34px);
   font-weight: 800;
-  line-height: 1.12;
+  line-height: 1.08;
   text-decoration: none;
 }
 
@@ -633,21 +638,26 @@ body.reviewBuilding .reviewSideCol {
 
 .previewSection p {
   display: block;
-  margin: 8px 0 0;
+  margin: 18px 0 0;
   color: var(--blue);
-  font-size: 13px;
-  line-height: 1.24;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.18;
 }
 
 .previewSection p + p {
   display: block;
-  margin: 8px 0 0;
+  margin: 16px 0 0;
 }
 
 .previewSection + .previewSection,
 .previewSubtitle + .previewSection {
-  padding-top: 12px;
+  margin-top: 48px;
+  padding-top: 32px;
   border-top: 1px solid var(--line);
+}
+
+.previewSeries + .previewSubtitle {
+  margin-bottom: 46px;
 }
 
 .previewAgenda ul,
@@ -658,8 +668,10 @@ body.reviewBuilding .reviewSideCol {
 }
 
 .previewAgenda li {
-  margin: 2px 0;
-  line-height: 1.35;
+  margin: 10px 0 0;
+  color: var(--blue);
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.18;
 }
 
 .previewAgenda li::before {
@@ -667,7 +679,7 @@ body.reviewBuilding .reviewSideCol {
 }
 
 .previewQuestion {
-  margin: 10px 0;
+  margin: 24px 0;
 }
 
 .previewQuestions strong,
@@ -677,17 +689,17 @@ body.reviewBuilding .reviewSideCol {
 
 .previewQuestions strong {
   color: var(--blue);
-  font-size: 13px;
+  font-size: clamp(20px, 2vw, 28px);
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.18;
 }
 
 .previewQuestions span {
-  margin-top: 2px;
+  margin-top: 10px;
   color: var(--gray);
-  font-size: 12px;
+  font-size: clamp(16px, 1.55vw, 22px);
   font-style: italic;
-  line-height: 1.2;
+  line-height: 1.22;
 }
 
 .previewSkeleton {

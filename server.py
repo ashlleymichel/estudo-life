@@ -20,7 +20,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Flowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Flowable, HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 try:
     from PyPDF2 import PdfReader
@@ -96,12 +96,12 @@ def draw_document_header(canvas, doc, header_text="Estudo Life Group"):
     p.close()
 
     canvas.saveState()
-    canvas.setFillColor(colors.HexColor("#203A61"))
+    canvas.setFillColor(colors.HexColor("#274C77"))
     canvas.drawPath(p, fill=1, stroke=0)
     canvas.setFillColor(colors.white)
     header_font = "DocBold" if "DocBold" in pdfmetrics.getRegisteredFontNames() else "Helvetica-Bold"
-    canvas.setFont(header_font, 19)
-    text_width = canvas.stringWidth(header_text, header_font, 19)
+    canvas.setFont(header_font, 21)
+    text_width = canvas.stringWidth(header_text, header_font, 21)
     canvas.drawString((page_width - text_width) / 2, page_height - h + 23, header_text)
     canvas.restoreState()
 
@@ -1350,19 +1350,27 @@ def agenda_lines(value):
     return [line for line in lines if line.lower() != "paz church"]
 
 
-def bullet_paragraph(label, text, style, bold_font):
+def section_rule():
+    return HRFlowable(
+        width="100%",
+        thickness=0.8,
+        color=colors.HexColor("#E7ECEF"),
+        spaceBefore=11,
+        spaceAfter=9,
+    )
+
+
+def add_bullet_section(story, label, text, styles, bold_font):
     escaped_label = str(label or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     quoted_text = italicize_scripture_lines(italicize_quoted_scripture(escape_pdf_text(text)))
     highlighted_text = highlight_required_terms(quoted_text, bold_font)
-    return Paragraph(f'{bold_underline(f"- {escaped_label}:", bold_font)}&nbsp;{highlighted_text}', style)
-
-
-def add_bullet_section(story, label, text, style, bold_font):
-    story.append(bullet_paragraph(label, text, style, bold_font))
+    story.append(Paragraph(escaped_label, styles["section"]))
+    if highlighted_text:
+        story.append(Paragraph(highlighted_text, styles["body"]))
 
 
 def add_agenda_section(story, lines, styles, bold_font):
-    story.append(Paragraph(bold_underline("- Agenda Paz Church:", bold_font), styles["body"]))
+    story.append(Paragraph("Agenda Paz Church", styles["section"]))
     for line in lines:
         story.append(plain_bullet(line, styles["agenda"]))
 
@@ -1400,36 +1408,41 @@ def agenda_box(lines, doc_width, styles):
 def document_styles():
     base = getSampleStyleSheet()
     regular_font, bold_font = register_document_fonts()
-    body_size = 10.5
-    body_leading = 12.8
+    body_size = 11
+    body_leading = 13.4
+    blue = colors.HexColor("#274C77")
+    soft_blue = colors.HexColor("#6096BA")
+    gray = colors.HexColor("#8B8C89")
     styles = {
         "title": ParagraphStyle(
             "Title",
             parent=base["Title"],
             fontName=bold_font,
-            fontSize=10.5,
-            leading=12.8,
+            fontSize=14,
+            leading=17,
             alignment=TA_CENTER,
-            spaceAfter=14.2,
+            textColor=soft_blue,
+            spaceAfter=18,
         ),
         "meta": ParagraphStyle(
             "Meta",
             parent=base["Normal"],
             fontName=regular_font,
-            fontSize=body_size,
-            leading=body_leading,
-            alignment=TA_LEFT,
-            spaceAfter=13.2,
+            fontSize=11.5,
+            leading=14,
+            alignment=TA_CENTER,
+            textColor=gray,
+            spaceAfter=16,
         ),
         "section": ParagraphStyle(
             "Section",
             parent=base["Normal"],
             fontName=bold_font,
-            fontSize=body_size,
-            leading=body_leading,
+            fontSize=13,
+            leading=15.5,
             alignment=TA_LEFT,
-            textColor=colors.black,
-            spaceAfter=8,
+            textColor=blue,
+            spaceAfter=6,
         ),
         "body": ParagraphStyle(
             "Body",
@@ -1438,7 +1451,8 @@ def document_styles():
             fontSize=body_size,
             leading=body_leading,
             alignment=TA_JUSTIFY,
-            spaceAfter=9,
+            textColor=blue,
+            spaceAfter=7,
         ),
         "agenda": ParagraphStyle(
             "Agenda",
@@ -1447,6 +1461,7 @@ def document_styles():
             fontSize=body_size,
             leading=body_leading,
             alignment=TA_LEFT,
+            textColor=blue,
             spaceAfter=2,
         ),
         "center": ParagraphStyle(
@@ -1456,6 +1471,7 @@ def document_styles():
             fontSize=body_size,
             leading=body_leading,
             alignment=TA_CENTER,
+            textColor=blue,
             spaceAfter=2,
         ),
         "question": ParagraphStyle(
@@ -1465,6 +1481,7 @@ def document_styles():
             fontSize=body_size,
             leading=body_leading,
             alignment=TA_LEFT,
+            textColor=blue,
             leftIndent=0,
             firstLineIndent=0,
             spaceAfter=10,
@@ -1477,9 +1494,9 @@ def make_doc(output_path, title):
     doc = SimpleDocTemplate(
         str(output_path),
         pagesize=A4,
-        rightMargin=2.0 * cm,
-        leftMargin=2.0 * cm,
-        topMargin=HEADER_HEIGHT + 0.42 * cm,
+        rightMargin=1.55 * cm,
+        leftMargin=1.55 * cm,
+        topMargin=HEADER_HEIGHT + 0.78 * cm,
         bottomMargin=1.3 * cm,
         title=title,
     )
@@ -1499,21 +1516,26 @@ def build_life_group_pdf(data, output_path):
     story = [
         paragraph(f'Tema: {data.get("titulo", "Folha de Estudo Life Group")}', styles["title"]),
         paragraph(data.get("subtitulo") or "Culto Presencial e On-Line / Life Group", styles["meta"]),
+        section_rule(),
     ]
 
-    add_bullet_section(story, "Momento Generosidade", data.get("momentoGenerosidade"), styles["body"], bold_font)
+    add_bullet_section(story, "Momento Generosidade", data.get("momentoGenerosidade"), styles, bold_font)
+    story.append(section_rule())
     add_agenda_section(story, agenda_lines(data.get("avisos")), styles, bold_font)
+    story.append(section_rule())
 
-    story.append(Spacer(1, 6))
-    add_bullet_section(story, "Momento Visão e Missão Paz Church", data.get("momentoVisao"), styles["body"], bold_font)
-    add_bullet_section(story, "Introdução", data.get("resumo"), styles["body"], bold_font)
+    add_bullet_section(story, "Momento Visão e Missão Paz Church", data.get("momentoVisao"), styles, bold_font)
+    story.append(section_rule())
+    add_bullet_section(story, "Introdução", data.get("resumo"), styles, bold_font)
+    story.append(section_rule())
 
-    story.append(Paragraph("<b>- Perguntas:</b>", styles["section"]))
+    story.append(Paragraph("Perguntas", styles["section"]))
     for index, question in enumerate(final_questions, start=1):
         clean_question = strip_question_number_prefix(question)
         story.append(Paragraph(f"{index}) {formatted_paragraph_text(clean_question)}", styles["question"]))
 
-    add_bullet_section(story, "Conclusão", data.get("conclusao"), styles["body"], bold_font)
+    story.append(section_rule())
+    add_bullet_section(story, "Conclusão", data.get("conclusao"), styles, bold_font)
     doc.build(story, onFirstPage=draw_life_group_header, onLaterPages=draw_life_group_header)
 
 
