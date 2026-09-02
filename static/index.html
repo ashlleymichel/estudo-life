@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Folha de Estudo</title>
     <meta name="description" content="Crie, revise e exporte suas folhas de estudo." />
-    <link rel="stylesheet" href="/styles.css?v=47" />
+    <link rel="stylesheet" href="/styles.css?v=48" />
   </head>
   <body>
     <main class="appFrame">
       <aside class="leftSidebar" aria-label="Menu da plataforma">
-        <button id="extractBtn" class="createButton" type="button">Criar PDF</button>
+        <div class="sidebarBrand">
+          <span class="brandMark">F</span>
+          <strong>Folha de Estudo</strong>
+        </div>
+
+        <nav class="sidebarNav" aria-label="Ações principais">
+          <button id="extractBtn" class="createButton" type="button">Criar PDF</button>
+          <a class="sidebarLink" href="/salvos.html">Arquivos salvos</a>
+        </nav>
 
         <section class="recentPanel" aria-label="PDFs recentes">
           <div class="recentHeader">
@@ -56,7 +64,17 @@
 
         <section class="editor" aria-label="Área de criação da folha">
           <form id="uploadForm" class="uploadStage">
+            <div class="dashboardIntro">
+              <div>
+                <span>PAZ Church Barueri</span>
+                <h1>Crie sua folha de estudo</h1>
+                <p>Envie o esboço da ministração e gere uma folha pronta para revisar, salvar e baixar.</p>
+              </div>
+              <a class="introAction" href="/salvos.html">Ver salvos</a>
+            </div>
+
             <label class="dropzone" for="pdfFile">
+              <span class="uploadBadge">Novo PDF</span>
               <img class="uploadIcon" src="/figma-assets/add-document.svg" alt="" />
               <strong>Arraste seu documento ou clique duas vezes para adicionar</strong>
               <small id="fileName">Nenhum arquivo escolhido</small>
@@ -121,6 +139,6 @@
       </section>
     </main>
 
-    <script src="/app.js?v=47"></script>
+    <script src="/app.js?v=48"></script>
   </body>
 </html>
