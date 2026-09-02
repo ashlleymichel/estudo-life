@@ -515,19 +515,6 @@ def life_group_full_schema():
     }
 
 
-def life_group_chat_schema():
-    return {
-        "type": "object",
-        "additionalProperties": False,
-        "properties": {
-            "reply": {"type": "string"},
-            "action": {"type": "string", "enum": ["answered", "updated"]},
-            "data": life_group_full_schema(),
-        },
-        "required": ["reply", "action", "data"],
-    }
-
-
 def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
@@ -541,7 +528,7 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "Use as referências bíblicas presentes no texto enviado. Quando o texto trouxer apenas a referência, use o texto completo da NAA se você o souber com segurança; "
         "caso contrário, não invente palavras do versículo. "
         "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, conectando Bíblia, vida prática e exemplos reais. "
-        "Não repita nas perguntas os mesmos versículos que já foram escritos na introdução, exceto se o usuário pedir depois pelo chat. "
+        "Não repita nas perguntas os mesmos versículos que já foram escritos na introdução. "
         "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo das perguntas 2, 3 e/ou 4, usando versículos diferentes dos usados na introdução sempre que possível. "
         "Nunca use a mesma passagem bíblica em duas perguntas diferentes. Cada pergunta com passagem bíblica precisa usar uma referência única. "
         "Quando uma pergunta tiver referência bíblica, escreva a pergunta em uma linha e o versículo logo abaixo. "
@@ -601,97 +588,6 @@ def normalize_editable_payload(data):
         "tipo": "life_group",
         "textoExtraido": str(data.get("textoExtraido") or ""),
     }
-
-
-def revise_life_group_with_chatgpt(data, instruction):
-    current = normalize_editable_payload(data)
-    instruction = clean_block(instruction)
-    if not instruction:
-        raise ValueError("Escreva o que deseja alterar na folhinha.")
-
-    system_prompt = (
-        "Você é um editor pastoral da PAZ Church. Receberá uma Folha de Estudo Life Group em JSON "
-        "e uma instrução de ajuste escrita pelo usuário. Altere somente o que foi solicitado. "
-        "Preserve todos os campos que não foram mencionados na instrução. "
-        "Mantenha o conteúdo em português do Brasil, com tom bíblico, claro, simples e pastoral. "
-        "Se ajustar perguntas com referência bíblica, mantenha sempre a estrutura: pergunta primeiro e passagem bíblica logo abaixo. "
-        "Nunca use a mesma passagem bíblica em duas perguntas diferentes; se não houver outra passagem adequada, deixe a pergunta sem passagem. "
-        "Quando houver versículos, escreva-os entre aspas e preserve a referência bíblica. "
-        "Não inclua markdown, comentários ou explicações fora do JSON."
-    )
-    user_prompt = f"""
-Pedido do usuário:
-{instruction}
-
-Folha atual em JSON:
-{json.dumps(current, ensure_ascii=False, indent=2)}
-""".strip()
-
-    revised = call_chatgpt_json(system_prompt, user_prompt, life_group_full_schema(), timeout=45)
-    if revised is None:
-        raise RuntimeError("Configure OPENAI_API_KEY para usar o chat de ajustes.")
-    merged = current.copy()
-    merged.update(normalize_editable_payload(revised))
-    merged["tipo"] = "life_group"
-    return merged
-
-
-def assist_life_group_with_chatgpt(data, message, history=None):
-    current = normalize_editable_payload(data)
-    message = clean_block(message)
-    if not message:
-        raise ValueError("Escreva uma mensagem para o assistente.")
-
-    history = history if isinstance(history, list) else []
-    safe_history = []
-    for item in history[-8:]:
-        if not isinstance(item, dict):
-            continue
-        role = item.get("role")
-        content = clean_block(item.get("content"))
-        if role in {"user", "assistant"} and content:
-            safe_history.append({"role": role, "content": content[:1500]})
-
-    system_prompt = (
-        "Você é o assistente pastoral e editorial da plataforma Folha de Estudo da PAZ Church. "
-        "Converse em português do Brasil, seja acolhedor, objetivo e útil. Responda dúvidas sobre o conteúdo, "
-        "sugira melhorias, explique como usar a plataforma e auxilie na preparação do Life Group. "
-        f"{MODEL_STRUCTURE_GUIDE} "
-        "Trate todo pedido de escrita, melhoria, correção, troca, remoção, acréscimo ou reestruturação como alteração concreta na folha, aplique a mudança e use action='updated'. "
-        "Quando ele fizer uma pergunta, pedir opinião, explicação ou orientação sem solicitar mudança, "
-        "responda sem alterar a folha e use action='answered'. Preserve rigorosamente os campos não mencionados. "
-        "Quando action='updated', a mudança precisa aparecer nos campos de data, porque a interface renderiza a prévia diretamente a partir desses campos. "
-        "Se alterar introdução, mantenha no máximo 9 linhas e dê ênfase aos versículos. "
-        "Se alterar perguntas, mantenha exatamente quatro perguntas, com a primeira sendo exatamente: "
-        "'Compartilhe conosco o que essa Palavra de domingo falou com você.'. "
-        "Quando uma pergunta tiver versículo, escreva primeiro a pergunta e logo abaixo a passagem bíblica. "
-        "Nunca repita a mesma passagem bíblica em duas perguntas diferentes. Cada pergunta com versículo deve usar uma referência única. "
-        "Evite perguntas genéricas como 'que verdade central esse texto revela'. As perguntas precisam soar como os modelos: concretas, pastorais, conversáveis e conectadas ao tema. "
-        "Evite repetir nas perguntas os versículos já usados na introdução, a menos que o usuário peça isso explicitamente. "
-        "Escreva os versículos entre aspas na versão NAA, completos e sem cortes quando souber o texto com segurança. "
-        "Se alterar conclusão, mantenha no máximo cinco linhas e foque no título. "
-        "Nunca invente que uma alteração foi feita. A resposta ao usuário deve dizer claramente se a folha foi alterada. "
-        "Mantenha tom bíblico, pastoral, claro e simples. O campo data deve sempre conter a folha completa, "
-        "mesmo quando nenhuma alteração for feita. Não use markdown complexo na resposta."
-    )
-    user_prompt = f"""
-Conversa recente:
-{json.dumps(safe_history, ensure_ascii=False, indent=2)}
-
-Mensagem atual:
-{message}
-
-Folha atual:
-{json.dumps(current, ensure_ascii=False, indent=2)}
-""".strip()
-
-    result = call_chatgpt_json(system_prompt, user_prompt, life_group_chat_schema(), timeout=45)
-    if result is None:
-        raise RuntimeError("Configure OPENAI_API_KEY para usar o assistente do chat.")
-    result["data"] = normalize_editable_payload(result.get("data"))
-    result["action"] = "updated" if result.get("action") == "updated" else "answered"
-    result["reply"] = clean_block(result.get("reply")) or "Como posso ajudar com esta folha de estudo?"
-    return result
 
 
 def split_questions(value):
@@ -1802,17 +1698,6 @@ class Handler(SimpleHTTPRequestHandler):
                     self.send_json(payload)
                 finally:
                     temp_path.unlink(missing_ok=True)
-                return
-
-            if self.path == "/api/revise":
-                length = int(self.headers.get("Content-Length", "0"))
-                data = json.loads(self.rfile.read(length).decode("utf-8"))
-                payload = assist_life_group_with_chatgpt(
-                    data.get("data") or {},
-                    data.get("message") or data.get("instruction") or "",
-                    data.get("history") or [],
-                )
-                self.send_json(payload)
                 return
 
             if self.path == "/api/pdf":

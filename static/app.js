@@ -15,7 +15,6 @@ const state = {
   busy: false,
   editingSavedId: "",
   view: "preview",
-  chatHistory: [],
 };
 
 const DB_NAME = "folha-estudo-arquivos";
@@ -58,8 +57,6 @@ function setBusy(isBusy, action = "") {
   const saveOnlineBtn = $("saveOnlineBtn");
   const addQuestion = $("addQuestion");
   const fileInput = $("pdfFile");
-  const chatInput = $("chatInput");
-  const chatSendBtn = $("chatSendBtn");
   const loadingState = $("loadingState");
   const fieldsToToggle = [
     ...fields.map((field) => $(field)),
@@ -73,8 +70,6 @@ function setBusy(isBusy, action = "") {
   saveOnlineBtn.disabled = isBusy;
   addQuestion.disabled = isBusy;
   fileInput.disabled = isBusy;
-  chatInput.disabled = isBusy;
-  chatSendBtn.disabled = isBusy;
   fieldsToToggle.forEach((field) => {
     field.disabled = isBusy;
   });
@@ -82,12 +77,10 @@ function setBusy(isBusy, action = "") {
   extractBtn.classList.toggle("loading", isBusy && action === "extract");
   downloadMenuBtn.classList.toggle("loading", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
-  chatSendBtn.classList.toggle("loading", isBusy && action === "chat");
   loadingState.classList.toggle("hidden", !(isBusy && action === "extract"));
   extractBtn.innerHTML = getExtractLabel();
   downloadMenuBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
-  chatSendBtn.innerHTML = buttonContent(action === "chat" ? "Ajustando..." : "Enviar", isBusy && action === "chat");
   document.body.classList.toggle("isBusy", isBusy);
   document.body.classList.toggle("isExtracting", isBusy && action === "extract");
 }
@@ -277,34 +270,8 @@ function validatePdfData(data) {
   return true;
 }
 
-function appendChatMessage(role, message) {
-  const messages = $("chatMessages");
-  const item = document.createElement("div");
-  item.className = `chatMessage ${role}`;
-  item.textContent = message;
-  messages.append(item);
-  messages.scrollTop = messages.scrollHeight;
-}
-
 function hasGeneratedContent(data) {
   return fields.some((field) => data[field]) || data.perguntas.length > 0;
-}
-
-async function talkWithAssistant(message) {
-  const response = await fetch("/api/revise", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message,
-      data: collectData(),
-      history: state.chatHistory.slice(-8),
-    }),
-  });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.erro || "Não foi possível ajustar a folhinha.");
-  }
-  return data;
 }
 
 async function generatePdfBlob(data) {
@@ -645,47 +612,6 @@ $("saveOnlineBtn").addEventListener("click", async () => {
   }
 });
 
-$("chatForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (state.busy) {
-    return;
-  }
-
-  const input = $("chatInput");
-  const instruction = input.value.trim();
-  if (!instruction) {
-    return;
-  }
-
-  appendChatMessage("user", instruction);
-  state.chatHistory.push({ role: "user", content: instruction });
-  input.value = "";
-  setStatus("O assistente está analisando sua mensagem...");
-  setBusy(true, "chat");
-
-  try {
-    const result = await talkWithAssistant(instruction);
-    if (result.data) {
-      fillForm(result.data);
-      showReview();
-      setView("preview");
-      highlightPreviewUpdate();
-      setStatus(result.action === "updated" ? "Alteração aplicada na prévia." : "Prévia atualizada pelo assistente.", "ok");
-    } else {
-      setStatus("Resposta recebida do assistente.", "ok");
-    }
-    const reply = result.reply || "Como posso ajudar?";
-    appendChatMessage("bot", reply);
-    state.chatHistory.push({ role: "assistant", content: reply });
-  } catch (error) {
-    appendChatMessage("bot", error.message);
-    setStatus(error.message, "error");
-  } finally {
-    setBusy(false);
-    input.focus();
-  }
-});
-
 fillForm({
   titulo: "",
   subtitulo: "",
@@ -737,14 +663,6 @@ themeToggle.addEventListener("click", () => {
 if (localStorage.getItem("folhaTheme") === "dark") {
   document.body.classList.add("dark");
   themeToggle.innerHTML = '<img src="/figma-assets/light-mode.svg" alt=""><span>Modo escuro</span>';
-}
-
-const chatLaunchButton = $("chatLaunchButton");
-if (chatLaunchButton) {
-  chatLaunchButton.addEventListener("click", () => {
-    setStatus("Gere uma folha primeiro. Depois disso o chat abre para você pedir ajustes no conteúdo.", "error");
-    $("pdfFile").focus();
-  });
 }
 
 const previewStyle = document.createElement("style");
