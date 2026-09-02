@@ -175,6 +175,15 @@ function renderPreviewSection(label, value) {
   return `<section class="previewSection"><h3>${escapeHtml(label)}</h3>${body}</section>`;
 }
 
+function renderPreviewAgenda(value) {
+  const lines = previewLines(value);
+  if (!lines.length) {
+    return "";
+  }
+  const items = lines.map((line) => `<li>${escapeHtml(line.replace(/^-+\s*/, ""))}</li>`).join("");
+  return `<section class="previewSection previewAgenda"><h3>Agenda Paz Church</h3><ul>${items}</ul></section>`;
+}
+
 function renderPreview() {
   const preview = $("previewPane");
   if (!preview) {
@@ -195,7 +204,7 @@ function renderPreview() {
       }
       const first = `<strong>${index + 1}) ${escapeHtml(stripQuestionNumberPrefix(lines[0]))}</strong>`;
       const rest = lines.slice(1).map((line) => `<span>${escapeHtml(line)}</span>`).join("");
-      return `<li>${first}${rest}</li>`;
+      return `<div class="previewQuestion">${first}${rest}</div>`;
     })
     .filter(Boolean)
     .join("");
@@ -206,13 +215,13 @@ function renderPreview() {
         <span>Estudo Life Group</span>
         <h3>Estudo Life Group</h3>
       </header>
-      ${data.titulo ? `<p class="previewSeries"><strong>Série:</strong> “${escapeHtml(data.titulo)}”</p>` : ""}
+      ${data.titulo ? `<p class="previewSeries"><strong>Tema:</strong> ${escapeHtml(data.titulo)}</p>` : ""}
       ${data.subtitulo ? `<p class="previewSubtitle">${escapeHtml(data.subtitulo)}</p>` : ""}
       ${renderPreviewSection("Momento Generosidade", data.momentoGenerosidade)}
-      ${renderPreviewSection("Avisos / Agenda", data.avisos)}
-      ${renderPreviewSection("Momento da Visão", data.momentoVisao)}
+      ${renderPreviewAgenda(data.avisos)}
+      ${renderPreviewSection("Momento Visão e Missão Paz Church", data.momentoVisao)}
       ${renderPreviewSection("Introdução", data.resumo)}
-      ${questions ? `<section class="previewSection"><h3>Perguntas</h3><ol class="previewQuestions">${questions}</ol></section>` : ""}
+      ${questions ? `<section class="previewSection"><h3>Perguntas</h3><div class="previewQuestions">${questions}</div></section>` : ""}
       ${renderPreviewSection("Conclusão", data.conclusao)}
     </article>
   `;

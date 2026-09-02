@@ -497,6 +497,10 @@ input[type="file"] {
   content: "- ";
 }
 
+.previewSection h3::after {
+  content: ": ";
+}
+
 .previewSection p {
   display: inline;
   margin: 0;
@@ -508,16 +512,36 @@ input[type="file"] {
   margin: 12px 0 0;
 }
 
-.previewQuestions {
-  margin: 0;
-  padding-left: 18px;
+.previewAgenda h3 {
+  display: block;
 }
 
-.previewQuestions li {
+.previewAgenda ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.previewAgenda li {
+  margin: 2px 0;
+  line-height: 1.35;
+}
+
+.previewAgenda li::before {
+  content: "- ";
+}
+
+.previewQuestions {
+  margin: 0;
+  padding: 0;
+}
+
+.previewQuestion {
   margin: 13px 0;
 }
 
 .previewQuestions strong {
+  display: block;
   font-weight: 400;
 }
 

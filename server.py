@@ -1458,14 +1458,17 @@ def bullet_paragraph(label, text, style, bold_font):
     escaped_label = str(label or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     quoted_text = italicize_scripture_lines(italicize_quoted_scripture(escape_pdf_text(text)))
     highlighted_text = highlight_required_terms(quoted_text, bold_font)
-    return [
-        Paragraph(bold_underline(f"- {escaped_label}:", bold_font), style),
-        Paragraph(highlighted_text, style),
-    ]
+    return Paragraph(f'{bold_underline(f"- {escaped_label}:", bold_font)}&nbsp;{highlighted_text}', style)
 
 
 def add_bullet_section(story, label, text, style, bold_font):
-    story.extend(bullet_paragraph(label, text, style, bold_font))
+    story.append(bullet_paragraph(label, text, style, bold_font))
+
+
+def add_agenda_section(story, lines, styles, bold_font):
+    story.append(Paragraph(bold_underline("- Agenda Paz Church:", bold_font), styles["body"]))
+    for line in lines:
+        story.append(plain_bullet(line, styles["agenda"]))
 
 
 def plain_bullet(text, style):
@@ -1598,12 +1601,12 @@ def build_life_group_pdf(data, output_path):
     final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
 
     story = [
-        paragraph(f'Série: “{data.get("titulo", "Folha de Estudo Life Group")}”', styles["title"]),
+        paragraph(f'Tema: {data.get("titulo", "Folha de Estudo Life Group")}', styles["title"]),
         paragraph(data.get("subtitulo") or "Culto Presencial e On-Line / Life Group", styles["meta"]),
     ]
 
     add_bullet_section(story, "Momento Generosidade", data.get("momentoGenerosidade"), styles["body"], bold_font)
-    story.append(agenda_box(agenda_lines(data.get("avisos")), doc.width, styles))
+    add_agenda_section(story, agenda_lines(data.get("avisos")), styles, bold_font)
 
     story.append(Spacer(1, 6))
     add_bullet_section(story, "Momento Visão e Missão Paz Church", data.get("momentoVisao"), styles["body"], bold_font)
@@ -1656,9 +1659,20 @@ def split_word_paragraphs(text):
 
 
 def word_section(label, text):
-    blocks = [word_paragraph(f"- {label}:", "Heading2"), word_paragraph("")]
-    for paragraph_text in split_word_paragraphs(text):
+    paragraphs = split_word_paragraphs(text)
+    if not paragraphs:
+        return [word_paragraph(f"- {label}:", "Heading2")]
+    first, *rest = paragraphs
+    blocks = [word_paragraph(f"- {label}: {first}", "Heading2")]
+    for paragraph_text in rest:
         blocks.append(word_paragraph(paragraph_text))
+    return blocks
+
+
+def word_agenda_section(text):
+    blocks = [word_paragraph("- Agenda Paz Church:", "Heading2")]
+    for line in agenda_lines(text):
+        blocks.append(word_paragraph(f"- {line}"))
     return blocks
 
 
@@ -1668,7 +1682,7 @@ def docx_document_xml(data):
     subtitle = data.get("subtitulo") or ""
     body = [
         word_paragraph("Estudo Life Group", "Title"),
-        word_paragraph(title, "Heading1"),
+        word_paragraph(f"Tema: {title}", "Heading1"),
     ]
     if subtitle:
         body.append(word_paragraph(subtitle, "Subtitle"))
@@ -1676,7 +1690,7 @@ def docx_document_xml(data):
     source_for_questions = "\n".join(normalize_pdf_chars(data.get(key, "")).strip() for key in ("textoExtraido", "resumo"))
     final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
     body.extend(word_section("Momento Generosidade", data.get("momentoGenerosidade")))
-    body.extend(word_section("Avisos / Agenda", data.get("avisos")))
+    body.extend(word_agenda_section(data.get("avisos")))
     body.extend(word_section("Momento Visão e Missão Paz Church", data.get("momentoVisao")))
     body.extend(word_section("Introdução", data.get("resumo")))
     body.append(word_paragraph("- Perguntas:", "Heading2"))
