@@ -522,8 +522,8 @@ body.reviewOpen .workspaceHeader {
 .reviewMain {
   width: 848px;
   min-height: 480px;
-  padding: 36px 40px;
-  background: #ffffff;
+  padding: 40px 27px;
+  background: var(--line);
   border: 1px solid var(--line);
   border-radius: 16px;
 }
@@ -548,22 +548,25 @@ body.reviewOpen .workspaceHeader {
 }
 
 .previewSheet {
-  max-width: 760px;
+  width: min(100%, 794px);
+  max-width: 794px;
   margin: 0 auto;
-  padding-bottom: 20px;
+  padding-bottom: 28px;
   color: #111111;
   background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  font-size: 15px;
+  border: 0;
+  border-radius: 0;
+  font-size: 13px;
   overflow: hidden;
 }
 
 .previewHeader {
-  padding: 28px;
-  margin-bottom: 24px;
+  padding: 30px 10px;
+  margin-bottom: 34px;
   color: #ffffff;
   background: var(--blue);
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
   text-align: center;
 }
 
@@ -573,44 +576,67 @@ body.reviewOpen .workspaceHeader {
 
 .previewHeader h3 {
   margin: 0;
-  font-size: 28px;
-  line-height: 1.1;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.08;
 }
 
 .previewSeries,
 .previewSubtitle,
 .previewSection {
-  margin: 18px 48px;
+  margin: 14px 60px;
+}
+
+.previewSeries {
+  color: #6096ba;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.18;
+  text-align: center;
+}
+
+.previewSubtitle {
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .previewSection h3 {
-  display: inline;
+  display: block;
   margin: 0;
-  font-size: 15px;
-  text-decoration: underline;
+  color: var(--blue);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.12;
+  text-decoration: none;
 }
 
 .previewSection h3::before {
-  content: "- ";
+  content: "";
 }
 
 .previewSection h3::after {
-  content: ": ";
+  content: "";
 }
 
 .previewSection p {
-  display: inline;
-  margin: 0;
-  line-height: 1.35;
+  display: block;
+  margin: 8px 0 0;
+  color: var(--blue);
+  font-size: 13px;
+  line-height: 1.24;
 }
 
 .previewSection p + p {
   display: block;
-  margin: 12px 0 0;
+  margin: 8px 0 0;
 }
 
-.previewAgenda h3 {
-  display: block;
+.previewSection + .previewSection,
+.previewSubtitle + .previewSection {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
 }
 
 .previewAgenda ul,
@@ -630,7 +656,7 @@ body.reviewOpen .workspaceHeader {
 }
 
 .previewQuestion {
-  margin: 13px 0;
+  margin: 10px 0;
 }
 
 .previewQuestions strong,
@@ -639,12 +665,140 @@ body.reviewOpen .workspaceHeader {
 }
 
 .previewQuestions strong {
-  font-weight: 400;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .previewQuestions span {
-  margin-top: 8px;
+  margin-top: 2px;
+  color: var(--gray);
+  font-size: 12px;
   font-style: italic;
+  line-height: 1.2;
+}
+
+.previewSkeleton {
+  min-height: 720px;
+}
+
+.skeletonPaper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 60px 34px;
+}
+
+.skeletonLine,
+.skeletonDivider {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  height: 13px;
+  background: #eef3f6;
+  border-radius: 999px;
+}
+
+.skeletonLine::after,
+.skeletonDivider::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.88), transparent);
+  transform: translateX(-100%);
+  animation: skeletonSweep 1.3s ease-in-out infinite;
+}
+
+.skeletonLine.title {
+  width: 60%;
+  height: 17px;
+  margin: 0 auto;
+  background: rgba(96, 150, 186, 0.25);
+}
+
+.skeletonLine.short {
+  width: 44%;
+}
+
+.skeletonLine.center {
+  margin-inline: auto;
+}
+
+.skeletonLine.heading {
+  width: 32%;
+  height: 16px;
+  margin-top: 4px;
+  background: rgba(39, 76, 119, 0.2);
+}
+
+.skeletonLine.wide {
+  width: 92%;
+}
+
+.skeletonDivider {
+  width: 100%;
+  height: 1px;
+  margin: 2px 0;
+  border-radius: 0;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span {
+  color: var(--gray);
+  opacity: 0.5;
+  animation: buildText 0.4s ease forwards;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span::before {
+  background: transparent;
+  border-color: var(--line);
+  transform: scale(0.72);
+  animation: buildDot 0.42s ease forwards;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(1),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(1)::before {
+  animation-delay: 0.15s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(2),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(2)::before {
+  animation-delay: 0.45s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(3),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(3)::before {
+  animation-delay: 0.75s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(4),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(4)::before {
+  animation-delay: 1.05s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(5),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(5)::before {
+  animation-delay: 1.35s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(6),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(6)::before {
+  animation-delay: 1.65s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(7),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(7)::before {
+  animation-delay: 1.95s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(8),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(8)::before {
+  animation-delay: 2.25s;
+}
+
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(9),
+.reviewLayout.isBuilding .reviewSideCol .structCard span:nth-child(9)::before {
+  animation-delay: 2.55s;
 }
 
 .formEditor {
@@ -809,39 +963,6 @@ body.reviewOpen .workspaceHeader {
   animation-delay: 2.55s;
 }
 
-.reviewIntro {
-  display: grid;
-  place-items: center;
-  gap: 10px;
-  min-height: calc(100vh - 77px);
-  color: var(--blue);
-  text-align: center;
-  animation: reviewIntroIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.reviewIntro span {
-  display: inline-grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  color: #ffffff;
-  background: var(--blue);
-  border-radius: 16px;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: 0;
-}
-
-.reviewIntro strong {
-  font-size: clamp(28px, 5vw, 56px);
-  font-weight: 800;
-  line-height: 1.05;
-}
-
-.reviewIntro.isLeaving {
-  animation: reviewIntroOut 0.35s ease both;
-}
-
 .reviewLayout.enteringReview,
 .workspaceHeader.enteringReview {
   animation: reviewContentIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -904,21 +1025,9 @@ button.loading {
   }
 }
 
-@keyframes reviewIntroIn {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.98);
-  }
+@keyframes skeletonSweep {
   to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes reviewIntroOut {
-  to {
-    opacity: 0;
-    transform: translateY(-12px) scale(0.99);
+    transform: translateX(100%);
   }
 }
 

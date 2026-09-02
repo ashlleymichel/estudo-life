@@ -77,14 +77,7 @@ function setBusy(isBusy, action = "") {
   extractBtn.classList.toggle("loading", isBusy && action === "extract");
   downloadMenuBtn.classList.toggle("loading", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
-  loadingState.classList.toggle("hidden", !(isBusy && action === "extract"));
-  if (isBusy && action === "extract") {
-    loadingState.classList.remove("isBuilding");
-    void loadingState.offsetWidth;
-    loadingState.classList.add("isBuilding");
-  } else {
-    loadingState.classList.remove("isBuilding");
-  }
+  loadingState.classList.add("hidden");
   extractBtn.innerHTML = getExtractLabel();
   downloadMenuBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
@@ -247,46 +240,63 @@ function setView(view) {
   $("editViewBtn").classList.toggle("active", view === "edit");
   const stepLabel = $("stepLabel");
   if (stepLabel && !$("reviewLayout").classList.contains("hidden")) {
-    stepLabel.textContent = "Revisão de conteúdo";
+    stepLabel.textContent = "04 — Revisão de Conteúdo";
   }
 }
 
-function wait(ms) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
-}
-
-async function playReviewIntro() {
-  const loadingState = $("loadingState");
-  const reviewIntro = $("reviewIntro");
-  const workspaceHeader = document.querySelector(".workspaceHeader");
+function showReviewLoading() {
   const reviewLayout = $("reviewLayout");
-  if (!reviewIntro) {
-    return;
-  }
-
-  loadingState.classList.add("hidden");
   $("uploadForm").classList.add("hidden");
-  reviewIntro.classList.remove("hidden", "isLeaving");
-  await wait(950);
-  reviewIntro.classList.add("isLeaving");
-  await wait(320);
-  reviewIntro.classList.add("hidden");
-  reviewIntro.classList.remove("isLeaving");
-  showReview();
-  workspaceHeader.classList.add("enteringReview");
-  reviewLayout.classList.add("enteringReview");
-  await wait(560);
-  workspaceHeader.classList.remove("enteringReview");
-  reviewLayout.classList.remove("enteringReview");
+  reviewLayout.classList.remove("hidden", "isBuilding");
+  document.body.classList.add("reviewOpen");
+  $("stepLabel").textContent = "04 — Revisão de Conteúdo";
+  setView("preview");
+  void reviewLayout.offsetWidth;
+  reviewLayout.classList.add("isBuilding");
+  document.querySelectorAll(".reviewSideCol .structCard span").forEach((item) => {
+    item.classList.remove("done");
+  });
+  $("previewPane").innerHTML = `
+    <article class="previewSheet previewSkeleton" aria-label="Conteúdo em construção">
+      <header class="previewHeader">
+        <h3>Estudo de Life Group</h3>
+      </header>
+      <div class="skeletonPaper">
+        <span class="skeletonLine title"></span>
+        <span class="skeletonLine short center"></span>
+        <span class="skeletonDivider"></span>
+        <span class="skeletonLine heading"></span>
+        <span class="skeletonLine"></span>
+        <span class="skeletonLine wide"></span>
+        <span class="skeletonDivider"></span>
+        <span class="skeletonLine heading"></span>
+        <span class="skeletonLine"></span>
+        <span class="skeletonDivider"></span>
+        <span class="skeletonLine heading"></span>
+        <span class="skeletonLine wide"></span>
+        <span class="skeletonLine"></span>
+        <span class="skeletonDivider"></span>
+        <span class="skeletonLine heading"></span>
+        <span class="skeletonLine wide"></span>
+        <span class="skeletonLine wide"></span>
+      </div>
+    </article>
+  `;
+}
+
+function markReviewReady() {
+  $("reviewLayout").classList.remove("isBuilding");
+  document.querySelectorAll(".reviewSideCol .structCard span").forEach((item) => {
+    item.classList.add("done");
+  });
+  highlightPreviewUpdate();
 }
 
 function showReview() {
   $("uploadForm").classList.add("hidden");
   $("reviewLayout").classList.remove("hidden");
   document.body.classList.add("reviewOpen");
-  $("stepLabel").textContent = "Revisão de conteúdo";
+  $("stepLabel").textContent = "04 — Revisão de Conteúdo";
 }
 
 function collectData() {
@@ -484,6 +494,7 @@ function loadSavedDraftForEditing() {
     state.editingSavedId = saved.id || "";
     fillForm(saved.data);
     showReview();
+    markReviewReady();
     setStatus("Arquivo salvo aberto para edição. Ajuste o que precisar e salve novamente.", "ok");
     return true;
   } catch (error) {
@@ -527,6 +538,7 @@ $("uploadForm").addEventListener("submit", async (event) => {
   }
 
   setStatus("Lendo o arquivo e organizando os campos...");
+  showReviewLoading();
   setBusy(true, "extract");
   const form = new FormData();
   form.append("arquivo", file);
@@ -542,10 +554,13 @@ $("uploadForm").addEventListener("submit", async (event) => {
       throw new Error(data.erro || "Não foi possível extrair o arquivo.");
     }
     fillForm(data);
-    await playReviewIntro();
+    markReviewReady();
     setView("preview");
     setStatus("Conteúdo extraído. Revise e ajuste o que precisar antes de baixar.", "ok");
   } catch (error) {
+    $("reviewLayout").classList.add("hidden");
+    document.body.classList.remove("reviewOpen");
+    $("uploadForm").classList.remove("hidden");
     setStatus(error.message, "error");
   } finally {
     setBusy(false);
