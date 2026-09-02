@@ -253,29 +253,28 @@ function showReviewLoading() {
     item.classList.remove("done");
   });
   $("previewPane").innerHTML = `
-    <article class="previewSheet previewSkeleton" aria-label="Conteúdo em construção">
-      <header class="previewHeader">
-        <h3>Estudo de Life Group</h3>
-      </header>
-      <div class="skeletonPaper">
-        <span class="skeletonLine title"></span>
-        <span class="skeletonLine short center"></span>
-        <span class="skeletonDivider"></span>
-        <span class="skeletonLine heading"></span>
-        <span class="skeletonLine"></span>
-        <span class="skeletonLine wide"></span>
-        <span class="skeletonDivider"></span>
-        <span class="skeletonLine heading"></span>
-        <span class="skeletonLine"></span>
-        <span class="skeletonDivider"></span>
-        <span class="skeletonLine heading"></span>
-        <span class="skeletonLine wide"></span>
-        <span class="skeletonLine"></span>
-        <span class="skeletonDivider"></span>
-        <span class="skeletonLine heading"></span>
-        <span class="skeletonLine wide"></span>
-        <span class="skeletonLine wide"></span>
+    <article class="loadingPreviewCard" aria-label="Conteúdo em construção">
+      <div class="loadingStatusRow">
+        <span class="loadingStatusDot" aria-hidden="true"></span>
+        <div>
+          <strong>Montando estrutura...</strong>
+          <small>Estamos lendo o documento e preparando a folha.</small>
+        </div>
       </div>
+      <div class="loadingSkeletonLines">
+        <span class="skeletonLine blue w28"></span>
+        <span class="skeletonLine w66"></span>
+        <span class="skeletonLine w61"></span>
+        <span class="skeletonLine w43"></span>
+        <span class="skeletonGap"></span>
+        <span class="skeletonLine blue w25"></span>
+        <span class="skeletonLine w63"></span>
+        <span class="skeletonLine w38"></span>
+        <span class="skeletonGap"></span>
+        <span class="skeletonLine blue w23"></span>
+        <span class="skeletonLine w58"></span>
+      </div>
+      <p class="loadingPreviewNote">A prévia aparecerá aqui depois que você gerar o PDF.</p>
     </article>
   `;
 }

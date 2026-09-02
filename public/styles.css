@@ -527,7 +527,7 @@ body.reviewBuilding .reviewLayout {
 }
 
 body.reviewBuilding .reviewMain {
-  width: min(100%, 1120px);
+  width: min(100%, 1240px);
 }
 
 .reviewSideCol {
@@ -702,29 +702,74 @@ body.reviewBuilding .reviewMain {
   line-height: 1.22;
 }
 
-.previewSkeleton {
-  min-height: 720px;
-}
-
-.skeletonPaper {
+.loadingPreviewCard {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 0 60px 34px;
+  width: min(100%, 1238px);
+  min-height: 700px;
+  padding: 54px 58px;
+  color: var(--blue);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
 }
 
-.skeletonLine,
-.skeletonDivider {
+.loadingStatusRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.loadingStatusDot {
+  display: block;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin-top: 4px;
+  border: 3px solid var(--blue);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loadingStatusRow strong,
+.loadingStatusRow small {
+  display: block;
+}
+
+.loadingStatusRow strong {
+  color: var(--blue);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.loadingStatusRow small {
+  margin-top: 6px;
+  color: var(--gray);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.loadingSkeletonLines {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(100%, 760px);
+  margin-top: 38px;
+}
+
+.skeletonLine {
   display: block;
   overflow: hidden;
   position: relative;
-  height: 13px;
+  width: 100%;
+  height: 15px;
   background: #eef3f6;
   border-radius: 999px;
 }
 
-.skeletonLine::after,
-.skeletonDivider::after {
+.skeletonLine::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -733,37 +778,57 @@ body.reviewBuilding .reviewMain {
   animation: skeletonSweep 1.3s ease-in-out infinite;
 }
 
-.skeletonLine.title {
-  width: 60%;
-  height: 17px;
-  margin: 0 auto;
-  background: rgba(96, 150, 186, 0.25);
+.skeletonLine.blue {
+  height: 20px;
+  background: var(--blue-soft);
 }
 
-.skeletonLine.short {
-  width: 44%;
+.skeletonLine.w28 {
+  width: 28%;
 }
 
-.skeletonLine.center {
-  margin-inline: auto;
+.skeletonLine.w66 {
+  width: 66%;
 }
 
-.skeletonLine.heading {
-  width: 32%;
-  height: 16px;
-  margin-top: 4px;
-  background: rgba(39, 76, 119, 0.2);
+.skeletonLine.w61 {
+  width: 61%;
 }
 
-.skeletonLine.wide {
-  width: 92%;
+.skeletonLine.w43 {
+  width: 43%;
 }
 
-.skeletonDivider {
-  width: 100%;
-  height: 1px;
-  margin: 2px 0;
-  border-radius: 0;
+.skeletonLine.w25 {
+  width: 25%;
+}
+
+.skeletonLine.w63 {
+  width: 63%;
+}
+
+.skeletonLine.w38 {
+  width: 38%;
+}
+
+.skeletonLine.w23 {
+  width: 23%;
+}
+
+.skeletonLine.w58 {
+  width: 58%;
+}
+
+.skeletonGap {
+  display: block;
+  height: 26px;
+}
+
+.loadingPreviewNote {
+  margin: 58px 0 0;
+  color: var(--gray);
+  font-size: 19px;
+  line-height: 1.2;
 }
 
 .reviewLayout.isBuilding .reviewSideCol .structCard span {
