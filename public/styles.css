@@ -479,6 +479,39 @@ body.reviewOpen .workspaceHeader {
   flex: 0 0 auto;
 }
 
+.loadingSteps,
+.formatGroup {
+  display: none;
+}
+
+.toolbarSpacer {
+  flex: 1;
+  min-width: 1px;
+}
+
+.formatGroup {
+  gap: 4px;
+  padding: 4px;
+  background: var(--line);
+  border-radius: 12px;
+}
+
+.formatGroup span {
+  display: inline-grid;
+  place-items: center;
+  min-height: 31px;
+  padding: 0 16px;
+  color: var(--gray);
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.formatGroup span.active {
+  color: var(--blue);
+  background: #ffffff;
+}
+
 .downloadMenu {
   position: relative;
 }
@@ -514,24 +547,37 @@ body.reviewOpen .workspaceHeader {
 }
 
 body.reviewBuilding .workspaceHeader {
-  display: none;
-  width: 100%;
+  display: flex;
 }
 
 body.reviewBuilding .reviewLayout {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 190px);
-  padding-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 848px) 280px;
+  gap: 32px;
+  align-items: start;
+  padding-top: 20px;
 }
 
 body.reviewBuilding .reviewMain {
-  width: min(100%, 1240px);
+  width: 848px;
+  min-height: 480px;
+  padding: 36px 40px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
 }
 
 .reviewSideCol {
   display: none;
+}
+
+body.reviewBuilding .reviewSideCol {
+  display: flex;
+}
+
+body.reviewBuilding .loadingSteps,
+body.reviewBuilding .formatGroup {
+  display: inline-flex;
 }
 
 .reviewMain {
@@ -705,28 +751,28 @@ body.reviewBuilding .reviewMain {
 .loadingPreviewCard {
   display: flex;
   flex-direction: column;
-  width: min(100%, 1238px);
-  min-height: 700px;
-  padding: 54px 58px;
+  width: 100%;
+  min-height: 408px;
+  padding: 0;
   color: var(--blue);
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 20px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
 .loadingStatusRow {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: center;
+  gap: 10px;
 }
 
 .loadingStatusDot {
   display: block;
   flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
-  margin-top: 4px;
-  border: 3px solid var(--blue);
+  width: 16px;
+  height: 16px;
+  margin-top: 0;
+  border: 1.5px solid var(--blue);
   border-right-color: transparent;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -739,24 +785,24 @@ body.reviewBuilding .reviewMain {
 
 .loadingStatusRow strong {
   color: var(--blue);
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.1;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .loadingStatusRow small {
-  margin-top: 6px;
+  margin-top: 2px;
   color: var(--gray);
-  font-size: 20px;
-  line-height: 1.2;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .loadingSkeletonLines {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  width: min(100%, 760px);
-  margin-top: 38px;
+  gap: 10px;
+  width: 100%;
+  margin-top: 24px;
 }
 
 .skeletonLine {
@@ -764,9 +810,9 @@ body.reviewBuilding .reviewMain {
   overflow: hidden;
   position: relative;
   width: 100%;
-  height: 15px;
+  height: 10px;
   background: #eef3f6;
-  border-radius: 999px;
+  border-radius: 5px;
 }
 
 .skeletonLine::after {
@@ -779,56 +825,57 @@ body.reviewBuilding .reviewMain {
 }
 
 .skeletonLine.blue {
-  height: 20px;
+  height: 14px;
   background: var(--blue-soft);
+  border-radius: 7px;
 }
 
 .skeletonLine.w28 {
-  width: 28%;
+  width: 220px;
 }
 
 .skeletonLine.w66 {
-  width: 66%;
+  width: 520px;
 }
 
 .skeletonLine.w61 {
-  width: 61%;
+  width: 480px;
 }
 
 .skeletonLine.w43 {
-  width: 43%;
+  width: 340px;
 }
 
 .skeletonLine.w25 {
-  width: 25%;
+  width: 200px;
 }
 
 .skeletonLine.w63 {
-  width: 63%;
+  width: 500px;
 }
 
 .skeletonLine.w38 {
-  width: 38%;
+  width: 300px;
 }
 
 .skeletonLine.w23 {
-  width: 23%;
+  width: 180px;
 }
 
 .skeletonLine.w58 {
-  width: 58%;
+  width: 460px;
 }
 
 .skeletonGap {
   display: block;
-  height: 26px;
+  height: 8px;
 }
 
 .loadingPreviewNote {
-  margin: 58px 0 0;
+  margin: 24px 0 0;
   color: var(--gray);
-  font-size: 19px;
-  line-height: 1.2;
+  font-size: 12px;
+  line-height: 1;
 }
 
 .reviewLayout.isBuilding .reviewSideCol .structCard span {

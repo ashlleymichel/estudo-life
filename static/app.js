@@ -252,6 +252,9 @@ function showReviewLoading() {
   document.querySelectorAll(".reviewSideCol .structCard span").forEach((item) => {
     item.classList.remove("done");
   });
+  document.querySelectorAll(".reviewSideCol .structCard span:nth-child(-n+3)").forEach((item) => {
+    item.classList.add("done");
+  });
   $("previewPane").innerHTML = `
     <article class="loadingPreviewCard" aria-label="Conteúdo em construção">
       <div class="loadingStatusRow">
