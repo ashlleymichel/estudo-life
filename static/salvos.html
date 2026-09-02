@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Arquivos Salvos | Folha de Estudo</title>
     <meta name="description" content="Arquivos salvos da plataforma Folha de Estudo." />
-    <link rel="stylesheet" href="/styles.css?v=57" />
+    <link rel="stylesheet" href="/styles.css?v=58" />
   </head>
   <body>
     <main class="savedPage">
@@ -16,8 +16,22 @@
       <section class="savedList" id="savedList" aria-label="Arquivos salvos">
         <p class="emptyState">Carregando arquivos...</p>
       </section>
+
+      <div id="deleteModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+        <section class="confirmModal">
+          <div class="modalIcon" aria-hidden="true">!</div>
+          <div class="modalText">
+            <h2 id="deleteModalTitle">Excluir arquivo?</h2>
+            <p id="deleteModalMessage">Esse arquivo será removido permanentemente de Arquivos Salvos. Essa ação não pode ser desfeita.</p>
+          </div>
+          <div class="modalActions">
+            <button id="cancelDeleteBtn" class="modalCancel" type="button">Cancelar</button>
+            <button id="confirmDeleteBtn" class="modalDelete" type="button">Excluir</button>
+          </div>
+        </section>
+      </div>
     </main>
 
-    <script src="/salvos.js?v=4"></script>
+    <script src="/salvos.js?v=5"></script>
   </body>
 </html>

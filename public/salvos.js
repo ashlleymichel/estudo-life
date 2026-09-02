@@ -3,6 +3,11 @@ const DB_VERSION = 1;
 const STORE_NAME = "arquivos";
 
 const list = document.getElementById("savedList");
+const deleteModal = document.getElementById("deleteModal");
+const deleteModalMessage = document.getElementById("deleteModalMessage");
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+let pendingDeleteFile = null;
 
 function openSavedDb() {
   return new Promise((resolve, reject) => {
@@ -131,6 +136,23 @@ function editFile(file) {
   window.location.href = "/editar.html";
 }
 
+function openDeleteModal(file) {
+  pendingDeleteFile = file;
+  const title = file.title || "Arquivo salvo";
+  deleteModalMessage.textContent = `${title} será removido permanentemente de Arquivos Salvos. Essa ação não pode ser desfeita.`;
+  deleteModal.classList.remove("hidden");
+  document.body.classList.add("modalOpen");
+  cancelDeleteBtn.focus();
+}
+
+function closeDeleteModal() {
+  pendingDeleteFile = null;
+  deleteModal.classList.add("hidden");
+  document.body.classList.remove("modalOpen");
+  confirmDeleteBtn.disabled = false;
+  confirmDeleteBtn.textContent = "Excluir";
+}
+
 function renderFiles(files) {
   list.innerHTML = "";
   if (!files.length) {
@@ -208,10 +230,7 @@ function renderFiles(files) {
     remove.className = "deleteSaved";
     remove.type = "button";
     remove.textContent = "Excluir";
-    remove.addEventListener("click", async () => {
-      await deleteFile(file.id);
-      renderFiles(await getSavedFiles());
-    });
+    remove.addEventListener("click", () => openDeleteModal(file));
 
     info.append(title, meta);
     actions.append(edit, downloadMenu, remove);
@@ -219,6 +238,37 @@ function renderFiles(files) {
     list.append(item);
   });
 }
+
+cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+
+deleteModal.addEventListener("click", (event) => {
+  if (event.target === deleteModal) {
+    closeDeleteModal();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !deleteModal.classList.contains("hidden")) {
+    closeDeleteModal();
+  }
+});
+
+confirmDeleteBtn.addEventListener("click", async () => {
+  if (!pendingDeleteFile) {
+    return;
+  }
+  confirmDeleteBtn.disabled = true;
+  confirmDeleteBtn.textContent = "Excluindo...";
+  try {
+    await deleteFile(pendingDeleteFile.id);
+    closeDeleteModal();
+    renderFiles(await getSavedFiles());
+  } catch (error) {
+    confirmDeleteBtn.disabled = false;
+    confirmDeleteBtn.textContent = "Excluir";
+    deleteModalMessage.textContent = "Não foi possível excluir esse arquivo. Tente novamente.";
+  }
+});
 
 document.addEventListener("click", (event) => {
   if (event.target.closest(".downloadMenu")) {
