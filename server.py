@@ -50,6 +50,18 @@ DEFAULT_VISAO = (
 DEFAULT_AVISOS = "Encontro com Deus: 14 a 16 de agosto / inscrições abertas / informações com seu líder"
 FIRST_QUESTION = "Compartilhe conosco o que essa Palavra de domingo falou com você."
 
+MODEL_STRUCTURE_GUIDE = (
+    "Siga a estrutura dos PDFs da pasta modelo: comece com uma introdução pastoral em um bloco coeso, "
+    "conectada diretamente ao tema da mensagem, sem parecer uma lista de versículos. "
+    "Use normalmente de dois a três textos bíblicos principais na introdução, integrados ao raciocínio. "
+    "As perguntas devem soar como perguntas de Life Group: simples, conversáveis, profundas e ligadas ao tema. "
+    "Evite perguntas genéricas como 'que verdade central esse texto revela'. Prefira perguntas concretas: "
+    "'o que acontece quando...', 'como isso deve refletir...', 'o que isso significa na prática...', "
+    "'dê exemplos', 'como podemos viver isso durante a semana'. "
+    "Nem toda pergunta precisa ter versículo, mas quando tiver, a pergunta vem primeiro e a passagem bíblica logo abaixo. "
+    "A conclusão deve fechar o tema com tom pastoral, chamando para fé, prática, comunhão e obediência."
+)
+
 
 HEADER_HEIGHT = A4[0] * (168 / 1440)
 HEADER_RADIUS = A4[0] * (40 / 1440)
@@ -520,20 +532,22 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
         "com escrita clara, bíblica, pastoral e simples para uma reunião da igreja PAZ Church nas casas. "
-        "O conteúdo será usado em um pequeno PDF de estudo, então seja objetivo, profundo e fácil de discutir. "
-        "Dê ênfase maior aos versículos bíblicos citados no sermão. "
+        f"{MODEL_STRUCTURE_GUIDE} "
+        "O conteúdo será usado em um PDF curto de estudo, então seja objetivo, profundo e fácil de discutir. "
+        "Dê ênfase maior aos versículos bíblicos citados no sermão, mas escreva com naturalidade pastoral. "
         "Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas, usando a versão NAA. "
         "O sistema renderiza o itálico no PDF; no JSON, escreva o versículo entre aspas e com a referência bíblica. "
         "Escreva o versículo completo, sem cortes e sem reticências. "
         "Use as referências bíblicas presentes no texto enviado. Quando o texto trouxer apenas a referência, use o texto completo da NAA se você o souber com segurança; "
         "caso contrário, não invente palavras do versículo. "
-        "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, sempre apoiadas nos textos bíblicos citados. "
+        "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, conectando Bíblia, vida prática e exemplos reais. "
         "Não repita nas perguntas os mesmos versículos que já foram escritos na introdução, exceto se o usuário pedir depois pelo chat. "
         "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo das perguntas 2, 3 e/ou 4, usando versículos diferentes dos usados na introdução sempre que possível. "
         "Nunca use a mesma passagem bíblica em duas perguntas diferentes. Cada pergunta com passagem bíblica precisa usar uma referência única. "
         "Quando uma pergunta tiver referência bíblica, escreva a pergunta em uma linha e o versículo logo abaixo. "
-        "Prefira o formato: Leia Mateus 7:24-25 e responda: [pergunta]. Na linha seguinte, escreva o versículo entre aspas com a referência entre parênteses. "
+        "Use o formato dos modelos: a pergunta pode citar a referência no texto e, quando houver passagem, escreva a passagem logo abaixo. "
         "Evite perguntas rasas, genéricas ou que possam ser respondidas com sim/não. "
+        "Não use perguntas com cara de prompt técnico, como 'que verdade central esse texto revela'. "
         "Não inclua markdown, títulos de seção, numeração externa ou explicações fora dos campos JSON."
     )
     user_prompt = f"""
@@ -544,16 +558,19 @@ Contexto e regras por trás:
 - Faça um resumo introdutório claro e de fácil entendimento desse texto, que foi o sermão de domingo do pastor, em no máximo 9 linhas, dando ênfase aos versículos.
 - Esse texto será apenas a introdução de um pequeno PDF de estudos para uma reunião da igreja PAZ Church nas casas.
 - A introdução deve ser coesa, pastoral e conectada ao tema do sermão, não apenas uma lista de versículos.
-- Dê ênfase maior aos versículos; use preferencialmente os primeiros versículos principais que aparecem no documento.
+- Dê ênfase maior aos versículos; use preferencialmente os primeiros textos principais que aparecem no documento.
+- A introdução deve parecer com os modelos: um parágrafo ou poucos parágrafos curtos que explicam o tema, inserem os versículos dentro do raciocínio e preparam o grupo para conversar.
+- Na introdução, use normalmente de dois a três textos bíblicos principais. Use apenas mais do que isso se for essencial para entender o tema.
 - Logo após essa introdução, formule exatamente quatro perguntas para que pequenos grupos discutam esse assunto e aprendam mais profundamente.
 - As perguntas devem dar ênfase aos textos bíblicos citados no texto, escrevendo os versículos da mesma forma que na introdução, exceto os versículos que já foram escritos na introdução.
 - A primeira pergunta deverá ser exatamente: Compartilhe conosco o que essa Palavra de domingo falou com você.
-- As perguntas 2 a 4 devem ser simples de discutir em grupo, mas profundas; devem usar os versículos como apoio e fazer a pessoa ler o texto bíblico antes de responder.
+- As perguntas 2 a 4 devem seguir o estilo dos modelos: perguntas diretas, pastorais, fáceis de conversar em grupo e conectadas ao assunto da mensagem.
+- Evite perguntas genéricas como "que verdade central esse texto revela" ou "como essa verdade muda a forma de enxergar o tema". Escreva perguntas concretas sobre o tema, com exemplos, aplicação prática e reflexão pessoal.
 - Quando houver passagens bíblicas no esboço, as perguntas 2, 3 e/ou 4 devem trazer o versículo completo logo abaixo da pergunta, usando versículos diferentes dos que já apareceram na introdução sempre que possível.
 - Não repita a mesma passagem bíblica em duas perguntas diferentes. Se não houver outra referência bíblica adequada, deixe a pergunta sem passagem em vez de repetir uma referência já usada.
 - Se houver três ou mais passagens bíblicas relevantes que não foram usadas na introdução, coloque versículo de apoio nas perguntas 2, 3 e 4.
 - Nas perguntas que tiverem versículo de apoio, escreva primeiro a pergunta e logo abaixo a passagem bíblica, da mesma forma que na introdução.
-- Use este estilo para perguntas com referência bíblica: Leia Mateus 7:24-25 e responda: o que significa construir sua vida sobre a rocha? Quais ações práticas podem solidificar essa construção?
+- Use este estilo para perguntas com referência bíblica: O que significa construir sua vida sobre a rocha? Quais ações práticas podem solidificar essa construção?
 - Na linha logo abaixo da pergunta, escreva a passagem: "Texto completo do versículo" (Mateus 7:24-25 NAA).
 - Escreva todos os versículos citados nos textos da introdução e nas perguntas em itálico entre aspas na versão NAA (Nova Almeida Atualizada). O PDF aplicará o itálico; no texto, coloque a passagem entre aspas com a referência.
 - Para obter o texto do versículo, use a versão NAA conforme a referência bíblica enviada. Quando necessário, tome como referência o formato do site Bible.com, por exemplo https://www.bible.com/pt/bible/1840/JHN.1.NAA, mas sem copiar referências que não estejam relacionadas ao sermão.
@@ -639,6 +656,7 @@ def assist_life_group_with_chatgpt(data, message, history=None):
         "Você é o assistente pastoral e editorial da plataforma Folha de Estudo da PAZ Church. "
         "Converse em português do Brasil, seja acolhedor, objetivo e útil. Responda dúvidas sobre o conteúdo, "
         "sugira melhorias, explique como usar a plataforma e auxilie na preparação do Life Group. "
+        f"{MODEL_STRUCTURE_GUIDE} "
         "Trate todo pedido de escrita, melhoria, correção, troca, remoção, acréscimo ou reestruturação como alteração concreta na folha, aplique a mudança e use action='updated'. "
         "Quando ele fizer uma pergunta, pedir opinião, explicação ou orientação sem solicitar mudança, "
         "responda sem alterar a folha e use action='answered'. Preserve rigorosamente os campos não mencionados. "
@@ -648,6 +666,7 @@ def assist_life_group_with_chatgpt(data, message, history=None):
         "'Compartilhe conosco o que essa Palavra de domingo falou com você.'. "
         "Quando uma pergunta tiver versículo, escreva primeiro a pergunta e logo abaixo a passagem bíblica. "
         "Nunca repita a mesma passagem bíblica em duas perguntas diferentes. Cada pergunta com versículo deve usar uma referência única. "
+        "Evite perguntas genéricas como 'que verdade central esse texto revela'. As perguntas precisam soar como os modelos: concretas, pastorais, conversáveis e conectadas ao tema. "
         "Evite repetir nas perguntas os versículos já usados na introdução, a menos que o usuário peça isso explicitamente. "
         "Escreva os versículos entre aspas na versão NAA, completos e sem cortes quando souber o texto com segurança. "
         "Se alterar conclusão, mantenha no máximo cinco linhas e foque no título. "
@@ -711,7 +730,7 @@ def scripture_quote_for_ref(text, ref):
     escaped_ref = re.escape(ref)
     quote_chars = r"[“\"]"
     patterns = [
-        rf"{escaped_ref}(?:\s+[A-Z]{{2,5}})?\)?\s*[—:-]?\s*{quote_chars}([^”\"]{{20,420}}?)[”\"]",
+        rf"{escaped_ref}(?:\s+[A-Z]{{2,5}})?\s*[—:-]\s*{quote_chars}([^”\"]{{20,420}}?)[”\"]",
         rf"{quote_chars}([^”\"]{{20,420}}?)[”\"][ \t]*\(?{escaped_ref}(?:\s+[A-Z]{{2,5}})?\)?",
     ]
     for pattern in patterns:
@@ -734,7 +753,7 @@ def scripture_fragment(text, ref):
     quote = scripture_quote_for_ref(text, ref)
     if quote:
         return f'"{normalize_scripture_quotes(quote)}" ({ref} NAA)'
-    return f"({ref} NAA)"
+    return ""
 
 
 def scripture_line(text, ref):
@@ -891,7 +910,10 @@ def strip_repeated_reference_from_question_line(line, duplicate_refs):
     for ref in duplicate_refs:
         escaped_ref = re.escape(ref)
         result = re.sub(rf"^\s*Leia\s+{escaped_ref}\s+e\s+responda\s*:\s*", "", result, flags=re.IGNORECASE)
+        result = re.sub(rf"\b(ensino|orientação|texto|passagem|Palavra)\s+de\s+{escaped_ref}\b", r"\1 bíblico", result, flags=re.IGNORECASE)
+        result = re.sub(rf"\b(?:segundo|conforme|baseado em|a partir de|em)\s+{escaped_ref}\b\s*,?\s*", "", result, flags=re.IGNORECASE)
         result = re.sub(rf"\s*\({escaped_ref}(?:\s+NAA)?\)", "", result, flags=re.IGNORECASE)
+    result = re.sub(r"\b(orientação|passagem|Palavra) bíblico\b", r"\1 bíblica", result, flags=re.IGNORECASE)
     return clean_block(result)
 
 
@@ -957,26 +979,27 @@ def simplify_group_question(question, source_text, refs, index):
     if ref:
         verse = scripture_fragment(source_text, ref)
         simple_prompts = [
-            f"Leia {ref} e responda: que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
-            f"Leia {ref} e responda: que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
-            f"Leia {ref} e responda: quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
+            f"O que {ref} ensina sobre o tema da mensagem e como isso deve aparecer na vida prática durante a semana?\n{verse}",
+            f"Que atitude Deus está nos chamando a tomar a partir de {ref}? Dê exemplos práticos.\n{verse}",
+            f"Como a orientação de {ref} pode transformar nossas decisões, relacionamentos e reações diante das dificuldades?\n{verse}",
         ]
         return simple_prompts[index % len(simple_prompts)]
 
     simple_prompts = [
-        "O que essa mensagem ensina para a vida hoje?",
-        "Como essa Palavra pode ser praticada no dia a dia?",
-        "Quais passos práticos podem ser aplicados nesta semana?",
+        "O que essa mensagem revela sobre o nosso relacionamento com Deus e como isso precisa aparecer na vida prática?",
+        "Em quais áreas essa Palavra precisa sair da teoria e se tornar obediência nesta semana?",
+        "Como podemos ajudar uns aos outros no Life Group a viver essa Palavra com constância?",
     ]
     return simple_prompts[index % len(simple_prompts)]
 
 
 def discussion_question_for_ref(text, ref, title="", index=0):
     verse = scripture_fragment(text, ref)
+    theme = f' sobre "{title}"' if title and title != "Folha de Estudo Life Group" else ""
     prompts = [
-        f"Leia {ref} e responda: que verdade central esse texto revela e como essa verdade muda a forma de enxergar o tema da mensagem?\n{verse}",
-        f"Leia {ref} e responda: que atitude Deus está ensinando e como isso confronta a maneira de viver, decidir e reagir às circunstâncias?\n{verse}",
-        f"Leia {ref} e responda: quais passos práticos podem ser aplicados para que essa Palavra saia da teoria e se torne obediência?\n{verse}",
+        f"O que {ref} ensina{theme} e como essa Palavra deve mudar nossas atitudes?\n{verse}",
+        f"Que resposta prática Deus espera de nós a partir de {ref}? Dê exemplos que possam ser vividos durante a semana.\n{verse}",
+        f"Como o ensino de {ref} confronta nossa maneira de pensar, falar ou agir? O que precisa mudar?\n{verse}",
     ]
     return prompts[index % len(prompts)]
 
@@ -1012,9 +1035,9 @@ def normalize_questions(text, questions=None):
     title_match = re.search(r"S[ée]rie\s*:\s*[“\"]?(.+?)[”\"]?(?:\n|$)", text, re.IGNORECASE)
     title = title_match.group(1).strip() if title_match else ""
     fallback = [
-        "O que essa mensagem ensina para a vida hoje?",
-        "Onde essa Palavra precisa aparecer de forma prática na nossa rotina?",
-        "Quais passos práticos podem ser aplicados nesta semana para viver o que foi ouvido?",
+        "O que essa mensagem revela sobre o nosso relacionamento com Deus e como isso precisa aparecer na vida prática?",
+        "Em quais áreas essa Palavra precisa sair da teoria e se tornar obediência nesta semana?",
+        "Como podemos ajudar uns aos outros no Life Group a viver essa Palavra com constância?",
     ]
     if refs:
         fallback = [discussion_question_for_ref(text, refs[min(i, len(refs) - 1)], title, i) for i in range(3)]
@@ -1040,9 +1063,9 @@ def normalize_questions(text, questions=None):
         if candidate and candidate not in result:
             result.append(candidate)
     generic_fallback = [
-        "O que essa mensagem revela sobre Deus e como essa verdade confronta a maneira de viver a fé no dia a dia?",
+        "O que essa mensagem revela sobre o nosso relacionamento com Deus e como isso precisa aparecer na vida prática?",
         "Quais atitudes práticas podem ser aplicadas nesta semana para obedecer ao que foi ministrado?",
-        "Como essa Palavra pode fortalecer a fé, a família e o testemunho cristão durante a semana?",
+        "Como essa Palavra pode fortalecer a fé, a família e o testemunho cristão durante a semana? Dê exemplos.",
     ]
     result = remove_repeated_question_references(result)
     while len(result) < 4:
