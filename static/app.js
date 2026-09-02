@@ -630,6 +630,10 @@ fields.forEach((field) => {
 $("previewViewBtn").addEventListener("click", () => setView("preview"));
 $("editViewBtn").addEventListener("click", () => setView("edit"));
 $("extractBtn").addEventListener("click", startFileSelection);
+const topCreateBtn = $("topCreateBtn");
+if (topCreateBtn) {
+  topCreateBtn.addEventListener("click", startFileSelection);
+}
 setView("preview");
 
 const dropzone = document.querySelector(".dropzone");
