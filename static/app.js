@@ -78,6 +78,13 @@ function setBusy(isBusy, action = "") {
   downloadMenuBtn.classList.toggle("loading", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.classList.toggle("loading", isBusy && action === "save");
   loadingState.classList.toggle("hidden", !(isBusy && action === "extract"));
+  if (isBusy && action === "extract") {
+    loadingState.classList.remove("isBuilding");
+    void loadingState.offsetWidth;
+    loadingState.classList.add("isBuilding");
+  } else {
+    loadingState.classList.remove("isBuilding");
+  }
   extractBtn.innerHTML = getExtractLabel();
   downloadMenuBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
   saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");

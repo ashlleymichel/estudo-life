@@ -721,8 +721,8 @@ body.reviewOpen .workspaceHeader {
   place-items: center;
   gap: 10px;
   width: min(100%, 520px);
-  min-height: 180px;
-  margin: clamp(80px, 18vh, 180px) auto 0;
+  min-height: 360px;
+  margin: clamp(48px, 10vh, 120px) auto 0;
   padding: 32px;
   color: var(--blue);
   text-align: center;
@@ -741,6 +741,72 @@ body.reviewOpen .workspaceHeader {
 .centerLoading small {
   color: var(--gray);
   font-size: 13px;
+}
+
+.buildingStruct {
+  width: min(100%, 360px);
+  margin-top: 18px;
+  text-align: left;
+}
+
+.buildingStruct span {
+  opacity: 0.5;
+  animation: buildText 0.4s ease forwards;
+}
+
+.buildingStruct span::before {
+  transform: scale(0.72);
+  animation: buildDot 0.42s ease forwards;
+}
+
+.centerLoading:not(.isBuilding) .buildingStruct span,
+.centerLoading:not(.isBuilding) .buildingStruct span::before {
+  animation: none;
+}
+
+.buildingStruct span:nth-child(1),
+.buildingStruct span:nth-child(1)::before {
+  animation-delay: 0.15s;
+}
+
+.buildingStruct span:nth-child(2),
+.buildingStruct span:nth-child(2)::before {
+  animation-delay: 0.45s;
+}
+
+.buildingStruct span:nth-child(3),
+.buildingStruct span:nth-child(3)::before {
+  animation-delay: 0.75s;
+}
+
+.buildingStruct span:nth-child(4),
+.buildingStruct span:nth-child(4)::before {
+  animation-delay: 1.05s;
+}
+
+.buildingStruct span:nth-child(5),
+.buildingStruct span:nth-child(5)::before {
+  animation-delay: 1.35s;
+}
+
+.buildingStruct span:nth-child(6),
+.buildingStruct span:nth-child(6)::before {
+  animation-delay: 1.65s;
+}
+
+.buildingStruct span:nth-child(7),
+.buildingStruct span:nth-child(7)::before {
+  animation-delay: 1.95s;
+}
+
+.buildingStruct span:nth-child(8),
+.buildingStruct span:nth-child(8)::before {
+  animation-delay: 2.25s;
+}
+
+.buildingStruct span:nth-child(9),
+.buildingStruct span:nth-child(9)::before {
+  animation-delay: 2.55s;
 }
 
 .reviewIntro {
@@ -807,6 +873,34 @@ button.loading {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes buildDot {
+  0% {
+    background: transparent;
+    border-color: var(--line);
+    box-shadow: none;
+    transform: scale(0.72);
+  }
+  65% {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 0 6px rgba(67, 170, 115, 0.14);
+    transform: scale(1.08);
+  }
+  100% {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: none;
+    transform: scale(1);
+  }
+}
+
+@keyframes buildText {
+  to {
+    color: var(--blue);
+    opacity: 1;
   }
 }
 
