@@ -743,6 +743,44 @@ body.reviewOpen .workspaceHeader {
   font-size: 13px;
 }
 
+.reviewIntro {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  min-height: calc(100vh - 77px);
+  color: var(--blue);
+  text-align: center;
+  animation: reviewIntroIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.reviewIntro span {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  color: #ffffff;
+  background: var(--blue);
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.reviewIntro strong {
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.reviewIntro.isLeaving {
+  animation: reviewIntroOut 0.35s ease both;
+}
+
+.reviewLayout.enteringReview,
+.workspaceHeader.enteringReview {
+  animation: reviewContentIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .spinner {
   width: 17px;
   height: 17px;
@@ -769,6 +807,35 @@ button.loading {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes reviewIntroIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reviewIntroOut {
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.99);
+  }
+}
+
+@keyframes reviewContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

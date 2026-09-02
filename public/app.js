@@ -244,6 +244,37 @@ function setView(view) {
   }
 }
 
+function wait(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+async function playReviewIntro() {
+  const loadingState = $("loadingState");
+  const reviewIntro = $("reviewIntro");
+  const workspaceHeader = document.querySelector(".workspaceHeader");
+  const reviewLayout = $("reviewLayout");
+  if (!reviewIntro) {
+    return;
+  }
+
+  loadingState.classList.add("hidden");
+  $("uploadForm").classList.add("hidden");
+  reviewIntro.classList.remove("hidden", "isLeaving");
+  await wait(950);
+  reviewIntro.classList.add("isLeaving");
+  await wait(320);
+  reviewIntro.classList.add("hidden");
+  reviewIntro.classList.remove("isLeaving");
+  showReview();
+  workspaceHeader.classList.add("enteringReview");
+  reviewLayout.classList.add("enteringReview");
+  await wait(560);
+  workspaceHeader.classList.remove("enteringReview");
+  reviewLayout.classList.remove("enteringReview");
+}
+
 function showReview() {
   $("uploadForm").classList.add("hidden");
   $("reviewLayout").classList.remove("hidden");
@@ -504,7 +535,7 @@ $("uploadForm").addEventListener("submit", async (event) => {
       throw new Error(data.erro || "Não foi possível extrair o arquivo.");
     }
     fillForm(data);
-    showReview();
+    await playReviewIntro();
     setView("preview");
     setStatus("Conteúdo extraído. Revise e ajuste o que precisar antes de baixar.", "ok");
   } catch (error) {

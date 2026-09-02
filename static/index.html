@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Folha de Estudo</title>
     <meta name="description" content="Crie, revise e exporte suas folhas de estudo." />
-    <link rel="stylesheet" href="/styles.css?v=50" />
+    <link rel="stylesheet" href="/styles.css?v=51" />
   </head>
   <body>
     <main class="appFrame">
@@ -74,6 +74,11 @@
           <span class="spinner darkSpinner" aria-hidden="true"></span>
           <strong>Montando estrutura...</strong>
           <small>Estamos lendo o documento e preparando a folha.</small>
+        </div>
+
+        <div id="reviewIntro" class="reviewIntro hidden" role="status" aria-live="polite">
+          <span>04</span>
+          <strong>Revisão de Conteúdo</strong>
         </div>
 
         <header class="workspaceHeader">
@@ -161,6 +166,6 @@
       </section>
     </main>
 
-    <script src="/app.js?v=50"></script>
+    <script src="/app.js?v=51"></script>
   </body>
 </html>
