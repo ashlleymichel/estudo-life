@@ -519,6 +519,33 @@ body.reviewOpen .workspaceHeader {
   padding-top: 20px;
 }
 
+body.reviewBuilding .workspaceHeader {
+  justify-content: center;
+  width: 100%;
+}
+
+body.reviewBuilding .workspaceHeader .viewSwitch,
+body.reviewBuilding .workspaceHeader .secondaryAction,
+body.reviewBuilding .workspaceHeader .downloadMenu {
+  display: none;
+}
+
+body.reviewBuilding .reviewLayout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 190px);
+  padding-top: 0;
+}
+
+body.reviewBuilding .reviewMain {
+  width: min(100%, 848px);
+}
+
+body.reviewBuilding .reviewSideCol {
+  display: none;
+}
+
 .reviewMain {
   width: 848px;
   min-height: 480px;

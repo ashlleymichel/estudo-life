@@ -249,6 +249,7 @@ function showReviewLoading() {
   $("uploadForm").classList.add("hidden");
   reviewLayout.classList.remove("hidden", "isBuilding");
   document.body.classList.add("reviewOpen");
+  document.body.classList.add("reviewBuilding");
   $("stepLabel").textContent = "04 — Revisão de Conteúdo";
   setView("preview");
   void reviewLayout.offsetWidth;
@@ -285,6 +286,7 @@ function showReviewLoading() {
 }
 
 function markReviewReady() {
+  document.body.classList.remove("reviewBuilding");
   $("reviewLayout").classList.remove("isBuilding");
   document.querySelectorAll(".reviewSideCol .structCard span").forEach((item) => {
     item.classList.add("done");
@@ -560,6 +562,7 @@ $("uploadForm").addEventListener("submit", async (event) => {
   } catch (error) {
     $("reviewLayout").classList.add("hidden");
     document.body.classList.remove("reviewOpen");
+    document.body.classList.remove("reviewBuilding");
     $("uploadForm").classList.remove("hidden");
     setStatus(error.message, "error");
   } finally {
