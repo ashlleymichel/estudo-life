@@ -1,5 +1,4 @@
 const recent = document.getElementById("dashboardRecent");
-const totalFiles = document.getElementById("totalFiles");
 const greeting = document.getElementById("greeting");
 const todayLabel = document.getElementById("todayLabel");
 
@@ -17,6 +16,30 @@ function greetingText(hour) {
   return "Boa noite!";
 }
 
+function formatTableDate(value) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  })
+    .format(new Date(value))
+    .replace(".", "");
+}
+
+function authorName(file) {
+  return file.author || file.createdBy || file.owner || "PAZ Church";
+}
+
+function authorInitials(name) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
 async function loadFiles() {
   if (window.folhaSupabase?.isReady()) {
     const files = await window.folhaSupabase.listStudyFiles().catch(() => null);
@@ -31,25 +54,50 @@ async function loadFiles() {
 }
 
 function renderFiles(files) {
-  totalFiles.textContent = files.length;
   const items = files.slice(0, 5);
   if (!items.length) {
     recent.innerHTML = '<p class="emptyState compactEmpty">Nenhum PDF salvo ainda.</p>';
     return;
   }
-  recent.innerHTML = "";
+  recent.innerHTML = '<div class="dashboardTableHeader"><span>Documento</span><span>Criado por</span><span>Data</span><span>Status</span></div>';
   items.forEach((file) => {
     const row = document.createElement("a");
     row.className = "dashboardRow";
     row.href = `/salvos.html?arquivo=${encodeURIComponent(file.id)}`;
-    row.innerHTML = `<strong>${file.title || "Arquivo salvo"}</strong><span>Concluído</span>`;
+
+    const title = document.createElement("strong");
+    title.textContent = file.title || "Arquivo salvo";
+
+    const author = document.createElement("span");
+    author.className = "dashboardAuthor";
+    const avatar = document.createElement("span");
+    avatar.className = "savedAuthorAvatar";
+    if (file.avatarUrl) {
+      avatar.classList.add("hasPhoto");
+      avatar.style.backgroundImage = `url("${file.avatarUrl}")`;
+    } else {
+      avatar.textContent = authorInitials(authorName(file)) || "PC";
+    }
+    const authorLabel = document.createElement("span");
+    authorLabel.textContent = authorName(file);
+    author.append(avatar, authorLabel);
+
+    const date = document.createElement("span");
+    date.className = "dashboardDateCell";
+    date.textContent = formatTableDate(file.createdAt);
+
+    const status = document.createElement("span");
+    status.className = "savedStatusPill";
+    status.textContent = file.status || "Concluído";
+
+    row.append(title, author, date, status);
     recent.append(row);
   });
 }
 
 const now = new Date();
 todayLabel.textContent = formatDate(now);
-greeting.textContent = greetingText(now.getHours());
+greeting.textContent = `${greetingText(now.getHours())}, PAZ Church!`;
 
 loadFiles().then(renderFiles).catch(() => {
   recent.innerHTML = '<p class="emptyState compactEmpty">Não foi possível carregar os PDFs recentes.</p>';

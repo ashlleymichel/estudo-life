@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard | Folha de Estudo</title>
     <meta name="description" content="Painel inicial da Folha de Estudo." />
-    <link rel="stylesheet" href="/styles.css?v=66" />
+    <link rel="stylesheet" href="/styles.css?v=70" />
   </head>
   <body>
     <main class="appFrame dashboardPage">
       <header class="appHeader">
         <a class="logoText" href="/dashboard.html">Folha de Estudo</a>
         <div class="headerSpacer"></div>
-        <a class="savedHeaderLink" href="/salvos.html">Arquivos salvos</a>
         <a class="avatarLink" href="/perfil.html" aria-label="Perfil">PC</a>
       </header>
 
@@ -24,13 +23,8 @@
         <a class="createButton dashboardCta" href="/">+ Criar PDF</a>
       </section>
 
-      <section class="statsPill" aria-label="Resumo">
-        <span><strong id="totalFiles">0</strong> PDFs salvos</span>
-        <span><strong>100%</strong> concluídos</span>
-      </section>
-
       <section class="dashboardGrid">
-        <article class="dashboardCard">
+        <article class="dashboardCard dashboardTableCard">
           <header>
             <h2>PDFs recentes</h2>
             <a href="/salvos.html">Ver todos</a>
@@ -39,18 +33,11 @@
             <div class="savedSkeleton" aria-hidden="true"><span></span><span></span><span></span></div>
           </div>
         </article>
-
-        <article class="dashboardCard notesCard">
-          <header>
-            <h2>Notas</h2>
-          </header>
-          <p>Gere a folha a partir do esboço, revise a prévia e salve online para a equipe acessar.</p>
-        </article>
       </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="/supabase-client.js?v=1"></script>
-    <script src="/dashboard.js?v=2"></script>
+    <script src="/dashboard.js?v=3"></script>
   </body>
 </html>
