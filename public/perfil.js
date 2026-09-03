@@ -11,6 +11,10 @@ const cropImage = document.getElementById("cropImage");
 const cropZoom = document.getElementById("cropZoom");
 const cancelCrop = document.getElementById("cancelCrop");
 const applyCrop = document.getElementById("applyCrop");
+const profileToast = document.getElementById("profileToast");
+const profileToastTitle = document.getElementById("profileToastTitle");
+const profileToastMessage = document.getElementById("profileToastMessage");
+const closeProfileToast = document.getElementById("closeProfileToast");
 
 let selectedAvatarFile = null;
 let cropSourceUrl = "";
@@ -28,7 +32,18 @@ let cropState = {
 
 function setProfileStatus(message, type = "") {
   profileStatus.textContent = message;
-  profileStatus.className = `authStatus ${type}`.trim();
+  profileStatus.className = `authStatus srOnly ${type}`.trim();
+}
+
+function showProfileToast(title, message, type = "ok") {
+  profileToastTitle.textContent = title;
+  profileToastMessage.textContent = message;
+  profileToast.classList.toggle("error", type === "error");
+  profileToast.classList.remove("hidden");
+  window.clearTimeout(showProfileToast.timer);
+  showProfileToast.timer = window.setTimeout(() => {
+    profileToast.classList.add("hidden");
+  }, 4200);
 }
 
 function initials(value) {
@@ -203,8 +218,10 @@ applyCrop.addEventListener("click", async () => {
     setAvatar({ avatarUrl: URL.createObjectURL(selectedAvatarFile) });
     closeCropModal();
     setProfileStatus("Foto ajustada. Clique em salvar alterações.", "ok");
+    showProfileToast("Foto ajustada", "Clique em salvar alterações para concluir.");
   } catch (error) {
     setProfileStatus(error.message || "Não foi possível ajustar a foto.", "error");
+    showProfileToast("Não foi possível ajustar", error.message || "Tente escolher outra imagem.", "error");
   } finally {
     applyCrop.disabled = false;
     applyCrop.textContent = "Usar foto";
@@ -228,16 +245,22 @@ saveProfile.addEventListener("click", async () => {
     setAvatar({ name: profile.name, avatarUrl: profile.avatar_url || "" });
     await window.folhaSupabase.hydrateHeaderProfile();
     setProfileStatus("Perfil salvo com sucesso.", "ok");
+    showProfileToast("Alteração salva com sucesso!", "Seu perfil foi atualizado.");
     saveProfile.textContent = "Salvo ✓";
     window.setTimeout(() => {
       saveProfile.textContent = "Salvar alterações";
     }, 1500);
   } catch (error) {
     setProfileStatus(error.message || "Não foi possível salvar o perfil.", "error");
+    showProfileToast("Não foi possível salvar", error.message || "Tente novamente em instantes.", "error");
     saveProfile.textContent = "Salvar alterações";
   } finally {
     saveProfile.disabled = false;
   }
+});
+
+closeProfileToast.addEventListener("click", () => {
+  profileToast.classList.add("hidden");
 });
 
 logoutProfile.addEventListener("click", async () => {

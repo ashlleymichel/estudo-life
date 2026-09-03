@@ -2127,10 +2127,49 @@ button.loading {
 }
 
 .toast strong,
+.toast small,
 .toast a,
 .toast button {
   color: inherit;
   font-size: 13px;
+}
+
+.toastIcon {
+  display: grid;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: #22a765;
+  background: rgba(34, 167, 101, 0.14);
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.toastText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.toastText strong {
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.toastText small {
+  max-width: 260px;
+  overflow: hidden;
+  color: var(--gray);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profileToast.error .toastIcon {
+  color: var(--danger);
+  background: #fff3f2;
 }
 
 .toast a {

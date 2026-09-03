@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Perfil | Folha de Estudo</title>
     <meta name="description" content="Perfil da plataforma Folha de Estudo." />
-    <link rel="stylesheet" href="/styles.css?v=67" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
   </head>
   <body>
     <main class="appFrame profilePage">
@@ -36,7 +36,7 @@
           <span>E-mail</span>
           <input id="profileEmail" type="email" value="equipe@pazchurch.com" />
         </label>
-        <p id="profileStatus" class="authStatus" aria-live="polite"></p>
+        <p id="profileStatus" class="authStatus srOnly" aria-live="polite"></p>
         <div class="profileActions">
           <button id="saveProfile" class="download" type="button">Salvar alterações</button>
           <button id="logoutProfile" class="secondaryAction" type="button">Sair da conta</button>
@@ -62,10 +62,19 @@
           </div>
         </section>
       </div>
+
+      <div id="profileToast" class="toast profileToast hidden" role="status" aria-live="polite">
+        <span class="toastIcon" aria-hidden="true">✓</span>
+        <span class="toastText">
+          <strong id="profileToastTitle">Alteração salva</strong>
+          <small id="profileToastMessage">Seu perfil foi atualizado com sucesso.</small>
+        </span>
+        <button id="closeProfileToast" type="button" aria-label="Fechar">×</button>
+      </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="/supabase-client.js?v=1"></script>
-    <script src="/perfil.js?v=3"></script>
+    <script src="/perfil.js?v=4"></script>
   </body>
 </html>
