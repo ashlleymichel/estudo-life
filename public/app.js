@@ -252,6 +252,7 @@ function setView(view) {
   $("previewViewBtn").classList.toggle("active", view === "preview");
   $("editViewBtn").classList.toggle("active", view === "edit");
   document.body.classList.toggle("editingReview", view === "edit");
+  document.body.classList.toggle("previewingReview", view === "preview" && document.body.classList.contains("reviewOpen"));
 }
 
 function showReviewLoading() {
@@ -260,6 +261,7 @@ function showReviewLoading() {
   reviewLayout.classList.remove("hidden", "isBuilding");
   document.body.classList.add("reviewOpen");
   document.body.classList.add("reviewBuilding");
+  document.body.classList.add("previewingReview");
   setView("preview");
   void reviewLayout.offsetWidth;
   reviewLayout.classList.add("isBuilding");
@@ -298,6 +300,7 @@ function showReviewLoading() {
 
 function markReviewReady() {
   document.body.classList.remove("reviewBuilding");
+  document.body.classList.add("reviewOpen", "previewingReview");
   $("reviewLayout").classList.remove("isBuilding");
   document.querySelectorAll(".reviewSideCol .structCard span").forEach((item) => {
     item.classList.add("done");
@@ -309,6 +312,7 @@ function showReview() {
   $("uploadForm").classList.add("hidden");
   $("reviewLayout").classList.remove("hidden");
   document.body.classList.add("reviewOpen");
+  document.body.classList.add("previewingReview");
 }
 
 function collectData() {

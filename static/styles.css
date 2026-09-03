@@ -592,7 +592,8 @@ body.reviewBuilding .reviewLayout {
   padding-top: 20px;
 }
 
-body.reviewBuilding .reviewMain {
+body.reviewBuilding .reviewMain,
+body.previewingReview .reviewMain {
   width: 848px;
   min-height: 480px;
   padding: 36px 40px;
@@ -605,13 +606,32 @@ body.reviewBuilding .reviewMain {
   display: none;
 }
 
-body.reviewBuilding .reviewSideCol {
+body.reviewBuilding .reviewSideCol,
+body.previewingReview .reviewSideCol {
   display: flex;
 }
 
 body.reviewBuilding .loadingSteps,
-body.reviewBuilding .formatGroup {
+body.reviewBuilding .formatGroup,
+body.previewingReview .loadingSteps,
+body.previewingReview .formatGroup {
   display: inline-flex;
+}
+
+body.previewingReview .reviewLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 848px) 280px;
+  gap: 32px;
+  align-items: start;
+  padding-top: 20px;
+}
+
+body.previewingReview .workspaceHeader {
+  width: 848px;
+}
+
+body.previewingReview.editingReview .reviewMain {
+  padding: 28px 32px;
 }
 
 body.editingReview .reviewLayout {
@@ -665,6 +685,8 @@ body.editingReview .reviewMain {
 
 .previewPane {
   min-height: 408px;
+  overflow: auto;
+  border-radius: 12px;
 }
 
 .previewPane.previewUpdated {
@@ -683,16 +705,17 @@ body.editingReview .reviewMain {
 }
 
 .previewSheet {
-  width: 100%;
-  max-width: none;
+  width: 720px;
+  max-width: 100%;
   margin: 0 auto;
   padding-bottom: 60px;
   color: #111111;
   background: #ffffff;
-  border: 0;
-  border-radius: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
   font-size: 13px;
   overflow: hidden;
+  box-shadow: 0 6px 18px rgba(39, 76, 119, 0.12);
 }
 
 .previewHeader {
