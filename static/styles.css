@@ -1733,48 +1733,60 @@ button.loading {
   margin-bottom: 32px;
 }
 
-.savedHero {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20px;
-  max-width: 1040px;
-  padding: 42px 0 22px;
+.savedIntro {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  padding: 30px 0 16px;
 }
 
-.savedHero h1 {
-  margin: 12px 0 8px;
-  color: var(--blue);
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.savedHero p {
-  margin: 0;
+.savedBackLink {
+  width: fit-content;
   color: var(--gray);
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.savedBackLink:hover {
+  color: var(--blue);
+}
+
+.savedIntro h1 {
+  margin: 0;
+  color: var(--blue);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.12;
 }
 
 .savedFilters {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) 180px 150px;
+  grid-template-columns: minmax(260px, 1fr) 130px 121px;
   gap: 10px;
-  max-width: 1040px;
-  margin-bottom: 18px;
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 .searchBox input,
 .savedFilters select {
   width: 100%;
-  height: 42px;
+  height: 35px;
   padding: 0 14px;
   color: var(--blue);
-  background: var(--line);
   border: 1px solid var(--line);
   border-radius: 10px;
   outline: 0;
   font-size: 13px;
+}
+
+.searchBox input {
+  background: var(--line);
+}
+
+.savedFilters select {
+  background: #ffffff;
 }
 
 .searchBox input:focus,
@@ -1790,12 +1802,11 @@ button.loading {
 
 .savedList {
   display: grid;
+  width: 100%;
   gap: 12px;
-  max-width: 1040px;
 }
 
-.savedItem,
-.emptyState,
+.savedTableCard,
 .editEditor {
   padding: 24px;
   background: #ffffff;
@@ -1803,15 +1814,39 @@ button.loading {
   border-radius: 16px;
 }
 
-.savedItem {
-  display: flex;
+.savedTableCard {
+  width: 100%;
+  padding: 8px 24px;
+  overflow-x: auto;
+}
+
+.savedTableHeader,
+.savedTableRow {
+  display: grid;
+  grid-template-columns: minmax(320px, 2fr) minmax(160px, 0.9fr) minmax(120px, 0.6fr) minmax(210px, 1fr) 88px;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  column-gap: 16px;
+  min-width: 960px;
+}
+
+.savedTableHeader {
+  min-height: 43px;
+  color: var(--gray);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.savedTableHeader span:last-child {
+  text-align: right;
+}
+
+.savedTableRow {
+  min-height: 56px;
+  border-top: 1px solid var(--line);
   transition: background-color 100ms ease-out;
 }
 
-.savedItem:hover {
+.savedTableRow:hover {
   background: #fafbfc;
 }
 
@@ -1824,23 +1859,97 @@ button.loading {
   cursor: pointer;
 }
 
-.savedInfo h2 {
-  margin: 0 0 6px;
+.savedDocCell span {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
   color: var(--blue);
-  font-size: 18px;
+  font-size: 13px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.savedInfo p,
+.savedAuthorCell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.savedAuthorCell > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.savedAuthorAvatar {
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: #ffffff;
+  background: var(--blue);
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.savedDateCell {
+  color: var(--gray);
+  font-size: 13px;
+}
+
+.savedStatusPill {
+  justify-self: end;
+  display: inline-flex;
+  min-height: 27px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  color: #22a765;
+  background: rgba(34, 167, 101, 0.13);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .emptyState {
   margin: 0;
+  padding: 28px 6px;
   color: var(--gray);
+  font-size: 16px;
+  font-weight: 700;
 }
 
-.savedActions {
+.savedInlineActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 100ms ease-out;
+}
+
+.savedTableRow:hover .savedInlineActions,
+.savedTableRow:focus-within .savedInlineActions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.savedInlineActions .secondaryAction,
+.savedInlineActions .download,
+.savedInlineActions .deleteSaved {
+  min-height: 28px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 11px;
 }
 
 .deleteSaved {
@@ -2207,8 +2316,7 @@ body.dark .workspaceHeader,
 body.dark .dropzone,
 body.dark .savedPage,
 body.dark .editPage,
-body.dark .savedItem,
-body.dark .emptyState,
+body.dark .savedTableCard,
 body.dark .editEditor {
   background: var(--surface);
 }
@@ -2294,7 +2402,7 @@ body.dark .editEditor textarea {
     padding-top: 0;
   }
 
-  .savedHero,
+  .savedIntro,
   .dashboardHero {
     align-items: flex-start;
     flex-direction: column;
@@ -2304,13 +2412,13 @@ body.dark .editEditor textarea {
     grid-template-columns: 1fr;
   }
 
-  .savedItem {
-    align-items: flex-start;
-    flex-direction: column;
+  .savedTableCard {
+    padding: 8px 14px;
   }
 
-  .savedActions {
-    justify-content: flex-start;
+  .savedInlineActions {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .dashboardHero h1 {

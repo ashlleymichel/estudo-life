@@ -90,6 +90,16 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function formatTableDate(value) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  })
+    .format(new Date(value))
+    .replace(".", "");
+}
+
 function formatSize(bytes) {
   if (!bytes) {
     return "PDF";
@@ -238,43 +248,76 @@ function filteredFiles() {
 }
 
 function closeAllDownloadMenus(except = null) {
-  document.querySelectorAll(".savedActions .downloadOptions").forEach((menu) => {
+  document.querySelectorAll(".downloadOptions").forEach((menu) => {
     if (menu !== except) {
       menu.classList.add("hidden");
     }
   });
-  document.querySelectorAll(".savedActions .download").forEach((button) => {
+  document.querySelectorAll(".download").forEach((button) => {
     if (!except || !button.parentElement.contains(except)) {
       button.setAttribute("aria-expanded", "false");
     }
   });
 }
 
+function authorName(file) {
+  return file.author || file.createdBy || file.owner || "PAZ Church";
+}
+
+function authorInitials(name) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
 function renderFiles() {
   const files = filteredFiles();
   list.innerHTML = "";
   if (!files.length) {
-    list.innerHTML = '<p class="emptyState">Nenhum arquivo encontrado.</p>';
+    list.innerHTML = '<section class="savedTableCard emptySavedTable"><p class="emptyState">Nenhum arquivo encontrado.</p></section>';
     return;
   }
 
+  const table = document.createElement("section");
+  table.className = "savedTableCard";
+
+  const header = document.createElement("div");
+  header.className = "savedTableHeader";
+  header.innerHTML = "<span>Documento</span><span>Criado por</span><span>Data</span><span></span><span>Status</span>";
+  table.append(header);
+
   files.forEach((file) => {
     const item = document.createElement("article");
-    item.className = "savedItem";
+    item.className = "savedTableRow";
 
     const info = document.createElement("button");
-    info.className = "savedInfo savedRowButton";
+    info.className = "savedDocCell savedRowButton";
     info.type = "button";
     info.addEventListener("click", () => editFile(file));
 
-    const title = document.createElement("h2");
+    const title = document.createElement("span");
     title.textContent = file.title || "Arquivo salvo";
 
-    const meta = document.createElement("p");
-    meta.textContent = `${formatDate(file.createdAt)} · ${formatSize(file.size)} · Concluído`;
+    const creator = document.createElement("div");
+    creator.className = "savedAuthorCell";
+    const creatorName = authorName(file);
+    const avatar = document.createElement("span");
+    avatar.className = "savedAuthorAvatar";
+    avatar.textContent = authorInitials(creatorName) || "PC";
+    const name = document.createElement("span");
+    name.textContent = creatorName;
+    creator.append(avatar, name);
+
+    const date = document.createElement("span");
+    date.className = "savedDateCell";
+    date.textContent = formatTableDate(file.createdAt);
 
     const actions = document.createElement("div");
-    actions.className = "savedActions";
+    actions.className = "savedInlineActions";
 
     const edit = document.createElement("button");
     edit.className = "secondaryAction";
@@ -328,11 +371,17 @@ function renderFiles() {
     remove.textContent = "Excluir";
     remove.addEventListener("click", () => openDeleteModal(file));
 
-    info.append(title, meta);
+    const status = document.createElement("span");
+    status.className = "savedStatusPill";
+    status.textContent = "Concluído";
+
+    info.append(title);
     actions.append(edit, downloadMenu, share, remove);
-    item.append(info, actions);
-    list.append(item);
+    item.append(info, creator, date, actions, status);
+    table.append(item);
   });
+
+  list.append(table);
 }
 
 async function refreshFiles() {
