@@ -331,7 +331,12 @@ function renderFiles() {
     const creatorName = authorName(file);
     const avatar = document.createElement("span");
     avatar.className = "savedAuthorAvatar";
-    avatar.textContent = authorInitials(creatorName) || "PC";
+    if (file.avatarUrl) {
+      avatar.classList.add("hasPhoto");
+      avatar.style.backgroundImage = `url("${file.avatarUrl}")`;
+    } else {
+      avatar.textContent = authorInitials(creatorName) || "PC";
+    }
     const name = document.createElement("span");
     name.textContent = creatorName;
     creator.append(avatar, name);
