@@ -48,6 +48,15 @@ function getFileName() {
   return "folha-de-estudo-life-group.pdf";
 }
 
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, options);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.erro || "Não foi possível concluir a ação.");
+  }
+  return payload;
+}
+
 function setBusy(isBusy, action = "") {
   state.busy = isBusy;
   const extractBtn = $("extractBtn");
@@ -58,6 +67,7 @@ function setBusy(isBusy, action = "") {
   const addQuestion = $("addQuestion");
   const fileInput = $("pdfFile");
   const loadingState = $("loadingState");
+  const processingBadge = $("processingBadge");
   const fieldsToToggle = [
     ...fields.map((field) => $(field)),
     ...document.querySelectorAll("#questions textarea, .questionRow button"),
@@ -80,9 +90,12 @@ function setBusy(isBusy, action = "") {
   loadingState.classList.add("hidden");
   extractBtn.innerHTML = getExtractLabel();
   downloadMenuBtn.innerHTML = buttonContent(action === "pdf" ? "Gerando PDF..." : action === "word" ? "Gerando DOCX..." : "Baixar", isBusy && (action === "pdf" || action === "word"));
-  saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar Arquivo Online", isBusy && action === "save");
+  saveOnlineBtn.innerHTML = buttonContent(action === "save" ? "Salvando..." : "Salvar", isBusy && action === "save");
   document.body.classList.toggle("isBusy", isBusy);
   document.body.classList.toggle("isExtracting", isBusy && action === "extract");
+  if (processingBadge) {
+    processingBadge.classList.toggle("hidden", !(isBusy && action === "extract"));
+  }
 }
 
 function fillForm(data) {
@@ -238,6 +251,7 @@ function setView(view) {
   $("formEditor").classList.toggle("hidden", view !== "edit");
   $("previewViewBtn").classList.toggle("active", view === "preview");
   $("editViewBtn").classList.toggle("active", view === "edit");
+  document.body.classList.toggle("editingReview", view === "edit");
 }
 
 function showReviewLoading() {
@@ -372,6 +386,25 @@ function openSavedDb() {
 }
 
 async function savePdfOnline(blob, data) {
+  const payload = {
+    id: state.editingSavedId || "",
+    name: getFileName(),
+    title: data.titulo || "Arquivo sem título",
+    size: blob.size,
+    data,
+  };
+  try {
+    const record = await fetchJson("/api/saved", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    state.editingSavedId = record.id || state.editingSavedId;
+    return record;
+  } catch (error) {
+    console.warn("Salvamento online indisponível, usando navegador.", error);
+  }
+
   const db = await openSavedDb();
   const id = state.editingSavedId || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const file = {
@@ -392,6 +425,7 @@ async function savePdfOnline(blob, data) {
     tx.onerror = () => reject(tx.error);
   });
   db.close();
+  state.editingSavedId = id;
   return file;
 }
 
@@ -408,6 +442,15 @@ function formatRecentDate(value) {
 }
 
 async function getRecentSavedFiles() {
+  try {
+    const payload = await fetchJson("/api/saved");
+    return (payload.files || [])
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+  } catch (error) {
+    console.warn("Lista online indisponível, usando navegador.", error);
+  }
+
   const db = await openSavedDb();
   const files = await new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readonly");
@@ -656,7 +699,13 @@ $("saveOnlineBtn").addEventListener("click", async () => {
     const blob = await generatePdfBlob(data);
     await savePdfOnline(blob, data);
     await renderRecentFiles();
+    $("saveOnlineBtn").textContent = "Salvo ✓";
     setStatus("Arquivo salvo. Abra a página Arquivos salvos para ver seus PDFs.", "ok");
+    window.setTimeout(() => {
+      if (!state.busy) {
+        $("saveOnlineBtn").textContent = "Salvar";
+      }
+    }, 1500);
   } catch (error) {
     setStatus(error.message, "error");
   } finally {

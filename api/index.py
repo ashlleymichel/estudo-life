@@ -4,6 +4,7 @@ import tempfile
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -12,9 +13,13 @@ if str(ROOT) not in sys.path:
 from server import (  # noqa: E402
     build_pdf,
     build_word,
+    delete_saved_record,
     extract_text_from_document,
     parse_multipart_file,
     parse_pdf_text,
+    public_saved_record,
+    read_saved_records,
+    upsert_saved_record,
 )
 
 
@@ -26,6 +31,25 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def do_GET(self):
+        try:
+            parsed = urlparse(self.path)
+            if parsed.path.startswith("/api/saved"):
+                records = [public_saved_record(record) for record in read_saved_records()]
+                record_id = (parse_qs(parsed.query).get("id") or [""])[0]
+                if record_id:
+                    record = next((item for item in records if str(item.get("id")) == str(record_id)), None)
+                    if not record:
+                        self.send_json({"erro": "Arquivo salvo não encontrado."}, HTTPStatus.NOT_FOUND)
+                        return
+                    self.send_json(record)
+                    return
+                self.send_json({"files": records})
+                return
+            self.send_error(HTTPStatus.NOT_FOUND)
+        except Exception as exc:
+            self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
 
     def do_POST(self):
         try:
@@ -88,6 +112,29 @@ class handler(BaseHTTPRequestHandler):
                     output_path.unlink(missing_ok=True)
                 return
 
+            if self.path.startswith("/api/saved"):
+                length = int(self.headers.get("Content-Length", "0"))
+                payload = json.loads(self.rfile.read(length).decode("utf-8"))
+                self.send_json(upsert_saved_record(payload))
+                return
+
             self.send_error(HTTPStatus.NOT_FOUND)
+        except Exception as exc:
+            self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
+
+    def do_DELETE(self):
+        try:
+            parsed = urlparse(self.path)
+            if not parsed.path.startswith("/api/saved"):
+                self.send_error(HTTPStatus.NOT_FOUND)
+                return
+            record_id = (parse_qs(parsed.query).get("id") or [""])[0]
+            if not record_id:
+                self.send_json({"erro": "Informe o arquivo que deseja excluir."}, HTTPStatus.BAD_REQUEST)
+                return
+            if not delete_saved_record(record_id):
+                self.send_json({"erro": "Arquivo salvo não encontrado."}, HTTPStatus.NOT_FOUND)
+                return
+            self.send_json({"ok": True})
         except Exception as exc:
             self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)

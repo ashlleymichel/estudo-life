@@ -37,6 +37,15 @@ function getFileName() {
   return "folha-de-estudo-life-group.pdf";
 }
 
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, options);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.erro || "Não foi possível concluir a ação.");
+  }
+  return payload;
+}
+
 function setBusy(isBusy, action = "") {
   state.busy = isBusy;
   const buttons = [$("saveOnlineBtn"), $("downloadMenuBtn"), $("downloadPdfBtn"), $("downloadDocxBtn"), $("addQuestion")];
@@ -200,6 +209,26 @@ function openSavedDb() {
 }
 
 async function savePdfOnline(blob, data) {
+  const payload = {
+    id: state.editingSavedId || "",
+    name: state.savedName || getFileName(),
+    title: data.titulo || "Arquivo sem título",
+    size: blob.size,
+    data,
+  };
+  try {
+    const record = await fetchJson("/api/saved", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    state.editingSavedId = record.id || state.editingSavedId;
+    state.savedName = record.name || state.savedName;
+    return record;
+  } catch (error) {
+    console.warn("Salvamento online indisponível, usando navegador.", error);
+  }
+
   const db = await openSavedDb();
   const file = {
     id: state.editingSavedId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -270,7 +299,13 @@ $("saveOnlineBtn").addEventListener("click", async () => {
   try {
     const blob = await generatePdfBlob(data);
     await savePdfOnline(blob, data);
+    $("saveOnlineBtn").textContent = "Salvo ✓";
     setStatus("Alterações salvas.", "ok");
+    window.setTimeout(() => {
+      if (!state.busy) {
+        $("saveOnlineBtn").textContent = "Salvar";
+      }
+    }, 1500);
   } catch (error) {
     setStatus(error.message, "error");
   } finally {

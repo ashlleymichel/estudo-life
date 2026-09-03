@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard | Folha de Estudo</title>
+    <meta name="description" content="Painel inicial da Folha de Estudo." />
+    <link rel="stylesheet" href="/styles.css?v=62" />
+  </head>
+  <body>
+    <main class="appFrame dashboardPage">
+      <header class="appHeader">
+        <a class="logoText" href="/dashboard.html">Folha de Estudo</a>
+        <div class="headerSpacer"></div>
+        <a class="savedHeaderLink" href="/salvos.html">Arquivos salvos</a>
+        <a class="avatarLink" href="/perfil.html" aria-label="Perfil">PB</a>
+      </header>
+
+      <section class="dashboardHero">
+        <div>
+          <p id="todayLabel" class="dashboardDate"></p>
+          <h1 id="greeting">Olá.</h1>
+        </div>
+        <a class="createButton dashboardCta" href="/">+ Criar PDF</a>
+      </section>
+
+      <section class="statsPill" aria-label="Resumo">
+        <span><strong id="totalFiles">0</strong> PDFs salvos</span>
+        <span><strong>100%</strong> concluídos</span>
+      </section>
+
+      <section class="dashboardGrid">
+        <article class="dashboardCard">
+          <header>
+            <h2>PDFs recentes</h2>
+            <a href="/salvos.html">Ver todos</a>
+          </header>
+          <div id="dashboardRecent" class="dashboardRecent">
+            <div class="savedSkeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+        </article>
+
+        <article class="dashboardCard notesCard">
+          <header>
+            <h2>Notas</h2>
+          </header>
+          <p>Gere a folha a partir do esboço, revise a prévia e salve online para a equipe acessar.</p>
+        </article>
+      </section>
+    </main>
+
+    <script src="/dashboard.js?v=1"></script>
+  </body>
+</html>

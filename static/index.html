@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Folha de Estudo</title>
     <meta name="description" content="Crie, revise e exporte suas folhas de estudo." />
-    <link rel="stylesheet" href="/styles.css?v=60" />
+    <link rel="stylesheet" href="/styles.css?v=62" />
   </head>
   <body>
     <main class="appFrame">
       <header class="appHeader">
         <a class="logoText" href="/">Folha de Estudo</a>
         <div class="headerSpacer"></div>
+        <span id="processingBadge" class="processingBadge hidden" aria-live="polite"><span></span>Gerando folha...</span>
         <a class="savedHeaderLink" href="/salvos.html">Arquivos salvos</a>
         <button id="extractBtn" class="createButton" type="button">Criar PDF</button>
+        <a class="avatarLink" href="/perfil.html" aria-label="Perfil">PB</a>
       </header>
 
       <div class="headerRule"></div>
@@ -118,6 +120,7 @@
             </section>
 
             <div id="formEditor" class="formEditor hidden">
+              <p class="editorKicker">PAZ Church Barueri</p>
               <label>
                 <span id="tituloLabel">Título da série</span>
                 <input id="titulo" type="text" />
@@ -150,6 +153,10 @@
               <label>
                 <span>Conclusão</span>
                 <textarea id="conclusao" rows="5"></textarea>
+              </label>
+              <label class="lifeOnly">
+                <span>Life Group</span>
+                <textarea id="lifeGroupNotes" rows="2" placeholder="Orientações para o Life Group da semana..."></textarea>
               </label>
             </div>
           </div>
@@ -186,6 +193,6 @@
       </section>
     </main>
 
-    <script src="/app.js?v=60"></script>
+    <script src="/app.js?v=62"></script>
   </body>
 </html>

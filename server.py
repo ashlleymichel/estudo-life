@@ -6,12 +6,14 @@ import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
+import base64
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
@@ -32,6 +34,9 @@ ROOT = Path(__file__).resolve().parent
 STATIC_DIR = ROOT / "public"
 LOGO_PATH = ROOT / "LOGO" / "LOGO.svg"
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+SAVED_FILES_PATH = ROOT / "data" / "saved-files.json"
+GITHUB_API = "https://api.github.com"
+GITHUB_STORAGE_PATH = os.environ.get("GITHUB_STORAGE_PATH", "data/saved-files.json")
 
 DEFAULT_GENEROSIDADE = (
     'Todas as ofertas dos "Life Groups" são destinadas ao ministério Amor em Ação. '
@@ -459,6 +464,140 @@ def call_chatgpt_json(system_prompt, user_prompt, schema, timeout=45):
     if not output:
         raise RuntimeError("A OpenAI não retornou conteúdo para a folha.")
     return json.loads(output)
+
+
+def github_configured():
+    return bool(os.environ.get("GITHUB_TOKEN") and os.environ.get("GITHUB_REPO") and os.environ.get("GITHUB_BRANCH"))
+
+
+def github_request(path, method="GET", payload=None):
+    token = os.environ.get("GITHUB_TOKEN")
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    request = Request(
+        f"{GITHUB_API}{path}",
+        data=data,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        method=method,
+    )
+    with urlopen(request, timeout=30) as response:
+        return json.loads(response.read().decode("utf-8") or "{}")
+
+
+def read_saved_records():
+    if github_configured():
+        repo = os.environ["GITHUB_REPO"]
+        branch = os.environ["GITHUB_BRANCH"]
+        path = f"/repos/{repo}/contents/{GITHUB_STORAGE_PATH}?ref={branch}"
+        try:
+            payload = github_request(path)
+            content = base64.b64decode(payload.get("content", "")).decode("utf-8")
+            records = json.loads(content or "[]")
+            return records if isinstance(records, list) else []
+        except HTTPError as exc:
+            if exc.code == 404:
+                return []
+            raise
+
+    if not SAVED_FILES_PATH.exists():
+        return []
+    try:
+        records = json.loads(SAVED_FILES_PATH.read_text(encoding="utf-8"))
+        return records if isinstance(records, list) else []
+    except json.JSONDecodeError:
+        return []
+
+
+def write_saved_records(records):
+    records = sorted(records, key=lambda item: item.get("createdAt", ""), reverse=True)
+    content = json.dumps(records, ensure_ascii=False, indent=2)
+    if github_configured():
+        repo = os.environ["GITHUB_REPO"]
+        branch = os.environ["GITHUB_BRANCH"]
+        path = f"/repos/{repo}/contents/{GITHUB_STORAGE_PATH}"
+        sha = None
+        try:
+            current = github_request(f"{path}?ref={branch}")
+            sha = current.get("sha")
+        except HTTPError as exc:
+            if exc.code != 404:
+                raise
+        body = {
+            "message": "Atualizar arquivos salvos da Folha de Estudo",
+            "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+            "branch": branch,
+        }
+        if sha:
+            body["sha"] = sha
+        github_request(path, "PUT", body)
+        return
+
+    SAVED_FILES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    SAVED_FILES_PATH.write_text(content + "\n", encoding="utf-8")
+
+
+def sanitize_saved_record(data, existing=None):
+    meta = dict(data or {})
+    editable = normalize_editable_payload(meta.get("data") if isinstance(meta.get("data"), dict) else meta)
+    now = meta.get("updatedAt") or ""
+    record_id = str(meta.get("id") or (existing or {}).get("id") or "")
+    if not record_id:
+        record_id = f"{int(datetime.now(timezone.utc).timestamp() * 1000)}"
+    return {
+        "id": record_id,
+        "name": str(meta.get("name") or (existing or {}).get("name") or "folha-de-estudo-life-group.pdf"),
+        "title": str(editable.get("titulo") or meta.get("title") or (existing or {}).get("title") or "Folha de Estudo Life Group"),
+        "status": "Concluído",
+        "type": "life_group",
+        "size": int(meta.get("size") or (existing or {}).get("size") or 0),
+        "createdAt": str((existing or {}).get("createdAt") or meta.get("createdAt") or now),
+        "updatedAt": now,
+        "data": editable,
+    }
+
+
+def public_saved_record(record):
+    return {
+        "id": record.get("id"),
+        "name": record.get("name"),
+        "title": record.get("title"),
+        "status": "Concluído",
+        "type": record.get("type", "life_group"),
+        "size": record.get("size", 0),
+        "createdAt": record.get("createdAt"),
+        "updatedAt": record.get("updatedAt"),
+        "data": record.get("data") or {},
+    }
+
+
+def upsert_saved_record(payload):
+    records = read_saved_records()
+    record_id = str(payload.get("id") or "")
+    existing_index = next((index for index, item in enumerate(records) if str(item.get("id")) == record_id and record_id), -1)
+    existing = records[existing_index] if existing_index >= 0 else None
+    normalized = dict(payload)
+    normalized.setdefault("updatedAt", datetime.now(timezone.utc).isoformat())
+    normalized.setdefault("createdAt", normalized["updatedAt"])
+    record = sanitize_saved_record(normalized, existing)
+    if existing_index >= 0:
+        records[existing_index] = record
+    else:
+        records.append(record)
+    write_saved_records(records)
+    return public_saved_record(record)
+
+
+def delete_saved_record(record_id):
+    records = read_saved_records()
+    next_records = [item for item in records if str(item.get("id")) != str(record_id)]
+    if len(next_records) == len(records):
+        return False
+    write_saved_records(next_records)
+    return True
 
 
 def life_group_schema():
@@ -1699,6 +1838,23 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        if parsed.path == "/api/saved":
+            records = [public_saved_record(record) for record in read_saved_records()]
+            query = parse_qs(parsed.query)
+            record_id = (query.get("id") or [""])[0]
+            if record_id:
+                record = next((item for item in records if str(item.get("id")) == str(record_id)), None)
+                if not record:
+                    self.send_json({"erro": "Arquivo salvo não encontrado."}, HTTPStatus.NOT_FOUND)
+                    return
+                self.send_json(record)
+                return
+            self.send_json({"files": records})
+            return
+        return super().do_GET()
+
     def do_POST(self):
         try:
             if self.path == "/api/extract":
@@ -1759,9 +1915,31 @@ class Handler(SimpleHTTPRequestHandler):
                     output_path.unlink(missing_ok=True)
                 return
 
+            if self.path == "/api/saved":
+                length = int(self.headers.get("Content-Length", "0"))
+                payload = json.loads(self.rfile.read(length).decode("utf-8"))
+                record = upsert_saved_record(payload)
+                self.send_json(record)
+                return
+
             self.send_error(HTTPStatus.NOT_FOUND)
         except Exception as exc:
             self.send_json({"erro": str(exc)}, HTTPStatus.BAD_REQUEST)
+
+    def do_DELETE(self):
+        parsed = urlparse(self.path)
+        if parsed.path != "/api/saved":
+            self.send_error(HTTPStatus.NOT_FOUND)
+            return
+        record_id = (parse_qs(parsed.query).get("id") or [""])[0]
+        if not record_id:
+            self.send_json({"erro": "Informe o arquivo que deseja excluir."}, HTTPStatus.BAD_REQUEST)
+            return
+        removed = delete_saved_record(record_id)
+        if not removed:
+            self.send_json({"erro": "Arquivo salvo não encontrado."}, HTTPStatus.NOT_FOUND)
+            return
+        self.send_json({"ok": True})
 
 
 def main():

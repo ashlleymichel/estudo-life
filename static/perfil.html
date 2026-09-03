@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Perfil | Folha de Estudo</title>
+    <meta name="description" content="Perfil da plataforma Folha de Estudo." />
+    <link rel="stylesheet" href="/styles.css?v=62" />
+  </head>
+  <body>
+    <main class="appFrame profilePage">
+      <header class="appHeader">
+        <a class="logoText" href="/">Folha de Estudo</a>
+        <div class="headerSpacer"></div>
+        <a class="savedHeaderLink" href="/salvos.html">Arquivos salvos</a>
+        <a class="createButton" href="/">Criar PDF</a>
+        <a class="avatarLink" href="/perfil.html" aria-label="Perfil">PB</a>
+      </header>
+
+      <section class="profileCard">
+        <div class="profileAvatar">PB</div>
+        <div>
+          <p class="sectionTag">Perfil</p>
+          <h1>Meu Perfil</h1>
+          <p>Informações básicas da conta usada pela equipe.</p>
+        </div>
+        <label>
+          <span>Nome</span>
+          <input id="profileName" type="text" value="PAZ Church Barueri" />
+        </label>
+        <label>
+          <span>E-mail</span>
+          <input id="profileEmail" type="email" value="equipe@pazchurch.com" />
+        </label>
+        <div class="profileActions">
+          <button id="saveProfile" class="download" type="button">Salvar alterações</button>
+          <a class="secondaryAction" href="/">Sair da conta</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="/perfil.js?v=1"></script>
+  </body>
+</html>

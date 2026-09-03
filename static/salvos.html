@@ -5,16 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Arquivos Salvos | Folha de Estudo</title>
     <meta name="description" content="Arquivos salvos da plataforma Folha de Estudo." />
-    <link rel="stylesheet" href="/styles.css?v=60" />
+    <link rel="stylesheet" href="/styles.css?v=62" />
   </head>
   <body>
     <main class="savedPage">
-      <section class="savedToolbar">
+      <header class="appHeader savedAppHeader">
+        <a class="logoText" href="/">Folha de Estudo</a>
+        <div class="headerSpacer"></div>
+        <a class="savedHeaderLink" href="/salvos.html">Arquivos salvos</a>
+        <a class="createButton" href="/">Criar PDF</a>
+        <a class="avatarLink" href="/perfil.html" aria-label="Perfil">PB</a>
+      </header>
+
+      <section class="savedHero">
+        <div>
+          <p class="sectionTag">Biblioteca</p>
+          <h1>Arquivos salvos</h1>
+          <p>Busque, edite, compartilhe e baixe as folhas criadas pela equipe.</p>
+        </div>
         <a class="backButton" href="/">Voltar</a>
       </section>
 
+      <section class="savedFilters" aria-label="Filtros dos arquivos salvos">
+        <label class="searchBox">
+          <span class="srOnly">Buscar por nome ou série</span>
+          <input id="savedSearch" type="search" placeholder="Buscar por nome ou série" autocomplete="off" />
+        </label>
+        <select id="seriesFilter" aria-label="Filtrar por série">
+          <option value="">Todas as séries</option>
+        </select>
+        <select id="sortFilter" aria-label="Ordenar arquivos">
+          <option value="recent">Mais recentes</option>
+          <option value="oldest">Mais antigos</option>
+          <option value="title">Nome</option>
+        </select>
+      </section>
+
       <section class="savedList" id="savedList" aria-label="Arquivos salvos">
-        <p class="emptyState">Carregando arquivos...</p>
+        <div class="savedSkeleton" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
       </section>
 
       <div id="deleteModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
@@ -30,8 +60,31 @@
           </div>
         </section>
       </div>
+
+      <div id="shareModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+        <section class="confirmModal shareModal">
+          <div class="modalText">
+            <h2 id="shareModalTitle">Compartilhar arquivo</h2>
+            <p id="shareModalMessage">Escolha como deseja compartilhar esta folha.</p>
+          </div>
+          <div class="shareOptions">
+            <a id="shareWhatsapp" href="#" target="_blank" rel="noreferrer">WhatsApp <span>→</span></a>
+            <a id="shareEmail" href="#">E-mail <span>→</span></a>
+            <button id="copyShareLink" type="button">Copiar link <span>→</span></button>
+          </div>
+          <div class="modalActions singleAction">
+            <button id="closeShareBtn" class="modalCancel" type="button">Fechar</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="toast" class="toast hidden" role="status" aria-live="polite">
+        <strong>Folha gerada com sucesso!</strong>
+        <a href="/salvos.html">Ver</a>
+        <button id="closeToast" type="button" aria-label="Fechar">×</button>
+      </div>
     </main>
 
-    <script src="/salvos.js?v=5"></script>
+    <script src="/salvos.js?v=6"></script>
   </body>
 </html>
