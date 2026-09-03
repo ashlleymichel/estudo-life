@@ -23,6 +23,18 @@ const STORE_NAME = "arquivos";
 
 const $ = (id) => document.getElementById(id);
 
+async function redirectGuestToLogin() {
+  if (!window.folhaSupabase?.isReady()) {
+    return;
+  }
+  const user = await window.folhaSupabase.currentUser().catch(() => null);
+  if (!user) {
+    window.location.replace("/login.html");
+  }
+}
+
+redirectGuestToLogin();
+
 function setStatus(message, type = "") {
   const status = $("status");
   status.textContent = message;
