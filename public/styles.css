@@ -1142,8 +1142,9 @@ body.editingReview .reviewMain {
 
 .questionRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 30px;
-  gap: 8px;
+  grid-template-columns: 38px minmax(0, 1fr) 30px;
+  gap: 10px;
+  align-items: start;
 }
 
 body.editingReview .questionRow .number {
@@ -1154,9 +1155,12 @@ body.editingReview .questionRow .number {
   display: grid;
   place-items: center;
   height: 38px;
+  min-width: 38px;
   color: #ffffff;
   background: var(--blue);
   border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .remove {
