@@ -1790,7 +1790,7 @@ button.loading {
 
 .savedFilters {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) 130px 121px;
+  grid-template-columns: minmax(260px, 1fr) minmax(160px, max-content) minmax(150px, max-content);
   gap: 10px;
   width: 100%;
   margin-bottom: 16px;
@@ -1813,7 +1813,10 @@ button.loading {
 }
 
 .savedFilters select {
+  min-width: 0;
+  padding-right: 36px;
   background: #ffffff;
+  text-overflow: clip;
 }
 
 .searchBox input:focus,
