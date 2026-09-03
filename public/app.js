@@ -187,7 +187,7 @@ function renderPreviewAgenda(value) {
     return "";
   }
   const items = lines.map((line) => `<li>${escapeHtml(line.replace(/^-+\s*/, ""))}</li>`).join("");
-  return `<section class="previewSection previewAgenda"><h3>Agenda Paz Church</h3><ul>${items}</ul></section>`;
+  return `<section class="previewSection previewAgenda"><h3>Agenda: Paz Church</h3><ul>${items}</ul></section>`;
 }
 
 function renderPreview() {
@@ -219,9 +219,9 @@ function renderPreview() {
     <article class="previewSheet">
       <header class="previewHeader">
         <span>Estudo Life Group</span>
-        <h3>Estudo Life Group</h3>
+        <h3>Estudo de Life Group</h3>
       </header>
-      ${data.titulo ? `<p class="previewSeries"><strong>Tema:</strong> ${escapeHtml(data.titulo)}</p>` : ""}
+      ${data.titulo ? `<p class="previewSeries"><strong>Série:</strong> ${escapeHtml(data.titulo)}</p>` : ""}
       ${data.subtitulo ? `<p class="previewSubtitle">${escapeHtml(data.subtitulo)}</p>` : ""}
       ${renderPreviewSection("Momento Generosidade", data.momentoGenerosidade)}
       ${renderPreviewAgenda(data.avisos)}
@@ -229,6 +229,7 @@ function renderPreview() {
       ${renderPreviewSection("Introdução", data.resumo)}
       ${questions ? `<section class="previewSection"><h3>Perguntas</h3><div class="previewQuestions">${questions}</div></section>` : ""}
       ${renderPreviewSection("Conclusão", data.conclusao)}
+      <footer class="previewFooter">PAZ Church Barueri · Folha de Estudo</footer>
     </article>
   `;
 }

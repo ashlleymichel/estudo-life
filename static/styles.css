@@ -595,10 +595,10 @@ body.reviewBuilding .reviewLayout {
 body.reviewBuilding .reviewMain,
 body.previewingReview .reviewMain {
   width: 848px;
-  min-height: 480px;
-  padding: 36px 40px;
-  background: #ffffff;
-  border: 1px solid var(--line);
+  min-height: 1116px;
+  padding: 24px;
+  background: var(--line);
+  border: 1px solid #d9dbde;
   border-radius: 16px;
 }
 
@@ -609,6 +609,10 @@ body.previewingReview .reviewMain {
 body.reviewBuilding .reviewSideCol,
 body.previewingReview .reviewSideCol {
   display: flex;
+}
+
+body.previewingReview:not(.reviewBuilding) .reviewSideCol .structCard {
+  display: none;
 }
 
 body.reviewBuilding .loadingSteps,
@@ -632,6 +636,8 @@ body.previewingReview .workspaceHeader {
 
 body.previewingReview.editingReview .reviewMain {
   padding: 28px 32px;
+  background: #ffffff;
+  border-color: var(--line);
 }
 
 body.editingReview .reviewLayout {
@@ -684,9 +690,12 @@ body.editingReview .reviewMain {
 }
 
 .previewPane {
-  min-height: 408px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 1068px;
   overflow: auto;
-  border-radius: 12px;
+  border-radius: 0;
 }
 
 .previewPane.previewUpdated {
@@ -697,6 +706,7 @@ body.editingReview .reviewMain {
 .previewEmpty {
   display: grid;
   place-items: center;
+  width: 100%;
   min-height: 408px;
   margin: 0;
   color: var(--gray);
@@ -705,26 +715,30 @@ body.editingReview .reviewMain {
 }
 
 .previewSheet {
-  width: 720px;
-  max-width: 100%;
+  width: 800px;
+  max-width: 800px;
   margin: 0 auto;
-  padding-bottom: 60px;
-  color: #111111;
+  padding-bottom: 34px;
+  color: var(--blue);
   background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  font-size: 13px;
+  border: 0;
+  border-radius: 0;
+  font-size: 13.1px;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(39, 76, 119, 0.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .previewHeader {
-  padding: 50px 10px 54px;
-  margin-bottom: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88px;
+  padding: 30px 10px;
+  margin: 0 0 34px;
   color: #ffffff;
   background: var(--blue);
-  border-bottom-right-radius: 44px;
-  border-bottom-left-radius: 44px;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
   text-align: center;
 }
 
@@ -734,30 +748,31 @@ body.editingReview .reviewMain {
 
 .previewHeader h3 {
   margin: 0;
-  font-size: clamp(34px, 4vw, 52px);
+  font-size: 26.2px;
   font-weight: 800;
-  line-height: 1.08;
+  line-height: 28.3px;
 }
 
 .previewSeries,
 .previewSubtitle,
 .previewSection {
-  margin: 0 clamp(42px, 7vw, 116px);
+  margin-left: 60px;
+  margin-right: 34px;
 }
 
 .previewSeries {
-  color: #6096ba;
-  font-size: clamp(20px, 2.2vw, 30px);
-  font-weight: 800;
-  line-height: 1.18;
+  color: var(--mid-blue);
+  font-size: 15.1px;
+  font-weight: 600;
+  line-height: 17.8px;
   text-align: center;
 }
 
 .previewSubtitle {
-  margin-top: 48px;
+  margin-top: 10px;
   color: var(--gray);
-  font-size: clamp(17px, 1.8vw, 26px);
-  line-height: 1.22;
+  font-size: 12.1px;
+  line-height: 14.5px;
   text-align: center;
 }
 
@@ -765,9 +780,9 @@ body.editingReview .reviewMain {
   display: block;
   margin: 0;
   color: var(--blue);
-  font-size: clamp(24px, 2.35vw, 34px);
+  font-size: 16.1px;
   font-weight: 800;
-  line-height: 1.08;
+  line-height: 18.1px;
   text-decoration: none;
 }
 
@@ -781,26 +796,26 @@ body.editingReview .reviewMain {
 
 .previewSection p {
   display: block;
-  margin: 18px 0 0;
+  margin: 10px 0 0;
   color: var(--blue);
-  font-size: clamp(20px, 2vw, 28px);
-  line-height: 1.18;
+  font-size: 13.1px;
+  line-height: 16.25px;
 }
 
 .previewSection p + p {
   display: block;
-  margin: 16px 0 0;
+  margin: 6px 0 0;
 }
 
 .previewSection + .previewSection,
 .previewSubtitle + .previewSection {
-  margin-top: 48px;
-  padding-top: 32px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--line);
 }
 
 .previewSeries + .previewSubtitle {
-  margin-bottom: 46px;
+  margin-bottom: 10px;
 }
 
 .previewAgenda ul,
@@ -813,16 +828,16 @@ body.editingReview .reviewMain {
 .previewAgenda li {
   margin: 10px 0 0;
   color: var(--blue);
-  font-size: clamp(20px, 2vw, 28px);
-  line-height: 1.18;
+  font-size: 13.1px;
+  line-height: 16.25px;
 }
 
 .previewAgenda li::before {
-  content: "- ";
+  content: "• ";
 }
 
 .previewQuestion {
-  margin: 24px 0;
+  margin: 10px 0;
 }
 
 .previewQuestions strong,
@@ -832,17 +847,27 @@ body.editingReview .reviewMain {
 
 .previewQuestions strong {
   color: var(--blue);
-  font-size: clamp(20px, 2vw, 28px);
+  font-size: 13.1px;
   font-weight: 500;
-  line-height: 1.18;
+  line-height: 15.72px;
 }
 
 .previewQuestions span {
-  margin-top: 10px;
+  margin-top: 1px;
   color: var(--gray);
-  font-size: clamp(16px, 1.55vw, 22px);
+  font-size: 12.1px;
   font-style: italic;
-  line-height: 1.22;
+  font-weight: 500;
+  line-height: 14.5px;
+}
+
+.previewFooter {
+  margin: 10px 34px 0 60px;
+  padding-top: 0;
+  color: var(--gray);
+  font-size: 10.1px;
+  line-height: 11.7px;
+  text-align: center;
 }
 
 .loadingPreviewCard {
@@ -1489,14 +1514,219 @@ button.loading {
 .avatarLink {
   display: inline-grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
+  color: #ffffff;
+  background: var(--mid-blue);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.authPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #ffffff;
+}
+
+.authCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  width: 440px;
+  padding: 40px;
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.authCardLogin {
+  min-height: auto;
+}
+
+.authBrand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.authBrand strong {
+  color: var(--blue);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.authBrand span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 23px;
+  padding: 5px 12px;
+  color: var(--gray);
+  background: var(--line);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.authHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 360px;
+}
+
+.authHeading h1 {
+  margin: 0;
+  color: var(--blue);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.authHeading p {
+  width: 360px;
+  margin: 0;
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.authField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.authField span {
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.authField input {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  color: var(--blue);
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  outline: 0;
+  font-size: 13px;
+}
+
+.authField input::placeholder {
+  color: var(--gray);
+}
+
+.authField input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(163, 206, 241, 0.38);
+}
+
+.authPrimary {
+  display: inline-grid;
+  place-items: center;
+  width: 100%;
+  min-height: 43px;
+  padding: 0;
   color: #ffffff;
   background: var(--blue);
+  border: 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.authPrimary:hover {
+  background: #1f3d61;
+}
+
+.authPrimary:active,
+.authGoogle:active {
+  transform: scale(0.98);
+}
+
+.authDivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.authDivider span {
+  flex: 1 1 0;
+  height: 1px;
+  min-width: 1px;
+  background: var(--line);
+}
+
+.authDivider small {
+  color: var(--gray);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.authGoogle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0;
+  color: var(--blue);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.authGoogle:hover {
+  background: #fafbfc;
+}
+
+.authGoogle span {
+  width: 16px;
+  height: 16px;
+  background: var(--blue-soft);
   border-radius: 50%;
+}
+
+.authSwitch {
+  width: 100%;
+  margin: 0;
+  color: var(--gray);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 400;
+  line-height: normal;
+  text-align: center;
+}
+
+.authSwitch a {
+  color: var(--mid-blue);
+  font-weight: 600;
   text-decoration: none;
+}
+
+.authSwitch a:hover {
+  text-decoration: underline;
 }
 
 .savedToolbar {

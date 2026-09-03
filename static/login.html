@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar | Folha de Estudo</title>
+    <meta name="description" content="Entre na plataforma Folha de Estudo." />
+    <link rel="stylesheet" href="/styles.css?v=65" />
+  </head>
+  <body>
+    <main class="authPage">
+      <form class="authCard authCardLogin" action="/dashboard.html">
+        <div class="authBrand">
+          <strong>Folha de Estudo</strong>
+          <span>PAZ Church Barueri</span>
+        </div>
+
+        <div class="authHeading">
+          <h1>Entrar na conta</h1>
+          <p>Acesse sua conta para gerar e revisar folhas de estudo.</p>
+        </div>
+
+        <label class="authField">
+          <span>E-mail</span>
+          <input type="email" placeholder="voce@pazchurch.com" autocomplete="email" />
+        </label>
+
+        <label class="authField">
+          <span>Senha</span>
+          <input type="password" placeholder="Sua senha" autocomplete="current-password" />
+        </label>
+
+        <button class="authPrimary" type="submit">Entrar</button>
+
+        <div class="authDivider"><span></span><small>ou</small><span></span></div>
+
+        <button class="authGoogle" type="button">
+          <span aria-hidden="true"></span>
+          Entrar com Google
+        </button>
+
+        <p class="authSwitch">Ainda não tem conta? <a href="/criar-conta.html">Criar conta</a></p>
+      </form>
+    </main>
+  </body>
+</html>
