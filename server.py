@@ -116,14 +116,34 @@ def draw_life_group_header(canvas, doc):
 
 
 def register_document_fonts():
+    font_dir = ROOT / "assets" / "fonts"
     fonts = {
-        "DocRegular": Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
-        "DocBold": Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
+        "DocRegular": font_dir / "Inter-Regular.ttf",
+        "DocBold": font_dir / "Inter-SemiBold.ttf",
     }
     registered = {}
     for name, path in fonts.items():
         if path.exists() and name not in pdfmetrics.getRegisteredFontNames():
-            pdfmetrics.registerFont(TTFont(name, str(path)))
+            try:
+                pdfmetrics.registerFont(TTFont(name, str(path)))
+            except Exception:
+                pass
+        if name in pdfmetrics.getRegisteredFontNames():
+            registered[name] = name
+
+    if registered.get("DocRegular") and registered.get("DocBold"):
+        return registered["DocRegular"], registered["DocBold"]
+
+    fallback_fonts = {
+        "DocRegular": Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
+        "DocBold": Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
+    }
+    for name, path in fallback_fonts.items():
+        if path.exists() and name not in pdfmetrics.getRegisteredFontNames():
+            try:
+                pdfmetrics.registerFont(TTFont(name, str(path)))
+            except Exception:
+                pass
         if name in pdfmetrics.getRegisteredFontNames():
             registered[name] = name
     return registered.get("DocRegular", "Helvetica"), registered.get("DocBold", "Helvetica-Bold")
@@ -1775,27 +1795,27 @@ def docx_styles_xml():
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:style w:type="paragraph" w:default="1" w:styleId="Normal">
     <w:name w:val="Normal"/>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/></w:rPr>
+    <w:rPr><w:rFonts w:ascii="Inter" w:hAnsi="Inter"/><w:sz w:val="22"/></w:rPr>
     <w:pPr><w:spacing w:after="160" w:line="276" w:lineRule="auto"/></w:pPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Title">
     <w:name w:val="Title"/>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="183A64"/><w:sz w:val="34"/></w:rPr>
+    <w:rPr><w:rFonts w:ascii="Inter" w:hAnsi="Inter"/><w:b/><w:color w:val="183A64"/><w:sz w:val="34"/></w:rPr>
     <w:pPr><w:jc w:val="center"/><w:spacing w:after="240"/></w:pPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Heading1">
     <w:name w:val="heading 1"/>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="183A64"/><w:sz w:val="28"/></w:rPr>
+    <w:rPr><w:rFonts w:ascii="Inter" w:hAnsi="Inter"/><w:b/><w:color w:val="183A64"/><w:sz w:val="28"/></w:rPr>
     <w:pPr><w:spacing w:before="120" w:after="180"/></w:pPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Heading2">
     <w:name w:val="heading 2"/>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:u w:val="single"/><w:sz w:val="22"/></w:rPr>
+    <w:rPr><w:rFonts w:ascii="Inter" w:hAnsi="Inter"/><w:b/><w:u w:val="single"/><w:sz w:val="22"/></w:rPr>
     <w:pPr><w:spacing w:before="160" w:after="80"/></w:pPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Subtitle">
     <w:name w:val="Subtitle"/>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:color w:val="5F6F82"/><w:sz w:val="22"/></w:rPr>
+    <w:rPr><w:rFonts w:ascii="Inter" w:hAnsi="Inter"/><w:color w:val="5F6F82"/><w:sz w:val="22"/></w:rPr>
     <w:pPr><w:spacing w:after="220"/></w:pPr>
   </w:style>
 </w:styles>"""

@@ -20,7 +20,10 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: Inter, "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "liga" 1, "calt" 1;
+  font-optical-sizing: auto;
+  text-rendering: geometricPrecision;
   color: var(--blue);
   background: var(--paper);
 }
