@@ -4,6 +4,7 @@ const SUPABASE_ANON_KEY =
 
 const folhaSupabase = (() => {
   const client = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const APP_URL = "https://estudo-life.vercel.app";
   const PDF_BUCKET = "study-pdfs";
   const AVATAR_BUCKET = "profile-photos";
 
@@ -123,7 +124,10 @@ const folhaSupabase = (() => {
     const { data, error } = await client.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: {
+        data: { name },
+        emailRedirectTo: `${APP_URL}/dashboard.html`,
+      },
     });
     if (error) {
       throw error;
@@ -152,7 +156,7 @@ const folhaSupabase = (() => {
   async function signInWithGoogle() {
     const { error } = await client.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard.html` },
+      options: { redirectTo: `${APP_URL}/dashboard.html` },
     });
     if (error) {
       throw error;

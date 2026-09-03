@@ -1704,11 +1704,20 @@ button.loading {
   background: #fafbfc;
 }
 
-.authGoogle span {
+.authGoogle .googleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 16px;
   height: 16px;
-  background: var(--blue-soft);
-  border-radius: 50%;
+  background: transparent;
+  border-radius: 0;
+}
+
+.authGoogle .googleIcon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 
 .authSwitch {

@@ -78,6 +78,10 @@ googleButton?.addEventListener("click", async () => {
   }
 });
 
+window.addEventListener("pageshow", () => {
+  setAuthBusy(false);
+});
+
 window.folhaSupabase?.currentUser().then((user) => {
   if (user) {
     window.location.href = "/dashboard.html";
