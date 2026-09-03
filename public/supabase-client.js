@@ -117,6 +117,15 @@ const folhaSupabase = (() => {
     if (error) {
       throw error;
     }
+    await client
+      .from("saved_files")
+      .update({
+        created_by_name: data.name,
+        created_by_avatar_url: data.avatar_url || "",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", user.id)
+      .catch(() => null);
     return data;
   }
 

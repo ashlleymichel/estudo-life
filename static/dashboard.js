@@ -11,9 +11,9 @@ function formatDate(value) {
 }
 
 function greetingText(hour) {
-  if (hour < 12) return "Bom dia!";
-  if (hour < 18) return "Boa tarde!";
-  return "Boa noite!";
+  if (hour < 12) return "Bom dia";
+  if (hour < 18) return "Boa tarde";
+  return "Boa noite";
 }
 
 function formatTableDate(value) {
@@ -38,6 +38,27 @@ function authorInitials(name) {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+}
+
+function firstName(value) {
+  return String(value || "")
+    .trim()
+    .split(/\s+/)[0];
+}
+
+async function hydrateDashboardProfile() {
+  if (!window.folhaSupabase?.isReady()) {
+    return;
+  }
+  const user = await window.folhaSupabase.currentUser().catch(() => null);
+  if (!user) {
+    return;
+  }
+  const profile = await window.folhaSupabase.getProfile(user.id).catch(() => null);
+  const name = firstName(profile?.name || user.user_metadata?.name || user.email?.split("@")[0]);
+  if (name) {
+    greeting.textContent = `${greetingText(new Date().getHours())}, ${name}!`;
+  }
 }
 
 async function loadFiles() {
@@ -97,9 +118,10 @@ function renderFiles(files) {
 
 const now = new Date();
 todayLabel.textContent = formatDate(now);
-greeting.textContent = `${greetingText(now.getHours())}, PAZ Church!`;
+greeting.textContent = `${greetingText(now.getHours())}!`;
 
 loadFiles().then(renderFiles).catch(() => {
   recent.innerHTML = '<p class="emptyState compactEmpty">Não foi possível carregar os PDFs recentes.</p>';
 });
 window.folhaSupabase?.hydrateHeaderProfile();
+hydrateDashboardProfile();
