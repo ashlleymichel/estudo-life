@@ -56,6 +56,17 @@ async function getLocalSavedFiles() {
 }
 
 async function getSavedFiles() {
+  if (window.folhaSupabase?.isReady()) {
+    try {
+      const files = await window.folhaSupabase.listStudyFiles();
+      if (files) {
+        return files;
+      }
+    } catch (error) {
+      console.warn("Arquivos do Supabase indisponíveis, usando salvamento antigo.", error);
+    }
+  }
+
   try {
     const payload = await fetchJson("/api/saved");
     return (payload.files || []).map((file) => ({ ...file, online: true }));
@@ -66,6 +77,11 @@ async function getSavedFiles() {
 }
 
 async function deleteFile(file) {
+  if (file.supabase && window.folhaSupabase?.isReady()) {
+    await window.folhaSupabase.deleteStudyFile(file);
+    return;
+  }
+
   if (file.online) {
     await fetchJson(`/api/saved?id=${encodeURIComponent(file.id)}`, { method: "DELETE" });
     return;
@@ -143,6 +159,14 @@ async function downloadFile(file, format, button) {
   button.disabled = true;
   button.textContent = "Gerando...";
   try {
+    if (format === "pdf" && file.pdfUrl) {
+      const response = await fetch(file.pdfUrl);
+      if (!response.ok) {
+        throw new Error("Não foi possível baixar o PDF salvo.");
+      }
+      downloadBlob(await response.blob(), file.name || "folha-de-estudo-life-group.pdf");
+      return;
+    }
     if (format === "pdf" && file.blob) {
       downloadBlob(file.blob, file.name || "folha-de-estudo-life-group.pdf");
       return;
@@ -460,3 +484,4 @@ document.addEventListener("click", (event) => {
 refreshFiles().catch(() => {
   list.innerHTML = '<p class="emptyState">Não foi possível carregar os arquivos salvos.</p>';
 });
+window.folhaSupabase?.hydrateHeaderProfile();

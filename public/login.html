@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Entrar | Folha de Estudo</title>
     <meta name="description" content="Entre na plataforma Folha de Estudo." />
-    <link rel="stylesheet" href="/styles.css?v=65" />
+    <link rel="stylesheet" href="/styles.css?v=66" />
   </head>
-  <body>
+  <body data-auth-mode="login">
     <main class="authPage">
-      <form class="authCard authCardLogin" action="/dashboard.html">
+      <form id="authForm" class="authCard authCardLogin">
         <div class="authBrand">
           <strong>Folha de Estudo</strong>
           <span>PAZ Church Barueri</span>
@@ -22,19 +22,21 @@
 
         <label class="authField">
           <span>E-mail</span>
-          <input type="email" placeholder="voce@pazchurch.com" autocomplete="email" />
+          <input id="authEmail" type="email" placeholder="voce@pazchurch.com" autocomplete="email" />
         </label>
 
         <label class="authField">
           <span>Senha</span>
-          <input type="password" placeholder="Sua senha" autocomplete="current-password" />
+          <input id="authPassword" type="password" placeholder="Sua senha" autocomplete="current-password" />
         </label>
 
-        <button class="authPrimary" type="submit">Entrar</button>
+        <p id="authStatus" class="authStatus" aria-live="polite"></p>
+
+        <button id="authSubmit" class="authPrimary" type="submit">Entrar</button>
 
         <div class="authDivider"><span></span><small>ou</small><span></span></div>
 
-        <button class="authGoogle" type="button">
+        <button id="googleAuth" class="authGoogle" type="button">
           <span aria-hidden="true"></span>
           Entrar com Google
         </button>
@@ -42,5 +44,8 @@
         <p class="authSwitch">Ainda não tem conta? <a href="/criar-conta.html">Criar conta</a></p>
       </form>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="/supabase-client.js?v=1"></script>
+    <script src="/auth.js?v=1"></script>
   </body>
 </html>

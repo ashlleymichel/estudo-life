@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Perfil | Folha de Estudo</title>
     <meta name="description" content="Perfil da plataforma Folha de Estudo." />
-    <link rel="stylesheet" href="/styles.css?v=65" />
+    <link rel="stylesheet" href="/styles.css?v=66" />
   </head>
   <body>
     <main class="appFrame profilePage">
@@ -18,7 +18,11 @@
       </header>
 
       <section class="profileCard">
-        <div class="profileAvatar">PC</div>
+        <label class="profileAvatarPicker">
+          <input id="profilePhoto" type="file" accept="image/*" />
+          <span class="profileAvatar">PC</span>
+          <strong>Alterar foto</strong>
+        </label>
         <div>
           <p class="sectionTag">Perfil</p>
           <h1>Meu Perfil</h1>
@@ -32,13 +36,16 @@
           <span>E-mail</span>
           <input id="profileEmail" type="email" value="equipe@pazchurch.com" />
         </label>
+        <p id="profileStatus" class="authStatus" aria-live="polite"></p>
         <div class="profileActions">
           <button id="saveProfile" class="download" type="button">Salvar alterações</button>
-          <a class="secondaryAction" href="/login.html">Sair da conta</a>
+          <button id="logoutProfile" class="secondaryAction" type="button">Sair da conta</button>
         </div>
       </section>
     </main>
 
-    <script src="/perfil.js?v=1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="/supabase-client.js?v=1"></script>
+    <script src="/perfil.js?v=2"></script>
   </body>
 </html>

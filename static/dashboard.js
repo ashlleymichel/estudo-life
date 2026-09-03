@@ -18,6 +18,12 @@ function greetingText(hour) {
 }
 
 async function loadFiles() {
+  if (window.folhaSupabase?.isReady()) {
+    const files = await window.folhaSupabase.listStudyFiles().catch(() => null);
+    if (files) {
+      return files.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+  }
   const response = await fetch("/api/saved");
   if (!response.ok) throw new Error("Falha ao carregar arquivos.");
   const payload = await response.json();
@@ -48,3 +54,4 @@ greeting.textContent = greetingText(now.getHours());
 loadFiles().then(renderFiles).catch(() => {
   recent.innerHTML = '<p class="emptyState compactEmpty">Não foi possível carregar os PDFs recentes.</p>';
 });
+window.folhaSupabase?.hydrateHeaderProfile();

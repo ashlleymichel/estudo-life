@@ -391,6 +391,28 @@ function openSavedDb() {
 }
 
 async function savePdfOnline(blob, data) {
+  if (window.folhaSupabase?.isReady()) {
+    try {
+      const record = await window.folhaSupabase.saveStudyFile({
+        id: state.editingSavedId || "",
+        name: getFileName(),
+        title: data.titulo || "Arquivo sem título",
+        size: blob.size,
+        data,
+        pdfBlob: blob,
+      });
+      if (record) {
+        state.editingSavedId = record.id || state.editingSavedId;
+        return record;
+      }
+    } catch (error) {
+      if (/entre na sua conta/i.test(error.message || "")) {
+        throw error;
+      }
+      console.warn("Supabase indisponível, usando salvamento antigo.", error);
+    }
+  }
+
   const payload = {
     id: state.editingSavedId || "",
     name: getFileName(),
@@ -447,6 +469,19 @@ function formatRecentDate(value) {
 }
 
 async function getRecentSavedFiles() {
+  if (window.folhaSupabase?.isReady()) {
+    try {
+      const files = await window.folhaSupabase.listStudyFiles();
+      if (files) {
+        return files
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 5);
+      }
+    } catch (error) {
+      console.warn("Lista do Supabase indisponível, usando salvamento antigo.", error);
+    }
+  }
+
   try {
     const payload = await fetchJson("/api/saved");
     return (payload.files || [])
@@ -777,3 +812,4 @@ if (localStorage.getItem("folhaTheme") === "dark") {
 
 loadSavedDraftForEditing();
 renderRecentFiles();
+window.folhaSupabase?.hydrateHeaderProfile();

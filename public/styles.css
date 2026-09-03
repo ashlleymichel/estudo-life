@@ -1522,6 +1522,8 @@ button.loading {
   font-size: 11px;
   font-weight: 600;
   text-decoration: none;
+  background-position: center;
+  background-size: cover;
 }
 
 .authPage {
@@ -1727,6 +1729,22 @@ button.loading {
 
 .authSwitch a:hover {
   text-decoration: underline;
+}
+
+.authStatus {
+  min-height: 18px;
+  margin: 0;
+  color: var(--gray);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.authStatus.ok {
+  color: #22a765;
+}
+
+.authStatus.error {
+  color: var(--danger);
 }
 
 .savedToolbar {
@@ -2234,6 +2252,31 @@ button.loading {
   border-radius: 50%;
   font-size: 20px;
   font-weight: 800;
+  background-position: center;
+  background-size: cover;
+}
+
+.profileAvatarPicker {
+  grid-column: auto;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  justify-items: center;
+  cursor: pointer;
+}
+
+.profileAvatarPicker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.profileAvatarPicker strong {
+  color: var(--mid-blue);
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .profileCard h1 {
@@ -2251,6 +2294,10 @@ button.loading {
 .profileCard label,
 .profileActions {
   grid-column: 1 / -1;
+}
+
+.profileCard .profileAvatarPicker {
+  grid-column: auto;
 }
 
 .profileCard label {

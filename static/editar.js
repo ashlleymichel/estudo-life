@@ -209,6 +209,29 @@ function openSavedDb() {
 }
 
 async function savePdfOnline(blob, data) {
+  if (window.folhaSupabase?.isReady()) {
+    try {
+      const record = await window.folhaSupabase.saveStudyFile({
+        id: state.editingSavedId || "",
+        name: state.savedName || getFileName(),
+        title: data.titulo || "Arquivo sem título",
+        size: blob.size,
+        data,
+        pdfBlob: blob,
+      });
+      if (record) {
+        state.editingSavedId = record.id || state.editingSavedId;
+        state.savedName = record.name || state.savedName;
+        return record;
+      }
+    } catch (error) {
+      if (/entre na sua conta/i.test(error.message || "")) {
+        throw error;
+      }
+      console.warn("Supabase indisponível, usando salvamento antigo.", error);
+    }
+  }
+
   const payload = {
     id: state.editingSavedId || "",
     name: state.savedName || getFileName(),
@@ -380,3 +403,4 @@ document.addEventListener("click", (event) => {
 });
 
 loadSavedDraftForEditing();
+window.folhaSupabase?.hydrateHeaderProfile();
