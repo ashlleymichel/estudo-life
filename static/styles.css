@@ -1151,6 +1151,10 @@ body.editingReview .questionRow .number {
   display: none;
 }
 
+body.editingReview .questionRow {
+  grid-template-columns: minmax(0, 1fr) 30px;
+}
+
 .number {
   display: grid;
   place-items: center;
