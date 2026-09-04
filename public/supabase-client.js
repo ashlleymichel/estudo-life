@@ -246,9 +246,12 @@ const folhaSupabase = (() => {
     if (!client || !file?.id) {
       return false;
     }
-    const { error } = await client.from("saved_files").delete().eq("id", file.id);
+    const { data, error } = await client.from("saved_files").delete().eq("id", file.id).select("id");
     if (error) {
       throw error;
+    }
+    if (!data?.length) {
+      throw new Error("Não foi possível confirmar a exclusão no Supabase.");
     }
     if (file.pdfPath) {
       await client.storage.from(PDF_BUCKET).remove([file.pdfPath]).catch(() => {});

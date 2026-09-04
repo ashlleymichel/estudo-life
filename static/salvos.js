@@ -471,13 +471,11 @@ confirmDeleteBtn.addEventListener("click", async () => {
   try {
     await deleteFile(deleting);
     closeDeleteModal();
-    savedFiles = savedFiles.filter((file) => file.id !== deleting.id);
-    updateSeriesOptions(savedFiles);
-    renderFiles();
+    await refreshFiles();
   } catch (error) {
     confirmDeleteBtn.disabled = false;
     confirmDeleteBtn.textContent = "Excluir";
-    deleteModalMessage.textContent = "Não foi possível excluir esse arquivo. Tente novamente.";
+    deleteModalMessage.textContent = "Não foi possível excluir esse arquivo no banco de dados. Tente novamente.";
   }
 });
 

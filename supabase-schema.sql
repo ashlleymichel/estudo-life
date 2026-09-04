@@ -66,7 +66,8 @@ with check (auth.uid() = user_id);
 drop policy if exists "saved_files_delete_own" on public.saved_files;
 create policy "saved_files_delete_own"
 on public.saved_files for delete
-using (auth.uid() = user_id);
+to authenticated
+using (true);
 
 insert into storage.buckets (id, name, public)
 values
@@ -108,7 +109,6 @@ on storage.objects for delete
 using (
   bucket_id = 'study-pdfs'
   and auth.role() = 'authenticated'
-  and split_part(name, '/', 1) = auth.uid()::text
 );
 
 drop policy if exists "profile_photos_read_all" on storage.objects;
