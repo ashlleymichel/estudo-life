@@ -1624,13 +1624,15 @@ def agenda_lines(value):
 
 
 def section_rule():
-    return HRFlowable(
+    rule = HRFlowable(
         width="100%",
         thickness=0.8,
         color=colors.HexColor("#E7ECEF"),
         spaceBefore=11,
         spaceAfter=9,
     )
+    rule.keepWithNext = 1
+    return rule
 
 
 def add_bullet_section(story, label, text, styles, bold_font):
@@ -1716,6 +1718,7 @@ def document_styles():
             alignment=TA_LEFT,
             textColor=blue,
             spaceAfter=6,
+            keepWithNext=1,
         ),
         "body": ParagraphStyle(
             "Body",
