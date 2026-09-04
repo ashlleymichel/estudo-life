@@ -19,6 +19,7 @@ const closeShareBtn = document.getElementById("closeShareBtn");
 let savedFiles = [];
 let pendingDeleteFile = null;
 let activeShareFile = null;
+const mobileQuery = window.matchMedia("(max-width: 700px)");
 
 function openSavedDb() {
   return new Promise((resolve, reject) => {
@@ -107,13 +108,20 @@ function formatDate(value) {
 }
 
 function formatTableDate(value) {
-  return new Intl.DateTimeFormat("pt-BR", {
+  const parts = new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  })
-    .format(new Date(value))
-    .replace(".", "");
+  }).formatToParts(new Date(value));
+  const dateParts = Object.fromEntries(parts.map((part) => [part.type, part.value.replace(".", "")]));
+  return `${dateParts.day} ${dateParts.month} ${dateParts.year}`;
+}
+
+function syncResponsiveLabels() {
+  const recentOption = sortFilter?.querySelector('option[value="recent"]');
+  if (recentOption) {
+    recentOption.textContent = mobileQuery.matches ? "Recentes" : "Mais recentes";
+  }
 }
 
 function formatSize(bytes) {
@@ -496,6 +504,9 @@ copyShareLink.addEventListener("click", async () => {
   element.addEventListener("input", renderFiles);
   element.addEventListener("change", renderFiles);
 });
+
+syncResponsiveLabels();
+mobileQuery.addEventListener("change", syncResponsiveLabels);
 
 document.addEventListener("click", (event) => {
   if (!event.target.closest(".downloadMenu")) {

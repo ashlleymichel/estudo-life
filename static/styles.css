@@ -2596,11 +2596,43 @@ body.dark .editEditor textarea {
   .savedPage,
   .editPage {
     display: block;
-    padding: 24px;
+    padding: 0 16px 32px;
   }
 
   .savedAppHeader {
-    padding-top: 0;
+    min-height: 56px;
+    padding: 14px 0;
+  }
+
+  .savedAppHeader .logoText {
+    font-size: 16px;
+  }
+
+  .savedAppHeader .savedHeaderLink {
+    display: none;
+  }
+
+  .savedAppHeader .createButton {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0;
+  }
+
+  .savedAppHeader .createButton::before {
+    content: "+";
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .savedAppHeader .avatarLink {
+    width: 28px;
+    height: 28px;
   }
 
   .savedIntro,
@@ -2609,17 +2641,133 @@ body.dark .editEditor textarea {
     flex-direction: column;
   }
 
+  .savedIntro {
+    gap: 14px;
+    padding: 18px 0 14px;
+  }
+
+  .savedBackLink {
+    font-size: 12px;
+  }
+
+  .savedIntro h1 {
+    font-size: 22px;
+    line-height: 1.1;
+  }
+
   .savedFilters {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 8px;
+    margin-bottom: 14px;
+  }
+
+  .savedFilters .searchBox {
+    grid-column: 1 / -1;
+  }
+
+  .searchBox input {
+    height: 35px;
+    border-radius: 8px;
+  }
+
+  .savedFilters select {
+    height: 30px;
+    min-width: 0;
+    padding: 0 30px 0 12px;
+    border-radius: 8px;
+    font-size: 12px;
   }
 
   .savedTableCard {
-    padding: 8px 14px;
+    display: grid;
+    gap: 14px;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .savedTableHeader {
+    display: none;
+  }
+
+  .savedTableRow {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    grid-template-areas:
+      "doc doc"
+      "creator date"
+      "status status";
+    min-width: 0;
+    min-height: 105px;
+    padding: 14px;
+    column-gap: 12px;
+    row-gap: 10px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  .savedTableRow:hover {
+    background: #ffffff;
+  }
+
+  .savedDocCell {
+    grid-area: doc;
+  }
+
+  .savedDocCell span {
+    overflow: visible;
+    font-size: 13px;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .savedAuthorCell {
+    grid-area: creator;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .savedAuthorAvatar {
+    flex-basis: 20px;
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .savedDateCell {
+    grid-area: date;
+    align-self: center;
+    color: var(--gray);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .savedStatusPill {
+    grid-area: status;
+    justify-self: start;
+    min-height: 23px;
+    padding: 0 14px;
+    font-size: 11px;
   }
 
   .savedInlineActions {
-    opacity: 1;
-    pointer-events: auto;
+    display: none;
+  }
+
+  .emptySavedTable {
+    min-height: 96px;
+    padding: 20px 14px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  .emptyState {
+    padding: 0;
+    font-size: 14px;
   }
 
   .dashboardHero h1 {
