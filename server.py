@@ -675,15 +675,18 @@ def life_group_full_schema():
 
 
 def generate_life_group_with_chatgpt(text, title="", subtitle=""):
+    scripture_context = scripture_passages_for_prompt(text)
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
         "com escrita clara, bíblica, pastoral e simples para uma reunião da igreja PAZ Church nas casas. "
         f"{MODEL_STRUCTURE_GUIDE} "
         "O conteúdo será usado em um PDF curto de estudo, então seja objetivo, profundo e fácil de discutir. "
         "Dê ênfase maior aos versículos bíblicos citados no sermão, mas escreva com naturalidade pastoral. "
+        "Antes de escrever, identifique os textos bíblicos que já aparecem no documento e use alguns deles de forma natural na introdução e em algumas perguntas. "
         "Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas, usando a versão NAA. "
         "O sistema renderiza o itálico no PDF; no JSON, escreva o versículo entre aspas e com a referência bíblica. "
         "Escreva o versículo completo, sem cortes e sem reticências. "
+        "Priorize as passagens bíblicas detectadas que forem enviadas separadamente no prompt do usuário, pois elas já vieram do arquivo original. "
         "Use as referências bíblicas presentes no texto enviado. Quando o texto trouxer apenas a referência, use o texto completo da NAA se você o souber com segurança; "
         "caso contrário, não invente palavras do versículo. "
         "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, conectando Bíblia, vida prática e exemplos reais. "
@@ -700,11 +703,14 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
 Título detectado: {title or "não informado"}
 Subtítulo detectado: {subtitle or "não informado"}
 
+Referências e trechos bíblicos detectados no arquivo:
+{scripture_context or "Nenhum trecho bíblico estruturado foi detectado automaticamente. Use as referências que aparecem no texto extraído."}
+
 Contexto e regras por trás:
 - Faça um resumo introdutório claro e de fácil entendimento desse texto, que foi o sermão de domingo do pastor, em no máximo 9 linhas, dando ênfase aos versículos.
 - Esse texto será apenas a introdução de um pequeno PDF de estudos para uma reunião da igreja PAZ Church nas casas.
 - A introdução deve ser coesa, pastoral e conectada ao tema do sermão, não apenas uma lista de versículos.
-- Dê ênfase maior aos versículos; use preferencialmente os primeiros textos principais que aparecem no documento.
+- Dê ênfase maior aos versículos; use preferencialmente os primeiros textos principais que aparecem no documento e foram listados em "Referências e trechos bíblicos detectados".
 - A introdução deve parecer com os modelos: um parágrafo ou poucos parágrafos curtos que explicam o tema, inserem os versículos dentro do raciocínio e preparam o grupo para conversar.
 - Na introdução, use normalmente de dois a três textos bíblicos principais. Use apenas mais do que isso se for essencial para entender o tema.
 - Logo após essa introdução, formule exatamente quatro perguntas para que pequenos grupos discutam esse assunto e aprendam mais profundamente.
@@ -781,7 +787,88 @@ def biblical_references(text):
     return refs
 
 
+def clean_scripture_candidate(value):
+    quote = normalize_scripture_quotes(value)
+    quote = re.sub(r"^[\s\"'-]+", "", quote)
+    quote = re.sub(r"[\s\"'-]+$", "", quote)
+    quote = compact_text(quote)
+    quote = re.sub(r"\b(?:NAA|NVI|ARA|ARC|ACF)\s*$", "", quote).strip()
+    if len(quote) < 18 or len(quote) > 900:
+        return ""
+    if quote and quote[0].islower():
+        return ""
+    lower = quote.lower()
+    blocked = [
+        "momento generosidade",
+        "agenda paz church",
+        "momento visão",
+        "momento visao",
+        "perguntas",
+        "conclusão",
+        "conclusao",
+        "nossa missão",
+        "nossa missao",
+        "nossa visão",
+        "nossa visao",
+    ]
+    if any(item in lower for item in blocked):
+        return ""
+    return quote
+
+
+def nearby_scripture_passages(text, limit=8):
+    source = normalize_pdf_chars(text)
+    refs = biblical_references(source)
+    passages = []
+    seen = set()
+    previous_end = 0
+    for ref in refs:
+        match = re.search(re.escape(ref), source, flags=re.IGNORECASE)
+        if not match:
+            continue
+
+        quote = scripture_quote_for_ref(source, ref)
+        before_since_previous = source[previous_end:match.start()]
+        dash_match = re.search(r"[—-]\s*([^:]{18,900})$", before_since_previous)
+        if dash_match:
+            quote = clean_scripture_candidate(dash_match.group(1)) or quote
+
+        if not quote:
+            before = source[max(previous_end, match.start() - 750):match.start()]
+            quote_start = max(before.rfind('"'), before.rfind("“"))
+            if quote_start >= 0:
+                quote = clean_scripture_candidate(before[quote_start + 1:])
+
+        if not quote:
+            after = source[match.end():match.end() + 750]
+            after_match = re.match(r"\s*(?:NAA|NVI|ARA|ARC|ACF)?\s*[:—-]\s*([^\n]{18,900})", after, flags=re.IGNORECASE)
+            if after_match:
+                quote = clean_scripture_candidate(after_match.group(1))
+
+        key = normalize_reference_key(ref)
+        if key in seen:
+            continue
+        seen.add(key)
+        passages.append({"ref": ref, "quote": clean_scripture_candidate(quote)})
+        previous_end = match.end()
+        if len(passages) == limit:
+            break
+    return passages
+
+
+def scripture_passages_for_prompt(text, limit=8):
+    passages = nearby_scripture_passages(text, limit)
+    lines = []
+    for item in passages:
+        if item.get("quote"):
+            lines.append(f'- {item["ref"]}: "{item["quote"]}"')
+        else:
+            lines.append(f'- {item["ref"]}')
+    return "\n".join(lines)
+
+
 def scripture_quote_for_ref(text, ref):
+    text = normalize_pdf_chars(text)
     escaped_ref = re.escape(ref)
     quote_chars = r"[“\"]"
     patterns = [
@@ -801,6 +888,33 @@ def scripture_quote_for_ref(text, ref):
                 continue
             if quote:
                 return quote
+
+    ref_matches = list(re.finditer(escaped_ref, text, flags=re.IGNORECASE))
+    for match in ref_matches:
+        previous_ref_end = 0
+        for other in re.finditer(r"(?:[1-3]\s*)?[A-Za-zÀ-ÿ]+\s+\d{1,3}:\d{1,3}(?:-\d{1,3})?(?:\s+[A-Z]{2,5})?", text):
+            if other.end() <= match.start():
+                previous_ref_end = other.end()
+            else:
+                break
+        before = text[max(previous_ref_end, match.start() - 900):match.start()]
+        dash_match = re.search(r"[—-]\s*([^:]{18,900})$", before)
+        if dash_match:
+            quote = clean_scripture_candidate(dash_match.group(1))
+            if quote:
+                return quote
+        quote_start = max(before.rfind('"'), before.rfind("“"))
+        if quote_start >= 0:
+            quote = clean_scripture_candidate(before[quote_start + 1:])
+            if quote:
+                return quote
+
+        after = text[match.end():match.end() + 900]
+        after_match = re.match(r"\s*(?:NAA|NVI|ARA|ARC|ACF)?\s*[:—-]\s*([^:]{18,900})", after, flags=re.IGNORECASE)
+        if after_match:
+            quote = clean_scripture_candidate(after_match.group(1))
+            if quote:
+                return quote
     return ""
 
 
@@ -808,7 +922,7 @@ def scripture_fragment(text, ref):
     quote = scripture_quote_for_ref(text, ref)
     if quote:
         return f'"{normalize_scripture_quotes(quote)}" ({ref} NAA)'
-    return ""
+    return f"{ref} NAA"
 
 
 def scripture_line(text, ref):

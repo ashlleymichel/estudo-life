@@ -276,11 +276,12 @@ async function savePdfOnline(blob, data) {
 }
 
 function loadSavedDraftForEditing() {
-  const raw = sessionStorage.getItem("folhaEstudoEditDraft");
+  const raw = sessionStorage.getItem("folhaEstudoSavedDraft") || sessionStorage.getItem("folhaEstudoEditDraft");
   if (!raw) {
     setStatus("Nenhum arquivo foi selecionado para edição. Volte para Arquivos salvos e escolha Editar.", "error");
     return false;
   }
+  sessionStorage.removeItem("folhaEstudoSavedDraft");
   sessionStorage.removeItem("folhaEstudoEditDraft");
   try {
     const saved = JSON.parse(raw);
@@ -288,11 +289,11 @@ function loadSavedDraftForEditing() {
       setStatus("Este arquivo não possui dados editáveis. Gere e salve novamente para editar online.", "error");
       return false;
     }
-    state.editingSavedId = saved.id || "";
+    state.editingSavedId = "";
     state.savedName = saved.name || "";
     fillForm(saved.data);
     updateHeading(saved);
-    setStatus("Arquivo aberto para edição.", "ok");
+    setStatus("Arquivo aberto como cópia. Ao salvar, um novo arquivo será criado.", "ok");
     return true;
   } catch (error) {
     setStatus("Não foi possível abrir o arquivo salvo para edição.", "error");

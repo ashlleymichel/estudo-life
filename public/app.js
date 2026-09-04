@@ -522,15 +522,16 @@ function openRecentFile(file) {
     return;
   }
   sessionStorage.setItem(
-    "folhaEstudoEditDraft",
+    "folhaEstudoSavedDraft",
     JSON.stringify({
       id: file.id,
       name: file.name,
       createdAt: file.createdAt,
       data: file.data,
+      mode: "preview",
     }),
   );
-  window.location.href = "/editar.html";
+  window.location.href = "/index.html";
 }
 
 async function renderRecentFiles() {
@@ -574,21 +575,23 @@ async function renderRecentFiles() {
 }
 
 function loadSavedDraftForEditing() {
-  const raw = sessionStorage.getItem("folhaEstudoEditDraft");
+  const raw = sessionStorage.getItem("folhaEstudoSavedDraft") || sessionStorage.getItem("folhaEstudoEditDraft");
   if (!raw) {
     return false;
   }
+  sessionStorage.removeItem("folhaEstudoSavedDraft");
   sessionStorage.removeItem("folhaEstudoEditDraft");
   try {
     const saved = JSON.parse(raw);
     if (!saved || !saved.data) {
       return false;
     }
-    state.editingSavedId = saved.id || "";
+    state.editingSavedId = "";
     fillForm(saved.data);
     showReview();
     markReviewReady();
-    setStatus("Arquivo salvo aberto para edição. Ajuste o que precisar e salve novamente.", "ok");
+    setView(saved.mode === "edit" ? "edit" : "preview");
+    setStatus("Arquivo salvo aberto como cópia. Ao salvar, um novo arquivo será criado.", "ok");
     return true;
   } catch (error) {
     setStatus("Não foi possível abrir o arquivo salvo para edição.", "error");

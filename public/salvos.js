@@ -181,21 +181,40 @@ async function downloadFile(file, format, button) {
   }
 }
 
-function editFile(file) {
+function savedDraftPayload(file, mode = "preview") {
   if (!file.data) {
+    return null;
+  }
+  return {
+    id: file.id,
+    name: file.name,
+    createdAt: file.createdAt,
+    data: file.data,
+    mode,
+  };
+}
+
+function viewFile(file) {
+  const payload = savedDraftPayload(file, "preview");
+  if (!payload) {
+    alert("Este arquivo foi salvo antes da função de prévia. Gere e salve novamente para visualizar online.");
+    return;
+  }
+  sessionStorage.setItem("folhaEstudoSavedDraft", JSON.stringify(payload));
+  window.location.href = "/index.html";
+}
+
+function editFile(file) {
+  const payload = savedDraftPayload(file, "edit");
+  if (!payload) {
     alert("Este arquivo foi salvo antes da função de edição. Gere e salve novamente para editar online.");
     return;
   }
   sessionStorage.setItem(
-    "folhaEstudoEditDraft",
-    JSON.stringify({
-      id: file.id,
-      name: file.name,
-      createdAt: file.createdAt,
-      data: file.data,
-    }),
+    "folhaEstudoSavedDraft",
+    JSON.stringify(payload),
   );
-  window.location.href = "/editar.html";
+  window.location.href = "/index.html";
 }
 
 function openDeleteModal(file) {
@@ -321,7 +340,7 @@ function renderFiles() {
     const info = document.createElement("button");
     info.className = "savedDocCell savedRowButton";
     info.type = "button";
-    info.addEventListener("click", () => editFile(file));
+    info.addEventListener("click", () => viewFile(file));
 
     const title = document.createElement("span");
     title.textContent = file.title || "Arquivo salvo";
