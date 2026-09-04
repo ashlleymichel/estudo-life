@@ -1681,8 +1681,8 @@ def agenda_box(lines, doc_width, styles):
 def document_styles():
     base = getSampleStyleSheet()
     regular_font, bold_font = register_document_fonts()
-    body_size = 11
-    body_leading = 13.4
+    body_size = 10
+    body_leading = 12.2
     blue = colors.HexColor("#274C77")
     soft_blue = colors.HexColor("#6096BA")
     gray = colors.HexColor("#8B8C89")
