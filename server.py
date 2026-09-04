@@ -22,7 +22,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Flowable, HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Flowable, HRFlowable, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 try:
     from PyPDF2 import PdfReader
@@ -1808,7 +1808,7 @@ def build_life_group_pdf(data, output_path):
     story.append(Paragraph("Perguntas", styles["section"]))
     for index, question in enumerate(final_questions, start=1):
         clean_question = strip_question_number_prefix(question)
-        story.append(Paragraph(f"{index}) {formatted_paragraph_text(clean_question)}", styles["question"]))
+        story.append(KeepTogether([Paragraph(f"{index}) {formatted_paragraph_text(clean_question)}", styles["question"])]))
 
     story.append(section_rule())
     add_bullet_section(story, "Conclusão", data.get("conclusao"), styles, bold_font)
