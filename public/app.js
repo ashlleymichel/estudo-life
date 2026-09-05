@@ -72,6 +72,7 @@ async function fetchJson(url, options = {}) {
 function setBusy(isBusy, action = "") {
   state.busy = isBusy;
   const extractBtn = $("extractBtn");
+  const mobileExtractBtn = $("mobileExtractBtn");
   const downloadMenuBtn = $("downloadMenuBtn");
   const downloadPdfBtn = $("downloadPdfBtn");
   const downloadDocxBtn = $("downloadDocxBtn");
@@ -86,6 +87,11 @@ function setBusy(isBusy, action = "") {
   ];
 
   extractBtn.disabled = isBusy;
+  if (mobileExtractBtn) {
+    mobileExtractBtn.disabled = isBusy;
+    mobileExtractBtn.innerHTML = buttonContent(isBusy && action === "extract" ? "Gerando..." : "Gerar PDF", isBusy && action === "extract");
+    mobileExtractBtn.classList.toggle("loading", isBusy && action === "extract");
+  }
   downloadMenuBtn.disabled = isBusy;
   downloadPdfBtn.disabled = isBusy;
   downloadDocxBtn.disabled = isBusy;

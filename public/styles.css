@@ -137,6 +137,11 @@ textarea:disabled {
   background: var(--blue);
 }
 
+.mobileHeaderCreate,
+.mobileGenerateButton {
+  display: none;
+}
+
 .secondaryAction,
 .ghost {
   color: var(--blue);
@@ -2328,6 +2333,10 @@ button.loading {
   align-items: start;
 }
 
+.mobileProfileIntro {
+  display: none;
+}
+
 .profileCard {
   display: grid;
   grid-template-columns: 74px minmax(0, 1fr);
@@ -2569,21 +2578,170 @@ body.dark .editEditor textarea {
 
 @media (max-width: 700px) {
   .appFrame {
-    padding: 0 18px 32px;
+    padding: 0 16px 32px;
   }
 
-  .appHeader,
+  .appHeader {
+    flex-wrap: nowrap;
+    min-height: 56px;
+    width: calc(100% + 32px);
+    margin: 0 -16px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
   .workspaceHeader {
     flex-wrap: wrap;
   }
 
+  .headerRule,
+  .appHeader .savedHeaderLink,
+  .appHeader .processingBadge {
+    display: none;
+  }
+
+  .appHeader .logoText {
+    font-size: 16px;
+  }
+
+  .appHeader .createButton {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0;
+  }
+
+  .appHeader .createButton::before {
+    content: "+";
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .appHeader .mobileHeaderCreate {
+    display: inline-grid;
+  }
+
+  .appHeader .avatarLink {
+    width: 28px;
+    height: 28px;
+  }
+
+  .contentArea {
+    padding-top: 0;
+  }
+
+  .uploadStage {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-top: 20px;
+  }
+
+  .mainCol {
+    gap: 20px;
+  }
+
+  .sectionTag {
+    min-height: 23px;
+    padding: 5px 12px;
+  }
+
   .mainCol h1 {
-    font-size: 26px;
+    font-size: 24px;
+    line-height: 1.12;
+  }
+
+  .introText {
+    width: 100%;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .introAction {
+    display: none;
   }
 
   .stepTabs,
   .viewSwitch {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    border-radius: 12px;
+  }
+
+  .stepTabs span,
+  .viewBtn {
+    min-height: 31px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  .uploadCard {
+    gap: 14px;
+    min-height: 221px;
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .dropzone {
+    min-height: 100px;
+    padding: 18px 20px;
+    border-radius: 10px;
+  }
+
+  .uploadIcon {
+    display: none;
+  }
+
+  .dropzone > strong {
+    font-size: 0;
+  }
+
+  .dropzone > strong::before {
+    content: "Toque para adicionar seu documento";
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .mobileGenerateButton {
+    display: inline-grid;
+    width: 100%;
+    min-height: 40px;
+    border-radius: 10px;
+  }
+
+  .uploadCard .status {
+    font-size: 12px;
+  }
+
+  .sideCol {
+    gap: 20px;
+  }
+
+  .recentPanel,
+  .structCard {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .recentPanel {
+    min-height: 110px;
+    padding: 18px;
+  }
+
+  .structCard {
+    min-height: 337px;
+    padding: 20px 18px;
+  }
+
+  .sideCol > .structCard::before {
+    content: "Estrutura da Folha";
+    color: var(--blue);
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
   }
 
   .previewSeries,
@@ -2601,7 +2759,9 @@ body.dark .editEditor textarea {
 
   .savedAppHeader {
     min-height: 56px;
-    padding: 14px 0;
+    width: calc(100% + 32px);
+    margin: 0 -16px;
+    padding: 14px 16px;
   }
 
   .savedAppHeader .logoText {
@@ -2674,6 +2834,7 @@ body.dark .editEditor textarea {
     height: 30px;
     min-width: 0;
     padding: 0 30px 0 12px;
+    color: var(--gray);
     border-radius: 8px;
     font-size: 12px;
   }
@@ -2719,6 +2880,7 @@ body.dark .editEditor textarea {
   .savedDocCell span {
     overflow: visible;
     font-size: 13px;
+    font-weight: 700;
     line-height: 1.25;
     text-overflow: clip;
     white-space: normal;
@@ -2771,7 +2933,109 @@ body.dark .editEditor textarea {
   }
 
   .dashboardHero h1 {
-    font-size: 32px;
+    font-size: 24px;
+    line-height: 1.12;
+  }
+
+  .dashboardHero {
+    gap: 10px;
+    padding: 20px 0 20px;
+  }
+
+  .dashboardHero > div {
+    width: 100%;
+  }
+
+  .dashboardDate {
+    margin-bottom: 7px;
+    font-size: 13px;
+  }
+
+  .dashboardCta {
+    width: 100%;
+    min-height: 40px;
+    border-radius: 10px;
+  }
+
+  .dashboardCard {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .dashboardTableCard {
+    overflow: visible;
+  }
+
+  .dashboardCard header {
+    margin-bottom: 20px;
+  }
+
+  .dashboardCard h2 {
+    font-size: 16px;
+  }
+
+  .dashboardCard a {
+    font-size: 12px;
+  }
+
+  .dashboardRecent {
+    gap: 14px;
+  }
+
+  .dashboardTableHeader {
+    display: none;
+  }
+
+  .dashboardRow {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    grid-template-areas:
+      "doc doc"
+      "creator date"
+      "status status";
+    min-width: 0;
+    min-height: 105px;
+    padding: 14px;
+    column-gap: 12px;
+    row-gap: 10px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  .dashboardRow:hover {
+    background: #ffffff;
+  }
+
+  .dashboardRow strong {
+    grid-area: doc;
+    overflow: visible;
+    font-size: 13px;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .dashboardAuthor {
+    grid-area: creator;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .dashboardDateCell {
+    grid-area: date;
+    align-self: center;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .dashboardRow .savedStatusPill {
+    grid-area: status;
+    justify-self: start;
+    min-height: 23px;
+    padding: 0 14px;
+    font-size: 11px;
   }
 
   .statsPill {
@@ -2787,5 +3051,91 @@ body.dark .editEditor textarea {
 
   .profileCard {
     grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 18px;
+    padding: 20px 18px;
+    border-radius: 12px;
+  }
+
+  .mobileProfileIntro {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    padding-top: 20px;
+  }
+
+  .mobileProfileIntro h1 {
+    margin: 0;
+    color: var(--blue);
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .mobileProfileIntro p {
+    margin: 0;
+    color: var(--gray);
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .profileCard > div:not(.profileActions) {
+    display: none;
+  }
+
+  .profileAvatarPicker {
+    justify-self: center;
+  }
+
+  .profileAvatar {
+    width: 56px;
+    height: 56px;
+    font-size: 16px;
+  }
+
+  .profileCard h1 {
+    margin-top: 6px;
+    font-size: 24px;
+  }
+
+  .profileCard input {
+    height: 35px;
+    border-radius: 8px;
+  }
+
+  .profileActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .profileActions .download,
+  .profileActions .secondaryAction {
+    width: 100%;
+    min-height: 37px;
+  }
+
+  .authPage {
+    align-items: flex-start;
+    padding: 60px 16px 32px;
+  }
+
+  .authCard {
+    width: 100%;
+    max-width: 358px;
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .authHeading,
+  .authHeading p {
+    width: 100%;
+  }
+
+  .authBrand strong {
+    font-size: 20px;
+  }
+
+  .authHeading h1 {
+    font-size: 22px;
   }
 }
