@@ -56,10 +56,11 @@ DEFAULT_AVISOS = "Encontro com Deus: 14 a 16 de agosto / inscrições abertas / 
 FIRST_QUESTION = "Compartilhe conosco o que essa Palavra de domingo falou com você."
 
 MODEL_STRUCTURE_GUIDE = (
-    "Siga a estrutura dos PDFs da pasta modelo: comece com uma introdução pastoral em um bloco coeso, "
-    "conectada diretamente ao tema da mensagem, sem parecer uma lista de versículos. "
-    "Use normalmente de dois a três textos bíblicos principais na introdução, integrados ao raciocínio. "
-    "As perguntas devem soar como perguntas de Life Group: simples, conversáveis, profundas e ligadas ao tema. "
+    "Siga a estrutura dos PDFs da pasta modelo: comece com uma introdução que seja um resumo claro de toda a Palavra pregada, "
+    "não apenas uma abertura do tema ou uma lista de versículos. "
+    "A introdução deve sintetizar o sermão inteiro em linguagem simples, pastoral e fácil de entender, "
+    "integrando normalmente de dois a três textos bíblicos principais ao raciocínio. "
+    "As perguntas devem soar como perguntas de Life Group para adolescentes, jovens e adultos estudarem juntos: simples, conversáveis, profundas e ligadas ao tema. "
     "Evite perguntas genéricas como 'que verdade central esse texto revela'. Prefira perguntas concretas: "
     "'o que acontece quando...', 'como isso deve refletir...', 'o que isso significa na prática...', "
     "'dê exemplos', 'como podemos viver isso durante a semana'. "
@@ -678,9 +679,12 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     scripture_context = scripture_passages_for_prompt(text)
     system_prompt = (
         "Você é um editor pastoral da PAZ Church. Gere uma Folha de Estudo Life Group em português do Brasil, "
-        "com escrita clara, bíblica, pastoral e simples para uma reunião da igreja PAZ Church nas casas. "
+        "com escrita clara, bíblica, pastoral e simples para uma reunião da igreja PAZ Church nas casas, "
+        "onde adolescentes, jovens e adultos estudam juntos. "
         f"{MODEL_STRUCTURE_GUIDE} "
         "O conteúdo será usado em um PDF curto de estudo, então seja objetivo, profundo e fácil de discutir. "
+        "A introdução deve abranger toda a Palavra pregada de forma resumida e deve ter no máximo 9 linhas quando renderizada no PDF. "
+        "Não escreva a introdução como mera preparação para o assunto; escreva como resumo introdutório do conteúdo inteiro do PDF. "
         "Dê ênfase maior aos versículos bíblicos citados no sermão, mas escreva com naturalidade pastoral. "
         "Antes de escrever, identifique os textos bíblicos que já aparecem no documento e use alguns deles de forma natural na introdução e em algumas perguntas. "
         "Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas, usando a versão NAA. "
@@ -689,7 +693,8 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "Priorize as passagens bíblicas detectadas que forem enviadas separadamente no prompt do usuário, pois elas já vieram do arquivo original. "
         "Use as referências bíblicas presentes no texto enviado. Quando o texto trouxer apenas a referência, use o texto completo da NAA se você o souber com segurança; "
         "caso contrário, não invente palavras do versículo. "
-        "As perguntas devem ajudar pequenos grupos a discutir o assunto com mais profundidade, conectando Bíblia, vida prática e exemplos reais. "
+        "Depois da introdução, gere exatamente quatro perguntas para pequenos grupos discutirem o assunto com mais profundidade, conectando Bíblia, vida prática e exemplos reais. "
+        f"A primeira pergunta precisa ser exatamente: {FIRST_QUESTION} "
         "Não repita nas perguntas os mesmos versículos que já foram escritos na introdução. "
         "Quando houver versículos no esboço, inclua a passagem bíblica completa logo abaixo das perguntas 2, 3 e/ou 4, usando versículos diferentes dos usados na introdução sempre que possível. "
         "Nunca use a mesma passagem bíblica em duas perguntas diferentes. Cada pergunta com passagem bíblica precisa usar uma referência única. "
@@ -708,10 +713,13 @@ Referências e trechos bíblicos detectados no arquivo:
 
 Contexto e regras por trás:
 - Faça um resumo introdutório claro e de fácil entendimento desse texto, que foi o sermão de domingo do pastor, em no máximo 9 linhas, dando ênfase aos versículos.
-- Esse texto será apenas a introdução de um pequeno PDF de estudos para uma reunião da igreja PAZ Church nas casas.
-- A introdução deve ser coesa, pastoral e conectada ao tema do sermão, não apenas uma lista de versículos.
+- Esse texto será apenas a introdução, mas deverá abranger toda a Palavra pregada de forma resumida, como resumo total do conteúdo do PDF.
+- A introdução não deve ser somente uma introdução da Palavra; ela precisa resumir a mensagem inteira, destacando os principais pontos, revelações, aplicações e textos bíblicos do sermão.
+- Esse documento será um pequeno PDF de estudos para uma reunião da igreja PAZ Church nas casas, em que adolescentes, jovens e adultos estudam juntos.
+- Use linguagem clara o suficiente para adolescentes entenderem e profunda o suficiente para jovens e adultos discutirem.
+- A introdução deve ser coesa, pastoral e conectada ao tema do sermão, não uma lista de versículos.
 - Dê ênfase maior aos versículos; use preferencialmente os primeiros textos principais que aparecem no documento e foram listados em "Referências e trechos bíblicos detectados".
-- A introdução deve parecer com os modelos: um parágrafo ou poucos parágrafos curtos que explicam o tema, inserem os versículos dentro do raciocínio e preparam o grupo para conversar.
+- A introdução deve parecer com os modelos: um parágrafo ou poucos parágrafos curtos que explicam o conteúdo completo da mensagem, inserem os versículos dentro do raciocínio e preparam o grupo para conversar.
 - Na introdução, use normalmente de dois a três textos bíblicos principais. Use apenas mais do que isso se for essencial para entender o tema.
 - Logo após essa introdução, formule exatamente quatro perguntas para que pequenos grupos discutam esse assunto e aprendam mais profundamente.
 - As perguntas devem dar ênfase aos textos bíblicos citados no texto, escrevendo os versículos da mesma forma que na introdução, exceto os versículos que já foram escritos na introdução.
@@ -728,6 +736,7 @@ Contexto e regras por trás:
 - Para obter o texto do versículo, use a versão NAA conforme a referência bíblica enviada. Quando necessário, tome como referência o formato do site Bible.com, por exemplo https://www.bible.com/pt/bible/1840/JHN.1.NAA, mas sem copiar referências que não estejam relacionadas ao sermão.
 - Escreva o versículo completo, sem cortes, sempre.
 - No final, faça uma conclusão curta, com no máximo cinco linhas, sobre os principais destaques e revelações do texto, focando naquilo que é o título.
+- A conclusão deve retomar o foco do título, reforçar a resposta prática esperada e fechar com tom pastoral.
 - Não comece a conclusão com "Concluímos que", "Em resumo" ou "Então".
 
 Texto extraído do arquivo:
@@ -1174,12 +1183,13 @@ def discussion_question_for_ref(text, ref, title="", index=0):
 
 
 def sermon_source_text(text):
-    intro = section_between(
+    cleaned = re.sub(
+        r"(?:Momento Generosidade|Agenda:? Paz Church|Momento Visão e Missão Paz Church|Momento Visao e Missao Paz Church).*?(?=Introdução|Introducao|Resumo|$)",
+        "",
         text,
-        ["Introdução", "Introducao", "Resumo"],
-        ["Perguntas", "Conclusão", "Conclusao", "Momento Generosidade", "Agenda"],
+        flags=re.IGNORECASE | re.DOTALL,
     )
-    return intro or text
+    return cleaned or text
 
 
 def normalize_questions(text, questions=None):
