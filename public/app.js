@@ -15,11 +15,30 @@ const state = {
   busy: false,
   editingSavedId: "",
   view: "preview",
+  readyToSubmit: false,
 };
 
 const DB_NAME = "folha-estudo-arquivos";
 const DB_VERSION = 1;
 const STORE_NAME = "arquivos";
+const LIFE_STRUCTURE = [
+  "Título da série",
+  "Linha do culto",
+  "Momento Generosidade",
+  "Aviso/Agenda",
+  "Momento da visão",
+  "Resumo",
+  "Perguntas + Adicionar",
+  "Conclusão",
+  "Life Group",
+];
+const TADEL_STRUCTURE = [
+  "Título do TADEL",
+  "Data ou texto base",
+  "Resumo introdutório",
+  "Conteúdo resumido",
+  "Conclusão",
+];
 
 const $ = (id) => document.getElementById(id);
 
@@ -46,18 +65,39 @@ function buttonContent(label, loading = false) {
 }
 
 function getExtractLabel() {
-  return "Criar PDF";
+  return state.tipo === "tadel" ? "Criar Resumo" : "Criar PDF";
 }
 
 function startFileSelection() {
   if (state.busy) {
     return;
   }
+  state.readyToSubmit = false;
   $("pdfFile").click();
 }
 
 function getFileName() {
-  return "folha-de-estudo-life-group.pdf";
+  return state.tipo === "tadel" ? "resumo-tadel.pdf" : "folha-de-estudo-life-group.pdf";
+}
+
+function updateStructureCards() {
+  const labels = state.tipo === "tadel" ? TADEL_STRUCTURE : LIFE_STRUCTURE;
+  document.querySelectorAll(".structCard").forEach((card) => {
+    const spans = Array.from(card.querySelectorAll(":scope > span"));
+    if (!spans.length) {
+      return;
+    }
+    labels.forEach((label, index) => {
+      if (!spans[index]) {
+        const span = document.createElement("span");
+        card.append(span);
+        spans[index] = span;
+      }
+      spans[index].textContent = label;
+      spans[index].classList.remove("hidden");
+    });
+    spans.slice(labels.length).forEach((span) => span.classList.add("hidden"));
+  });
 }
 
 async function fetchJson(url, options = {}) {
@@ -89,7 +129,7 @@ function setBusy(isBusy, action = "") {
   extractBtn.disabled = isBusy;
   if (mobileExtractBtn) {
     mobileExtractBtn.disabled = isBusy;
-    mobileExtractBtn.innerHTML = buttonContent(isBusy && action === "extract" ? "Gerando..." : "Gerar PDF", isBusy && action === "extract");
+    mobileExtractBtn.innerHTML = buttonContent(isBusy && action === "extract" ? "Gerando..." : state.tipo === "tadel" ? "Gerar Resumo" : "Gerar PDF", isBusy && action === "extract");
     mobileExtractBtn.classList.toggle("loading", isBusy && action === "extract");
   }
   downloadMenuBtn.disabled = isBusy;
@@ -216,11 +256,11 @@ function renderPreview() {
   const data = collectData();
   const hasContent = fields.some((field) => data[field]) || data.perguntas.length > 0;
   if (!hasContent) {
-    preview.innerHTML = '<p class="previewEmpty">A prévia aparecerá aqui depois que você anexar um arquivo e gerar a folhinha.</p>';
+    preview.innerHTML = '<p class="previewEmpty">A prévia aparecerá aqui depois que você anexar um arquivo e gerar o conteúdo.</p>';
     return;
   }
 
-  const questions = data.perguntas
+  const questions = data.tipo === "tadel" ? "" : data.perguntas
     .map((question, index) => {
       const lines = previewLines(question);
       if (!lines.length) {
@@ -232,6 +272,24 @@ function renderPreview() {
     })
     .filter(Boolean)
     .join("");
+
+  if (data.tipo === "tadel") {
+    preview.innerHTML = `
+      <article class="previewSheet">
+        <header class="previewHeader">
+          <span>Resumo TADEL</span>
+          <h3>Resumo TADEL</h3>
+        </header>
+        ${data.titulo ? `<p class="previewSeries"><strong>Tema:</strong> ${escapeHtml(data.titulo)}</p>` : ""}
+        ${data.subtitulo ? `<p class="previewSubtitle">${escapeHtml(data.subtitulo)}</p>` : ""}
+        ${renderPreviewSection("Resumo introdutório", data.resumo)}
+        ${renderPreviewSection("Conteúdo resumido", data.momentoVisao)}
+        ${renderPreviewSection("Conclusão", data.conclusao)}
+        <footer class="previewFooter">PAZ Church Barueri · Resumo TADEL</footer>
+      </article>
+    `;
+    return;
+  }
 
   preview.innerHTML = `
     <article class="previewSheet">
@@ -296,7 +354,7 @@ function showReviewLoading() {
         <span class="loadingStatusDot" aria-hidden="true"></span>
         <div>
           <strong>Montando estrutura...</strong>
-          <small>Estamos lendo o documento e preparando a folha.</small>
+          <small>Estamos lendo o documento e preparando o conteúdo.</small>
         </div>
       </div>
       <div class="loadingSkeletonLines">
@@ -339,8 +397,8 @@ function collectData() {
   fields.forEach((field) => {
     data[field] = $(field).value.trim();
   });
-  data.perguntas = state.perguntas.map((item) => stripQuestionNumberPrefix(item)).filter(Boolean);
-  data.tipo = "life_group";
+  data.perguntas = state.tipo === "tadel" ? [] : state.perguntas.map((item) => stripQuestionNumberPrefix(item)).filter(Boolean);
+  data.tipo = state.tipo;
   data.textoExtraido = state.textoExtraido;
   return data;
 }
@@ -605,26 +663,61 @@ function loadSavedDraftForEditing() {
   }
 }
 
-function setMode() {
+function setMode(tipo = "life_group") {
   if (state.busy) {
     return;
   }
-  state.tipo = "life_group";
-  $("modeEyebrow").textContent = "Life Group";
-  $("tituloLabel").textContent = "Título da série";
-  $("subtituloLabel").textContent = "Linha do culto";
-  $("resumoLabel").textContent = "Resumo";
+  state.tipo = tipo === "tadel" ? "tadel" : "life_group";
+  const isTadel = state.tipo === "tadel";
+  document.body.classList.toggle("isTadel", isTadel);
+  $("modeEyebrow").textContent = isTadel ? "Resumo TADEL" : "Life Group";
+  $("tituloLabel").textContent = isTadel ? "Título do TADEL" : "Título da série";
+  $("subtituloLabel").textContent = isTadel ? "Data ou linha do encontro" : "Linha do culto";
+  $("resumoLabel").textContent = isTadel ? "Resumo introdutório" : "Resumo";
+  $("conteudoLabel").textContent = isTadel ? "Conteúdo resumido" : "Momento da visão";
   document.querySelectorAll(".lifeOnly").forEach((element) => {
-    element.classList.remove("hidden");
+    element.classList.toggle("hidden", isTadel);
   });
   $("extractBtn").innerHTML = getExtractLabel();
+  const mobileExtractBtn = $("mobileExtractBtn");
+  if (mobileExtractBtn) {
+    mobileExtractBtn.textContent = isTadel ? "Gerar Resumo" : "Gerar PDF";
+  }
+  updateStructureCards();
+  renderPreview();
+}
+
+function openContentTypePrompt() {
+  if (!$("pdfFile").files[0]) {
+    return;
+  }
+  $("contentTypeModal").classList.remove("hidden");
+  document.body.classList.add("modalOpen");
+}
+
+function closeContentTypePrompt({ clearFile = false } = {}) {
+  $("contentTypeModal").classList.add("hidden");
+  document.body.classList.remove("modalOpen");
+  if (clearFile) {
+    $("pdfFile").value = "";
+    $("fileName").textContent = "Nenhum arquivo escolhido";
+    state.readyToSubmit = false;
+  }
+}
+
+function chooseImportType(tipo) {
+  setMode(tipo);
+  state.readyToSubmit = true;
+  closeContentTypePrompt();
+  $("uploadForm").requestSubmit();
 }
 
 $("pdfFile").addEventListener("change", (event) => {
   const file = event.target.files[0];
   $("fileName").textContent = file ? file.name : "Nenhum arquivo escolhido";
   if (file) {
-    $("uploadForm").requestSubmit();
+    state.readyToSubmit = false;
+    openContentTypePrompt();
   }
 });
 
@@ -638,13 +731,18 @@ $("uploadForm").addEventListener("submit", async (event) => {
     setStatus("Escolha um PDF ou Word antes de extrair.", "error");
     return;
   }
+  if (!state.readyToSubmit) {
+    openContentTypePrompt();
+    return;
+  }
+  state.readyToSubmit = false;
 
   setStatus("Lendo o arquivo e organizando os campos...");
   showReviewLoading();
   setBusy(true, "extract");
   const form = new FormData();
   form.append("arquivo", file);
-  form.append("tipo", "life_group");
+  form.append("tipo", state.tipo);
 
   try {
     const response = await fetch("/api/extract", {
@@ -730,7 +828,7 @@ $("downloadDocxBtn").addEventListener("click", async () => {
   setBusy(true, "word");
   try {
     const blob = await generateWordBlob(data);
-    downloadBlob(blob, "folha-de-estudo-life-group.docx");
+    downloadBlob(blob, getFileName().replace(/\.pdf$/i, ".docx"));
     setStatus("Arquivo Word gerado e baixado.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
@@ -792,6 +890,10 @@ fields.forEach((field) => {
 $("previewViewBtn").addEventListener("click", () => setView("preview"));
 $("editViewBtn").addEventListener("click", () => setView("edit"));
 $("extractBtn").addEventListener("click", startFileSelection);
+document.querySelectorAll("[data-import-mode]").forEach((button) => {
+  button.addEventListener("click", () => chooseImportType(button.dataset.importMode));
+});
+$("cancelContentType").addEventListener("click", () => closeContentTypePrompt({ clearFile: true }));
 const topCreateBtn = $("topCreateBtn");
 if (topCreateBtn) {
   topCreateBtn.addEventListener("click", startFileSelection);
@@ -814,7 +916,8 @@ dropzone.addEventListener("drop", (event) => {
   transfer.items.add(file);
   $("pdfFile").files = transfer.files;
   $("fileName").textContent = file.name;
-  $("uploadForm").requestSubmit();
+  state.readyToSubmit = false;
+  openContentTypePrompt();
 });
 
 const themeToggle = $("themeToggle");

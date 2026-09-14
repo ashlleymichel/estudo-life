@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Folha de Estudo</title>
     <meta name="description" content="Crie, revise e exporte suas folhas de estudo." />
-    <link rel="stylesheet" href="/styles.css?v=75" />
+    <link rel="stylesheet" href="/styles.css?v=76" />
   </head>
   <body>
     <main class="appFrame">
@@ -73,10 +73,30 @@
           <input id="pdfFile" name="arquivo" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
         </form>
 
+        <div id="contentTypeModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="contentTypeTitle">
+          <section class="confirmModal contentTypeModal">
+            <div class="modalText">
+              <h2 id="contentTypeTitle">Que tipo de conteúdo você quer gerar?</h2>
+              <p>Escolha como o arquivo importado deve ser organizado.</p>
+            </div>
+            <div class="contentTypeOptions">
+              <button data-import-mode="life_group" type="button">
+                <strong>Folha de Estudo Life Group</strong>
+                <span>Introdução, perguntas para pequenos grupos e conclusão.</span>
+              </button>
+              <button data-import-mode="tadel" type="button">
+                <strong>Resumo do TADEL</strong>
+                <span>Resumo introdutório, conteúdo resumido e conclusão curta.</span>
+              </button>
+            </div>
+            <button id="cancelContentType" class="modalCancel" type="button">Cancelar</button>
+          </section>
+        </div>
+
         <div id="loadingState" class="centerLoading hidden" role="status" aria-live="polite">
           <span class="spinner darkSpinner" aria-hidden="true"></span>
           <strong>Montando estrutura...</strong>
-          <small>Estamos lendo o documento e preparando a folha.</small>
+          <small>Estamos lendo o documento e preparando o conteúdo.</small>
           <div class="structCard buildingStruct" aria-label="Progresso da estrutura">
             <span>Título da série</span>
             <span>Linha do culto</span>
@@ -138,8 +158,8 @@
                 <span>Aviso/Agenda</span>
                 <textarea id="avisos" rows="4"></textarea>
               </label>
-              <label class="lifeOnly">
-                <span>Momento da visão</span>
+              <label>
+                <span id="conteudoLabel">Momento da visão</span>
                 <textarea id="momentoVisao" rows="5"></textarea>
               </label>
               <label>
@@ -196,6 +216,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="/supabase-client.js?v=3"></script>
-    <script src="/app.js?v=69"></script>
+    <script src="/app.js?v=70"></script>
   </body>
 </html>

@@ -675,6 +675,21 @@ def life_group_full_schema():
     }
 
 
+def tadel_schema():
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "titulo": {"type": "string"},
+            "subtitulo": {"type": "string"},
+            "resumo": {"type": "string"},
+            "momentoVisao": {"type": "string"},
+            "conclusao": {"type": "string"},
+        },
+        "required": ["titulo", "subtitulo", "resumo", "momentoVisao", "conclusao"],
+    }
+
+
 def generate_life_group_with_chatgpt(text, title="", subtitle=""):
     scripture_context = scripture_passages_for_prompt(text)
     system_prompt = (
@@ -743,6 +758,41 @@ Texto extraído do arquivo:
 {truncate_for_model(text)}
 """.strip()
     return call_chatgpt_json(system_prompt, user_prompt, life_group_schema())
+
+
+def generate_tadel_with_chatgpt(text, title="", subtitle=""):
+    system_prompt = (
+        "Você é um editor pastoral da PAZ Church. Gere um Resumo do TADEL em português do Brasil, "
+        "com escrita clara, organizada, pastoral e objetiva. "
+        "Use como referência de estilo os resumos do TADEL: comece com data/tema quando houver, "
+        "faça um resumo introdutório curto, desenvolva o conteúdo resumido em parágrafos claros e, quando o sermão tiver pontos numerados, preserve essa lógica em tópicos numerados. "
+        "Não crie perguntas. Não inclua Momentos de Life Group, agenda, generosidade ou visão da igreja. "
+        "O resumo introdutório deve ter no máximo 9 linhas quando renderizado no PDF. "
+        "A conclusão deve ter no máximo 5 linhas, retomando os principais destaques e a resposta prática do tema. "
+        "Escreva de forma fiel ao conteúdo extraído, sem inventar informações, nomes, metas ou textos bíblicos que não apareçam no arquivo. "
+        "Não inclua markdown, títulos de seção fora dos campos JSON, numeração externa ou explicações fora dos campos JSON."
+    )
+    user_prompt = f"""
+Título detectado: {title or "não informado"}
+Subtítulo/Data detectada: {subtitle or "não informado"}
+
+Crie um Resumo do TADEL com estes campos:
+- titulo: título principal do TADEL.
+- subtitulo: data, texto base ou linha curta de contexto, quando houver.
+- resumo: resumo introdutório claro, com no máximo 9 linhas, apresentando o tema geral do TADEL.
+- momentoVisao: conteúdo resumido do PDF extraído. Preserve pontos numerados quando existirem, no estilo "1 - Título do ponto" seguido de parágrafos curtos.
+- conclusao: conclusão curta, com no máximo 5 linhas, focada no título e na aplicação prática.
+
+Tom desejado:
+- Linguagem pastoral, simples e fácil de entender.
+- Conteúdo organizado como resumo de ministração, não como estudo com perguntas.
+- Parágrafos curtos, objetivos e fiéis ao arquivo original.
+- Se houver referências bíblicas no PDF, cite-as naturalmente dentro do resumo, sem transformar o material em perguntas.
+
+Texto extraído do arquivo:
+{truncate_for_model(text)}
+""".strip()
+    return call_chatgpt_json(system_prompt, user_prompt, tadel_schema())
 
 
 def normalize_editable_payload(data):
@@ -1504,6 +1554,51 @@ def parse_pdf_text(text):
     }
 
 
+def parse_tadel_text(text):
+    text = normalize_pdf_chars(text)
+    lines = [compact_text(line) for line in text.splitlines() if compact_text(line)]
+    date_match = re.search(r"\bData\s*:\s*([0-3]?\d[\/.][01]?\d[\/.]\d{4})", text, re.IGNORECASE)
+    title = ""
+    for line in lines[:12]:
+        if re.match(r"^Data\s*:", line, re.IGNORECASE):
+            continue
+        if re.match(r"^Texto base\s*:", line, re.IGNORECASE):
+            continue
+        if len(line) > 6:
+            title = line
+            break
+    title = re.split(
+        r"\s+(?=(?:No\s+TADEL|Neste\s+TADEL|João\s+\d+|Mateus\s+\d+|Romanos\s+\d+|Em\s+(?:João|Mateus|Romanos)\s+\d+).{0,120}\b(?:apresenta|aprendemos|ensina|mostra|foi|encontramos|temos|nos)\b)",
+        title,
+        maxsplit=1,
+        flags=re.IGNORECASE,
+    )[0].strip()
+    title = title or "Resumo TADEL"
+    subtitle_parts = []
+    if date_match:
+        subtitle_parts.append(f"Data: {date_match.group(1)}")
+    text_base_match = re.search(r"Texto base\s*:\s*(.+)", text, re.IGNORECASE)
+    if text_base_match:
+        subtitle_parts.append(f"Texto base: {compact_text(text_base_match.group(1))}")
+    subtitle = " · ".join(subtitle_parts) or "TADEL"
+
+    chatgpt_payload = generate_tadel_with_chatgpt(text, title, subtitle)
+    selected, _ = select_context_sentences(text, title, 5)
+    fallback_content = clamp_sentences(" ".join(selected) or text, 4, 8)
+    return {
+        "titulo": (chatgpt_payload or {}).get("titulo") or title,
+        "subtitulo": (chatgpt_payload or {}).get("subtitulo") or subtitle,
+        "momentoGenerosidade": "",
+        "avisos": "",
+        "momentoVisao": (chatgpt_payload or {}).get("momentoVisao") or fallback_content,
+        "resumo": (chatgpt_payload or {}).get("resumo") or summarize_with_title(text, title, 4),
+        "perguntas": [],
+        "conclusao": (chatgpt_payload or {}).get("conclusao") or short_conclusion(text, title),
+        "tipo": "tadel",
+        "textoExtraido": text,
+    }
+
+
 def parse_multipart_file(body, content_type):
     boundary_match = re.search(r"boundary=(.+)", content_type)
     if not boundary_match:
@@ -1825,7 +1920,30 @@ def build_life_group_pdf(data, output_path):
     doc.build(story, onFirstPage=draw_life_group_header, onLaterPages=draw_life_group_header)
 
 
+def build_tadel_pdf(data, output_path):
+    doc = make_doc(output_path, data.get("titulo", "Resumo TADEL"))
+    styles, regular_font, bold_font = document_styles()
+    story = [
+        paragraph(f'Tema: {data.get("titulo", "Resumo TADEL")}', styles["title"]),
+        paragraph(data.get("subtitulo") or "TADEL", styles["meta"]),
+        section_rule(),
+    ]
+    add_bullet_section(story, "Resumo introdutório", data.get("resumo"), styles, bold_font)
+    story.append(section_rule())
+    add_bullet_section(story, "Conteúdo resumido", data.get("momentoVisao"), styles, bold_font)
+    story.append(section_rule())
+    add_bullet_section(story, "Conclusão", data.get("conclusao"), styles, bold_font)
+    doc.build(
+        story,
+        onFirstPage=lambda canvas, doc: draw_document_header(canvas, doc, "Resumo TADEL"),
+        onLaterPages=lambda canvas, doc: draw_document_header(canvas, doc, "Resumo TADEL"),
+    )
+
+
 def build_pdf(data, output_path):
+    if data.get("tipo") == "tadel":
+        build_tadel_pdf(data, output_path)
+        return
     data["tipo"] = "life_group"
     build_life_group_pdf(data, output_path)
 
@@ -1881,15 +1999,32 @@ def word_agenda_section(text):
 
 
 def docx_document_xml(data):
-    data["tipo"] = "life_group"
-    title = data.get("titulo") or "Folha de Estudo Life Group"
+    is_tadel = data.get("tipo") == "tadel"
+    title = data.get("titulo") or ("Resumo TADEL" if is_tadel else "Folha de Estudo Life Group")
     subtitle = data.get("subtitulo") or ""
     body = [
-        word_paragraph("Estudo Life Group", "Title"),
+        word_paragraph("Resumo TADEL" if is_tadel else "Estudo Life Group", "Title"),
         word_paragraph(f"Tema: {title}", "Heading1"),
     ]
     if subtitle:
         body.append(word_paragraph(subtitle, "Subtitle"))
+
+    if is_tadel:
+        body.extend(word_section("Resumo introdutório", data.get("resumo")))
+        body.extend(word_section("Conteúdo resumido", data.get("momentoVisao")))
+        body.extend(word_section("Conclusão", data.get("conclusao")))
+        section = (
+            "<w:sectPr>"
+            '<w:pgSz w:w="11906" w:h="16838"/>'
+            '<w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>'
+            "</w:sectPr>"
+        )
+        return (
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+            f"<w:body>{''.join(body)}{section}</w:body>"
+            "</w:document>"
+        )
 
     source_for_questions = "\n".join(normalize_pdf_chars(data.get(key, "")).strip() for key in ("textoExtraido", "resumo"))
     final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
@@ -2018,8 +2153,9 @@ class Handler(SimpleHTTPRequestHandler):
                     temp_path = Path(temp.name)
                 try:
                     text = extract_text_from_document(temp_path, filename)
-                    payload = parse_pdf_text(text)
-                    payload["tipo"] = "life_group"
+                    tipo = (fields.get("tipo") or "life_group").strip().lower()
+                    payload = parse_tadel_text(text) if tipo == "tadel" else parse_pdf_text(text)
+                    payload["tipo"] = "tadel" if tipo == "tadel" else "life_group"
                     self.send_json(payload)
                 finally:
                     temp_path.unlink(missing_ok=True)
@@ -2033,9 +2169,10 @@ class Handler(SimpleHTTPRequestHandler):
                 try:
                     build_pdf(data, output_path)
                     pdf = output_path.read_bytes()
+                    filename = "resumo-tadel.pdf" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.pdf"
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/pdf")
-                    self.send_header("Content-Disposition", 'attachment; filename="folha-de-estudo-life-group.pdf"')
+                    self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
                     self.send_header("Content-Length", str(len(pdf)))
                     self.end_headers()
                     self.wfile.write(pdf)
@@ -2051,7 +2188,7 @@ class Handler(SimpleHTTPRequestHandler):
                 try:
                     build_word(data, output_path)
                     docx = output_path.read_bytes()
-                    filename = "folha-de-estudo-life-group.docx"
+                    filename = "resumo-tadel.docx" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.docx"
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                     self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
