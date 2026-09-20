@@ -798,8 +798,7 @@ Texto extraído do arquivo:
 def normalize_editable_payload(data):
     data = data or {}
     perguntas = data.get("perguntas") if isinstance(data.get("perguntas"), list) else []
-    source_text = "\n".join(str(data.get(key) or "") for key in ("textoExtraido", "resumo"))
-    perguntas = normalize_questions(source_text, [str(item) for item in perguntas])
+    perguntas = submitted_questions(perguntas)
     return {
         "titulo": str(data.get("titulo") or ""),
         "subtitulo": str(data.get("subtitulo") or ""),
@@ -812,6 +811,14 @@ def normalize_editable_payload(data):
         "tipo": "life_group",
         "textoExtraido": str(data.get("textoExtraido") or ""),
     }
+
+
+def submitted_questions(questions):
+    return [
+        strip_question_number_prefix(str(question or "")).strip()
+        for question in (questions or [])
+        if compact_text(question)
+    ]
 
 
 def split_questions(value):
@@ -1888,11 +1895,13 @@ def build_life_group_pdf(data, output_path):
     doc = make_doc(output_path, data.get("titulo", "Folha de Estudo Life Group"))
     styles, regular_font, bold_font = document_styles()
 
-    source_for_questions = "\n".join(
-        normalize_pdf_chars(data.get(key, "")).strip()
-        for key in ("textoExtraido", "resumo")
-    )
-    final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
+    final_questions = submitted_questions(data.get("perguntas") or [])
+    if not final_questions:
+        source_for_questions = "\n".join(
+            normalize_pdf_chars(data.get(key, "")).strip()
+            for key in ("textoExtraido", "resumo")
+        )
+        final_questions = normalize_questions(source_for_questions, [])
 
     story = [
         paragraph(f'Tema: {data.get("titulo", "Folha de Estudo Life Group")}', styles["title"]),
@@ -2026,8 +2035,10 @@ def docx_document_xml(data):
             "</w:document>"
         )
 
-    source_for_questions = "\n".join(normalize_pdf_chars(data.get(key, "")).strip() for key in ("textoExtraido", "resumo"))
-    final_questions = normalize_questions(source_for_questions, data.get("perguntas") or [])
+    final_questions = submitted_questions(data.get("perguntas") or [])
+    if not final_questions:
+        source_for_questions = "\n".join(normalize_pdf_chars(data.get(key, "")).strip() for key in ("textoExtraido", "resumo"))
+        final_questions = normalize_questions(source_for_questions, [])
     body.extend(word_section("Momento Generosidade", data.get("momentoGenerosidade")))
     body.extend(word_agenda_section(data.get("avisos")))
     body.extend(word_section("Momento Visão e Missão Paz Church", data.get("momentoVisao")))
