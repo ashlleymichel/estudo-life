@@ -3,8 +3,14 @@ const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbnd6ZWlidnJodG5nb3F4em9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0NTMwNjYsImV4cCI6MjEwNDAyOTA2Nn0.TA1vVL8ZZU5B3c_Z7LGGtLVeC41JBSZBdXNBXeAsyUA";
 
 const folhaSupabase = (() => {
-  const client = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const APP_URL = "https://estudo-life.vercel.app";
+  const client = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      detectSessionInUrl: true,
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  });
+  const APP_URL = window.location.origin && window.location.origin !== "null" ? window.location.origin : "https://estudo-life.vercel.app";
   const PDF_BUCKET = "study-pdfs";
   const AVATAR_BUCKET = "profile-photos";
 
@@ -56,6 +62,9 @@ const folhaSupabase = (() => {
   async function currentSession() {
     if (!client) {
       return null;
+    }
+    if (window.location.hash.includes("access_token=") || window.location.hash.includes("refresh_token=")) {
+      await new Promise((resolve) => window.setTimeout(resolve, 150));
     }
     const { data, error } = await client.auth.getSession();
     if (error) {

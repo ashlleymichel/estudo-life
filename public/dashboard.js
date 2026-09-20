@@ -2,6 +2,18 @@ const recent = document.getElementById("dashboardRecent");
 const greeting = document.getElementById("greeting");
 const todayLabel = document.getElementById("todayLabel");
 
+async function requireSession() {
+  if (!window.folhaSupabase?.isReady()) {
+    return null;
+  }
+  const user = await window.folhaSupabase.currentUser().catch(() => null);
+  if (!user) {
+    window.location.replace("/login.html");
+    return null;
+  }
+  return user;
+}
+
 function formatDate(value) {
   return new Intl.DateTimeFormat("pt-BR", {
     weekday: "long",
@@ -50,7 +62,7 @@ async function hydrateDashboardProfile() {
   if (!window.folhaSupabase?.isReady()) {
     return;
   }
-  const user = await window.folhaSupabase.currentUser().catch(() => null);
+  const user = await requireSession();
   if (!user) {
     return;
   }
@@ -116,12 +128,19 @@ function renderFiles(files) {
   });
 }
 
-const now = new Date();
-todayLabel.textContent = formatDate(now);
-greeting.textContent = `${greetingText(now.getHours())}!`;
+async function initDashboard() {
+  const user = await requireSession();
+  if (!user) {
+    return;
+  }
+  const now = new Date();
+  todayLabel.textContent = formatDate(now);
+  greeting.textContent = `${greetingText(now.getHours())}!`;
+  await window.folhaSupabase?.hydrateHeaderProfile();
+  await hydrateDashboardProfile();
+  loadFiles().then(renderFiles).catch(() => {
+    recent.innerHTML = '<p class="emptyState compactEmpty">Não foi possível carregar os PDFs recentes.</p>';
+  });
+}
 
-loadFiles().then(renderFiles).catch(() => {
-  recent.innerHTML = '<p class="emptyState compactEmpty">Não foi possível carregar os PDFs recentes.</p>';
-});
-window.folhaSupabase?.hydrateHeaderProfile();
-hydrateDashboardProfile();
+initDashboard();

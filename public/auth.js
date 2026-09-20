@@ -8,6 +8,18 @@ const authStatus = document.getElementById("authStatus");
 const googleButton = document.getElementById("googleAuth");
 const mode = document.body.dataset.authMode || "login";
 
+function authUrlError() {
+  const params = new URLSearchParams(window.location.search);
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  return params.get("error_description") || hash.get("error_description") || params.get("error") || hash.get("error") || "";
+}
+
+function cleanAuthUrl() {
+  if (window.location.search || window.location.hash) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
 function setAuthStatus(message, type = "") {
   authStatus.textContent = message;
   authStatus.className = `authStatus ${type}`.trim();
@@ -82,8 +94,18 @@ window.addEventListener("pageshow", () => {
   setAuthBusy(false);
 });
 
+const urlError = authUrlError();
+if (urlError) {
+  setAuthStatus(urlError.replace(/\+/g, " "), "error");
+  cleanAuthUrl();
+}
+
 window.folhaSupabase?.currentUser().then((user) => {
-  if (user) {
-    window.location.href = "/dashboard.html";
+  if (user && !urlError) {
+    window.location.replace("/dashboard.html");
+  }
+}).catch(() => {
+  if (!urlError) {
+    setAuthStatus("Não foi possível verificar sua sessão. Tente entrar novamente.", "error");
   }
 });
