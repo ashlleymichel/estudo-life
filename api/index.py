@@ -13,10 +13,12 @@ if str(ROOT) not in sys.path:
 from server import (  # noqa: E402
     build_pdf,
     build_word,
+    content_disposition,
     delete_saved_record,
     extract_text_from_document,
     parse_multipart_file,
     parse_pdf_text,
+    payload_filename,
     public_saved_record,
     read_saved_records,
     upsert_saved_record,
@@ -83,9 +85,10 @@ class handler(BaseHTTPRequestHandler):
                 try:
                     build_pdf(data, output_path)
                     pdf = output_path.read_bytes()
+                    filename = payload_filename(data, "pdf")
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/pdf")
-                    self.send_header("Content-Disposition", 'attachment; filename="folha-de-estudo-life-group.pdf"')
+                    self.send_header("Content-Disposition", content_disposition(filename))
                     self.send_header("Content-Length", str(len(pdf)))
                     self.end_headers()
                     self.wfile.write(pdf)
@@ -101,10 +104,10 @@ class handler(BaseHTTPRequestHandler):
                 try:
                     build_word(data, output_path)
                     docx = output_path.read_bytes()
-                    filename = "folha-de-estudo-life-group.docx"
+                    filename = payload_filename(data, "docx")
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-                    self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+                    self.send_header("Content-Disposition", content_disposition(filename))
                     self.send_header("Content-Length", str(len(docx)))
                     self.end_headers()
                     self.wfile.write(docx)

@@ -146,6 +146,21 @@ function downloadBlob(blob, filename) {
   URL.revokeObjectURL(url);
 }
 
+function fileBaseName(value, fallback) {
+  return String(value || "")
+    .normalize("NFC")
+    .replace(/[\\/:*?"<>|]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120) || fallback;
+}
+
+function downloadName(file, format) {
+  const fallback = file?.type === "tadel" ? "Resumo TADEL" : "Folha de Estudo Life Group";
+  const title = file?.title || file?.data?.titulo || "";
+  return `${fileBaseName(title, fallback)}.${format}`;
+}
+
 async function generateBlob(file, endpoint) {
   if (!file.data) {
     throw new Error("Este arquivo precisa ser salvo novamente para baixar neste formato.");
@@ -172,15 +187,15 @@ async function downloadFile(file, format, button) {
       if (!response.ok) {
         throw new Error("Não foi possível baixar o PDF salvo.");
       }
-      downloadBlob(await response.blob(), file.name || "folha-de-estudo-life-group.pdf");
+      downloadBlob(await response.blob(), downloadName(file, "pdf"));
       return;
     }
     if (format === "pdf" && file.blob) {
-      downloadBlob(file.blob, file.name || "folha-de-estudo-life-group.pdf");
+      downloadBlob(file.blob, downloadName(file, "pdf"));
       return;
     }
     const blob = await generateBlob(file, format === "pdf" ? "/api/pdf" : "/api/word");
-    downloadBlob(blob, format === "pdf" ? "folha-de-estudo-life-group.pdf" : "folha-de-estudo-life-group.docx");
+    downloadBlob(blob, downloadName(file, format));
   } catch (error) {
     alert(error.message);
   } finally {

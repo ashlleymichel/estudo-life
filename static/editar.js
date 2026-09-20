@@ -33,8 +33,18 @@ function buttonContent(label, loading = false) {
   return loading ? `<span class="spinner" aria-hidden="true"></span><span>${label}</span>` : label;
 }
 
-function getFileName() {
-  return "folha-de-estudo-life-group.pdf";
+function fileBaseName(value, fallback) {
+  return String(value || "")
+    .normalize("NFC")
+    .replace(/[\\/:*?"<>|]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120) || fallback;
+}
+
+function getFileName(data = null, extension = "pdf") {
+  const title = data?.titulo || $("titulo")?.value || "";
+  return `${fileBaseName(title, "Folha de Estudo Life Group")}.${extension}`;
 }
 
 async function fetchJson(url, options = {}) {
@@ -213,7 +223,7 @@ async function savePdfOnline(blob, data) {
     try {
       const record = await window.folhaSupabase.saveStudyFile({
         id: state.editingSavedId || "",
-        name: state.savedName || getFileName(),
+        name: getFileName(data),
         title: data.titulo || "Arquivo sem título",
         size: blob.size,
         data,
@@ -234,7 +244,7 @@ async function savePdfOnline(blob, data) {
 
   const payload = {
     id: state.editingSavedId || "",
-    name: state.savedName || getFileName(),
+    name: getFileName(data),
     title: data.titulo || "Arquivo sem título",
     size: blob.size,
     data,
@@ -255,7 +265,7 @@ async function savePdfOnline(blob, data) {
   const db = await openSavedDb();
   const file = {
     id: state.editingSavedId || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    name: state.savedName || getFileName(),
+    name: getFileName(data),
     title: data.titulo || "Arquivo sem título",
     type: data.tipo,
     size: blob.size,
@@ -365,7 +375,7 @@ $("downloadPdfBtn").addEventListener("click", async () => {
   setBusy(true, "pdf");
   try {
     const blob = await generatePdfBlob(data);
-    downloadBlob(blob, getFileName());
+    downloadBlob(blob, getFileName(data));
     setStatus("PDF baixado.", "ok");
   } catch (error) {
     setStatus(error.message, "error");
@@ -388,7 +398,7 @@ $("downloadDocxBtn").addEventListener("click", async () => {
   setBusy(true, "word");
   try {
     const blob = await generateWordBlob(data);
-    downloadBlob(blob, "folha-de-estudo-life-group.docx");
+    downloadBlob(blob, getFileName(data, "docx"));
     setStatus("Word baixado.", "ok");
   } catch (error) {
     setStatus(error.message, "error");

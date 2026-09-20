@@ -13,7 +13,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
@@ -819,6 +819,25 @@ def submitted_questions(questions):
         for question in (questions or [])
         if compact_text(question)
     ]
+
+
+def file_base_name(value, fallback="arquivo"):
+    name = re.sub(r'[\\/:*?"<>|]+', " ", str(value or ""))
+    name = re.sub(r"\s+", " ", name).strip()[:120]
+    return name or fallback
+
+
+def payload_filename(data, extension):
+    fallback = "Resumo TADEL" if data.get("tipo") == "tadel" else "Folha de Estudo Life Group"
+    return f"{file_base_name(data.get('titulo'), fallback)}.{extension}"
+
+
+def content_disposition(filename):
+    ascii_name = file_base_name(
+        filename.encode("ascii", "ignore").decode("ascii"),
+        "arquivo.pdf" if filename.lower().endswith(".pdf") else "arquivo.docx",
+    )
+    return f'attachment; filename="{ascii_name}"; filename*=UTF-8\'\'{quote(filename)}'
 
 
 def split_questions(value):
@@ -2180,10 +2199,10 @@ class Handler(SimpleHTTPRequestHandler):
                 try:
                     build_pdf(data, output_path)
                     pdf = output_path.read_bytes()
-                    filename = "resumo-tadel.pdf" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.pdf"
+                    filename = payload_filename(data, "pdf")
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/pdf")
-                    self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+                    self.send_header("Content-Disposition", content_disposition(filename))
                     self.send_header("Content-Length", str(len(pdf)))
                     self.end_headers()
                     self.wfile.write(pdf)
@@ -2199,10 +2218,10 @@ class Handler(SimpleHTTPRequestHandler):
                 try:
                     build_word(data, output_path)
                     docx = output_path.read_bytes()
-                    filename = "resumo-tadel.docx" if data.get("tipo") == "tadel" else "folha-de-estudo-life-group.docx"
+                    filename = payload_filename(data, "docx")
                     self.send_response(HTTPStatus.OK)
                     self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-                    self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+                    self.send_header("Content-Disposition", content_disposition(filename))
                     self.send_header("Content-Length", str(len(docx)))
                     self.end_headers()
                     self.wfile.write(docx)
