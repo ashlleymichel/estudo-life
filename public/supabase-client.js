@@ -18,6 +18,22 @@ const folhaSupabase = (() => {
     return Boolean(client);
   }
 
+  async function ensureConnection() {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 6000);
+    try {
+      await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+        mode: "no-cors",
+        cache: "no-store",
+        signal: controller.signal,
+      });
+    } catch (error) {
+      throw new Error("Não foi possível conectar ao Supabase. Verifique se o projeto está ativo e se a URL do projeto está correta.");
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
   function cleanName(value, fallback = "arquivo") {
     return String(value || fallback)
       .normalize("NFD")
@@ -139,6 +155,7 @@ const folhaSupabase = (() => {
   }
 
   async function signUp({ name, email, password }) {
+    await ensureConnection();
     const { data, error } = await client.auth.signUp({
       email,
       password,
@@ -157,6 +174,7 @@ const folhaSupabase = (() => {
   }
 
   async function signIn({ email, password }) {
+    await ensureConnection();
     const { data, error } = await client.auth.signInWithPassword({ email, password });
     if (error) {
       throw error;
@@ -172,6 +190,7 @@ const folhaSupabase = (() => {
   }
 
   async function signInWithGoogle() {
+    await ensureConnection();
     const { error } = await client.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${APP_URL}/dashboard.html` },
