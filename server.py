@@ -698,9 +698,10 @@ def generate_life_group_with_chatgpt(text, title="", subtitle=""):
         "onde adolescentes, jovens e adultos estudam juntos. "
         f"{MODEL_STRUCTURE_GUIDE} "
         "O conteúdo será usado em um PDF curto de estudo, então seja objetivo, profundo e fácil de discutir. "
+        "O campo titulo deve ser exatamente o título detectado no arquivo quando ele for informado; não invente, encurte ou substitua esse título. "
         "A introdução deve abranger toda a Palavra pregada de forma resumida e deve ter no máximo 9 linhas quando renderizada no PDF. "
-        "Não escreva a introdução como mera preparação para o assunto; escreva como resumo introdutório do conteúdo inteiro do PDF. "
-        "Dê ênfase maior aos versículos bíblicos citados no sermão, mas escreva com naturalidade pastoral. "
+        "Não escreva a introdução como mera preparação para o assunto; escreva como resumo introdutório da ministração inteira, com os principais pontos, aplicações e revelações. "
+        "Dê ênfase maior às referências bíblicas citadas no sermão, mas escreva com naturalidade pastoral. "
         "Antes de escrever, identifique os textos bíblicos que já aparecem no documento e use alguns deles de forma natural na introdução e em algumas perguntas. "
         "Escreva todos os versículos citados na introdução e nas perguntas em itálico entre aspas, usando a versão NAA. "
         "O sistema renderiza o itálico no PDF; no JSON, escreva o versículo entre aspas e com a referência bíblica. "
@@ -727,8 +728,9 @@ Referências e trechos bíblicos detectados no arquivo:
 {scripture_context or "Nenhum trecho bíblico estruturado foi detectado automaticamente. Use as referências que aparecem no texto extraído."}
 
 Contexto e regras por trás:
+- O campo titulo deve manter exatamente o título detectado acima quando ele existir. Esse título será exibido no PDF como o título da ministração.
 - Faça um resumo introdutório claro e de fácil entendimento desse texto, que foi o sermão de domingo do pastor, em no máximo 9 linhas, dando ênfase aos versículos.
-- Esse texto será apenas a introdução, mas deverá abranger toda a Palavra pregada de forma resumida, como resumo total do conteúdo do PDF.
+- Esse texto será a introdução do material, mas deverá abranger toda a Palavra pregada de forma resumida, como resumo total da ministração.
 - A introdução não deve ser somente uma introdução da Palavra; ela precisa resumir a mensagem inteira, destacando os principais pontos, revelações, aplicações e textos bíblicos do sermão.
 - Esse documento será um pequeno PDF de estudos para uma reunião da igreja PAZ Church nas casas, em que adolescentes, jovens e adultos estudam juntos.
 - Use linguagem clara o suficiente para adolescentes entenderem e profunda o suficiente para jovens e adultos discutirem.
@@ -753,6 +755,7 @@ Contexto e regras por trás:
 - No final, faça uma conclusão curta, com no máximo cinco linhas, sobre os principais destaques e revelações do texto, focando naquilo que é o título.
 - A conclusão deve retomar o foco do título, reforçar a resposta prática esperada e fechar com tom pastoral.
 - Não comece a conclusão com "Concluímos que", "Em resumo" ou "Então".
+- A seção Agenda Paz Church deve ficar vazia; a pessoa preencherá os avisos manualmente depois, se desejar.
 
 Texto extraído do arquivo:
 {truncate_for_model(text)}
@@ -851,6 +854,55 @@ def split_questions(value):
         if item:
             questions.append(re.sub(r"^\d+\)\s*", "", item).strip())
     return questions
+
+
+def looks_like_sermon_title(line):
+    value = compact_text(line)
+    if not (6 <= len(value) <= 140):
+        return False
+    if not re.search(r"[A-Za-zÀ-ÿ]", value):
+        return False
+    lower = value.lower()
+    blocked = [
+        "folha de estudo",
+        "estudo life group",
+        "life group",
+        "paz church",
+        "culto presencial",
+        "momento generosidade",
+        "agenda",
+        "introdução",
+        "introducao",
+        "perguntas",
+        "conclusão",
+        "conclusao",
+        "texto base",
+        "data:",
+        "pastor",
+        "cnpj",
+        "banco:",
+    ]
+    if any(item in lower for item in blocked):
+        return False
+    if value.startswith(("“", '"', "'", "-", "•")):
+        return False
+    if biblical_references(value):
+        return False
+    letters = [char for char in value if char.isalpha()]
+    uppercase_ratio = sum(1 for char in letters if char.isupper()) / max(len(letters), 1)
+    return uppercase_ratio >= 0.55 or bool(re.search(r"\bparte\b|\blição\b|\blicao\b|[-–—]", value, re.IGNORECASE))
+
+
+def detect_life_group_title(text):
+    source = normalize_pdf_chars(text)
+    serie_match = re.search(r"S[ée]rie\s*:\s*[“\"]?(.+?)[”\"]?(?:\n|$)", source, re.IGNORECASE)
+    if serie_match:
+        return compact_text(serie_match.group(1))
+    for line in source.splitlines()[:45]:
+        candidate = compact_text(line)
+        if looks_like_sermon_title(candidate):
+            return candidate
+    return "Folha de Estudo Life Group"
 
 
 def biblical_references(text):
@@ -1527,7 +1579,6 @@ def infer_questions(text):
 
 
 def parse_pdf_text(text):
-    title_match = re.search(r"S[ée]rie\s*:\s*[“\"]?(.+?)[”\"]?(?:\n|$)", text, re.IGNORECASE)
     meta_match = re.search(r"(Culto Presencial[^\n]+)", text, re.IGNORECASE)
     date_match = re.search(r"Data\s*:\s*([0-9./-]+)", text, re.IGNORECASE)
     pastor_match = re.search(r"Pastor(?:a)?\s+([^/\n]+)", text, re.IGNORECASE)
@@ -1543,35 +1594,27 @@ def parse_pdf_text(text):
             "Introducao",
         ],
     )
-    avisos = section_between(
-        text,
-        ["Agenda", "Avisos"],
-        [
-            "Momento Visão e Missão Paz Church",
-            "Momento Visao e Missao Paz Church",
-            "Introdução",
-            "Introducao",
-        ],
-    )
     visao = section_between(
         text,
         ["Momento Visão e Missão Paz Church", "Momento Visao e Missao Paz Church"],
         ["Introdução", "Introducao", "Perguntas"],
     )
-    title = title_match.group(1).strip() if title_match else "Folha de Estudo Life Group"
+    title = detect_life_group_title(text)
     subtitle = meta_match.group(1).strip() if meta_match else "Culto Presencial e On-Line / Life Group"
     chatgpt_payload = generate_life_group_with_chatgpt(text, title, subtitle)
     resumo = (chatgpt_payload or {}).get("resumo") or summarize_with_title(text, title)
     conclusao = (chatgpt_payload or {}).get("conclusao") or short_conclusion(text, title)
     perguntas = normalize_questions(text, (chatgpt_payload or {}).get("perguntas") or infer_questions(text))
+    generated_title = compact_text((chatgpt_payload or {}).get("titulo") or "")
+    final_title = title if title and title != "Folha de Estudo Life Group" else generated_title or title
 
     return {
-        "titulo": (chatgpt_payload or {}).get("titulo") or title,
+        "titulo": final_title,
         "subtitulo": (chatgpt_payload or {}).get("subtitulo") or subtitle,
         "data": date_match.group(1).strip() if date_match else "",
         "pastor": pastor_match.group(1).strip() if pastor_match else "",
         "momentoGenerosidade": generosidade or DEFAULT_GENEROSIDADE,
-        "avisos": avisos or DEFAULT_AVISOS,
+        "avisos": "",
         "momentoVisao": visao or DEFAULT_VISAO,
         "resumo": resumo or "Resumo da mensagem extraído a partir do PDF enviado.",
         "perguntas": perguntas,
@@ -1923,7 +1966,7 @@ def build_life_group_pdf(data, output_path):
         final_questions = normalize_questions(source_for_questions, [])
 
     story = [
-        paragraph(f'Tema: {data.get("titulo", "Folha de Estudo Life Group")}', styles["title"]),
+        paragraph(data.get("titulo") or "Folha de Estudo Life Group", styles["title"]),
         paragraph(data.get("subtitulo") or "Culto Presencial e On-Line / Life Group", styles["meta"]),
         section_rule(),
     ]
