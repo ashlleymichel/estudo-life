@@ -905,6 +905,14 @@ def detect_life_group_title(text):
     return "Folha de Estudo Life Group"
 
 
+def title_from_filename(filename):
+    stem = Path(filename or "").stem
+    value = compact_text(stem.replace("_", " ").replace("-", " - "))
+    value = re.sub(r"\b(?:folha\s+de\s+estudo|life\s+group|resumo|tadel|pdf|docx?)\b", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"\s*[-–—]\s*$", "", compact_text(value))
+    return value if looks_like_sermon_title(value) else ""
+
+
 def biblical_references(text):
     books = (
         "Gênesis|Genesis|Êxodo|Exodo|Levítico|Levitico|Números|Numeros|Deuteronômio|Deuteronomio|"
@@ -1578,7 +1586,7 @@ def infer_questions(text):
     return normalize_questions(text, base[:3])
 
 
-def parse_pdf_text(text):
+def parse_pdf_text(text, source_filename=""):
     meta_match = re.search(r"(Culto Presencial[^\n]+)", text, re.IGNORECASE)
     date_match = re.search(r"Data\s*:\s*([0-9./-]+)", text, re.IGNORECASE)
     pastor_match = re.search(r"Pastor(?:a)?\s+([^/\n]+)", text, re.IGNORECASE)
@@ -1599,14 +1607,23 @@ def parse_pdf_text(text):
         ["Momento Visão e Missão Paz Church", "Momento Visao e Missao Paz Church"],
         ["Introdução", "Introducao", "Perguntas"],
     )
-    title = detect_life_group_title(text)
+    detected_title = detect_life_group_title(text)
+    filename_title = title_from_filename(source_filename)
+    title = detected_title if detected_title != "Folha de Estudo Life Group" else filename_title or detected_title
     subtitle = meta_match.group(1).strip() if meta_match else "Culto Presencial e On-Line / Life Group"
     chatgpt_payload = generate_life_group_with_chatgpt(text, title, subtitle)
     resumo = (chatgpt_payload or {}).get("resumo") or summarize_with_title(text, title)
     conclusao = (chatgpt_payload or {}).get("conclusao") or short_conclusion(text, title)
     perguntas = normalize_questions(text, (chatgpt_payload or {}).get("perguntas") or infer_questions(text))
     generated_title = compact_text((chatgpt_payload or {}).get("titulo") or "")
-    final_title = title if title and title != "Folha de Estudo Life Group" else generated_title or title
+    if title and title != "Folha de Estudo Life Group":
+        final_title = title
+    elif filename_title:
+        final_title = filename_title
+    elif generated_title and generated_title != "Folha de Estudo Life Group":
+        final_title = generated_title
+    else:
+        final_title = title
 
     return {
         "titulo": final_title,
@@ -2227,7 +2244,7 @@ class Handler(SimpleHTTPRequestHandler):
                 try:
                     text = extract_text_from_document(temp_path, filename)
                     tipo = (fields.get("tipo") or "life_group").strip().lower()
-                    payload = parse_tadel_text(text) if tipo == "tadel" else parse_pdf_text(text)
+                    payload = parse_tadel_text(text) if tipo == "tadel" else parse_pdf_text(text, filename)
                     payload["tipo"] = "tadel" if tipo == "tadel" else "life_group"
                     self.send_json(payload)
                 finally:

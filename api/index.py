@@ -70,7 +70,7 @@ class handler(BaseHTTPRequestHandler):
                     temp_path = Path(temp.name)
                 try:
                     text = extract_text_from_document(temp_path, filename)
-                    data = parse_pdf_text(text)
+                    data = parse_pdf_text(text, filename)
                     data["tipo"] = "life_group"
                     self.send_json(data)
                 finally:
