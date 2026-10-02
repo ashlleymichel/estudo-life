@@ -102,7 +102,7 @@ def draw_document_header(canvas, doc, header_text="Estudo Life Group"):
     p.close()
 
     canvas.saveState()
-    canvas.setFillColor(colors.HexColor("#274C77"))
+    canvas.setFillColor(colors.HexColor("#6096BA"))
     canvas.drawPath(p, fill=1, stroke=0)
     canvas.setFillColor(colors.white)
     header_font = "DocBold" if "DocBold" in pdfmetrics.getRegisteredFontNames() else "Helvetica-Bold"
